@@ -4,6 +4,7 @@ import os
 import sys
 import time
 import json
+import argparse
 from pathlib import Path
 from datetime import datetime, timezone
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,6 +17,9 @@ from localauthor.nn.optimizer import AdamW
 from localauthor.nn.tensor import no_grad
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--report', type=Path, default=ROOT / 'reports' / 'neural-smoke.json')
+    args = parser.parse_args()
     model = Transformer(ModelConfig(context_length=8, dimension=8, heads=2, layers=1, seed=42))
     optimizer = AdamW(model.parameters, lr=0.01)
     # Integers for a toy cyclic pattern: this is NOT an example of programming teaching data.
@@ -36,20 +40,23 @@ if __name__ == '__main__':
         'at': datetime.now(timezone.utc).isoformat(),
         'kind': 'controlled_numerical_overfit', 'seed': 42,
         'device': 'CPU', 'dtype': 'float64', 'numpy': np.__version__,
+        'platform': sys.platform, 'python': sys.version,
         'parameter_count': model.parameter_count,
         'steps': 90, 'tokens_processed': 720,
         'initial_loss': initial, 'final_loss': final,
         'training_positions_correct': int((predictions == targets).sum()),
         'training_positions_total': int(targets.size),
         'elapsed_seconds': elapsed,
+        'tokens_per_second': 720 / elapsed,
         'successful_numeric_smoke': final < initial * 0.2,
         'programming_qualified': False,
         'weights_exported': False,
         'limitations': ['Mesmo padrão usado para ajuste e medição: overfit deliberado, não generalização.',
                        'Nenhum desafio de C# foi resolvido por este experimento.',
-                       'Medição no container, não no notebook ou RTX 2060 do usuário.']
+                       'Medição no ambiente identificado por platform/python, usando CPU; não mede CUDA.']
     }
-    path = ROOT / 'reports' / 'neural-smoke.json'
+    path = args.report
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(report, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
     print(path.read_text(encoding='utf-8'))
     sys.exit(0 if report['successful_numeric_smoke'] else 1)

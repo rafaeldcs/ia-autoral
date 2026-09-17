@@ -1,5 +1,6 @@
 from __future__ import annotations
 import hashlib
+from contextlib import contextmanager
 import json
 import os
 import tempfile
@@ -20,13 +21,14 @@ def canonical_json(value: Any) -> bytes:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
 
-def atomic_write(path: Path, data: bytes, mode: int = 0o600) -> None:
-    """Replace atômico de UM arquivo. Não é uma transação de vários arquivos."""
+@contextmanager
+def atomic_writer(path: Path, mode: int = 0o600):
+    """Stream to a same-directory temporary file; publish only after fsync."""
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, tmp = tempfile.mkstemp(prefix=".localai-", dir=path.parent)
     try:
         with os.fdopen(fd, "wb") as stream:
-            stream.write(data)
+            yield stream
             stream.flush()
             os.fsync(stream.fileno())
         os.chmod(tmp, mode)
@@ -40,6 +42,12 @@ def atomic_write(path: Path, data: bytes, mode: int = 0o600) -> None:
     finally:
         if os.path.exists(tmp):
             os.unlink(tmp)
+
+
+def atomic_write(path: Path, data: bytes, mode: int = 0o600) -> None:
+    """Replace atômico de UM arquivo. Não é uma transação de vários arquivos."""
+    with atomic_writer(path, mode) as stream:
+        stream.write(data)
 
 
 def read_json(path: Path) -> Any:

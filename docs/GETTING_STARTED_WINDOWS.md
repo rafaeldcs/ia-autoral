@@ -1,5 +1,9 @@
 # Inicialização no notebook de Rafael
 
+Atualização de 17/09/2026: o notebook foi medido e os fluxos centrais foram testados.
+Veja [PROGRESS_WINDOWS.md](PROGRESS_WINDOWS.md) para resultados, limitações e o comando
+`scripts/validate-windows.ps1`. As seções abaixo preservam o fluxo de operação inicial.
+
 ## 1. Preparar sem mexer nos projetos reais
 
 Extraia o ZIP em uma pasta curta, por exemplo `C:\Projetos\ia-local-autoral`. Verifique Python 3.11+ com `py -3 --version`. A versão efetivamente testada nesta entrega foi 3.13.5 no Linux; execute a bateria no Windows antes de uso real.
@@ -80,11 +84,11 @@ py -3 -m localauthor backup D:\Backups\localauthor.zip
 py -3 -m localauthor restore D:\Backups\localauthor.zip C:\LocalAuthorRestaurado
 ```
 
-A restauração requer destino vazio, não inicia o servidor e cria outro token. Confirme os caminhos dos projetos antes de apontar `LOCALAI_HOME` para a cópia restaurada. O backup pode conter código privado: proteja-o. Esta versão é para bases pequenas e não oferece backup incremental/encriptado/streaming.
+A restauração requer destino vazio, não inicia o servidor e cria outro token. Confirme os caminhos dos projetos antes de apontar `LOCALAI_HOME` para a cópia restaurada. O backup pode conter código privado: proteja-o. Backup e restauração agora usam streaming, com limite de 512 MB de conteúdo; não há backup incremental ou criptografado. A restauração valida conteúdo, banco e configurações em pasta temporária antes de publicar o destino.
 
 ## 8. Host .NET opcional
 
-Siga `dotnet/README.md` após iniciar Python. Ele disponibiliza a mesma UI em `http://127.0.0.1:5080` e depende do backend local. Não foi compilado nesta entrega. Não confunda essa integração com a migração integral para C#.
+Siga `dotnet/README.md` após iniciar Python. Ele disponibiliza a mesma UI em `http://127.0.0.1:5080` e depende do backend local. O host foi compilado e exercitado na continuação Windows. A migração integral para C# continua pendente.
 
 ## 9. Publicação privada
 

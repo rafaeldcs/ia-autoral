@@ -1,0 +1,92 @@
+"""Isolated browser/API checks, including real own-model generation when available."""
+import os,sys,json,tempfile,threading,shutil
+from pathlib import Path
+os.environ['OPENBLAS_NUM_THREADS']='1';os.environ['OMP_NUM_THREADS']='1'
+ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'src'))
+from localauthor.application import Application
+from localauthor.config import Settings
+from localauthor.server import create_server
+from playwright.sync_api import sync_playwright,expect
+checks=[];art=ROOT/'reports';art.mkdir(exist_ok=True)
+def check(name,condition=True):
+    assert condition,name
+    checks.append(name)
+with tempfile.TemporaryDirectory() as tmp:
+    base=Path(tmp);settings=Settings.load(base/'data')
+    model_report=json.loads((Path(os.environ['LOCALAPPDATA'])/'LocalAuthor/exports/engineering-report.json').read_text(encoding='utf-8'))
+    checkpoint=Path(model_report['selectedCheckpoint']);target=settings.home/'models/candidate';target.mkdir()
+    for suffix in ['', '.sha256']:shutil.copyfile(str(checkpoint)+suffix,str(target/'best.npz')+suffix)
+    model_report['selectedCheckpoint']=str(target/'best.npz')
+    (settings.home/'exports/engineering-report.json').write_text(json.dumps(model_report),encoding='utf-8')
+    project=base/'project';project.mkdir();(project/'notes.md').write_text('Teste de conversa local',encoding='utf-8')
+    other=base/'other';other.mkdir()
+    app=Application(settings);app.start();server=create_server(app,ROOT/'ui',port=0)
+    thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start();url=f'http://127.0.0.1:{server.server_port}'
+    try:
+        with sync_playwright() as pw:
+            browser=pw.chromium.launch(channel='msedge',headless=True);context=browser.new_context(viewport={'width':1440,'height':1000});page=context.new_page();page.set_default_timeout(20000)
+            errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
+            page.goto(url);page.locator('#local-token').fill('invalid');page.locator('#connect-form button').click();expect(page.locator('#notification')).to_contain_text('Token local obrigatório');check('Invalid token blocked',page.locator('#studio').is_hidden())
+            page.locator('#local-token').fill(settings.token);page.locator('#connect-form button').click();expect(page.locator('#studio')).to_be_visible();check('Token not persisted',page.evaluate('localStorage.length+sessionStorage.length')==0 and page.locator('#local-token').input_value()=='')
+            expect(page.locator('#send')).to_be_disabled();expect(page.locator('#new-chat')).to_be_disabled();expect(page.locator('#show-rules')).to_be_disabled()
+            expect(page.locator('#start-project')).to_be_visible();check('First visit explains next step and disables unavailable actions')
+            page.locator('#start-project').focus();page.keyboard.press('Enter');expect(page.get_by_role('dialog',name='Adicionar projeto')).to_be_visible();expect(page.locator('#project-name')).to_be_focused()
+            page.keyboard.press('Escape');expect(page.locator('#project-dialog')).not_to_be_visible();check('Keyboard opens and dismisses named project dialog')
+            page.locator('#add-project').click();page.locator('#project-name').fill('Produto Atlas');page.locator('#project-root').fill(str(project));page.locator('#project-create button.primary').click();expect(page.locator('#project-heading')).to_have_text('Produto Atlas');check('Project folder registered')
+            expect(page.locator('#start-project')).to_be_hidden();expect(page.locator('#send')).to_be_enabled();expect(page.locator('#conversation-empty')).to_be_visible()
+            check('Selected project is announced',page.locator('#project-list button.active').get_attribute('aria-current')=='true')
+            page.get_by_role('button',name='Melhorar a facilidade de uso').focus();page.keyboard.press('Space')
+            expect(page.locator('#message-input')).to_have_value('Como tornar a interface intuitiva para pessoas leigas?');expect(page.locator('#message-input')).to_be_focused();expect(page.locator('.message')).to_have_count(0)
+            check('Suggestion fills editable draft without sending or creating a conversation')
+            expect(page.locator('#new-chat')).to_have_text('＋ Nova conversa');check('New conversation action has visible words')
+            link=page.get_by_role('link',name='Ferramentas avançadas')
+            check('Navigation uses real underlined link',link.get_attribute('href')=='/advanced' and 'underline' in link.evaluate('(e)=>getComputedStyle(e).textDecorationLine'))
+            page.locator('#new-chat').click()
+            page.locator('#show-rules').click();page.locator('#method').select_option('scrum');page.locator('#wip').fill('4');page.locator('#done').fill('Aceite aprovado e testes executados.');page.locator('#rules-form button.primary').click();check('Project preferences saved')
+            expect(page.locator('#rules-dialog')).not_to_be_visible()
+            page.locator('#message-input').fill('Como aplicar clean code? <script>window.PWNED=1</script>')
+            page.locator('#send').click()
+            expect(page.locator('.message.assistant')).to_have_count(1)
+            expect(page.locator('.message.assistant')).to_contain_text('Aceite aprovado e testes executados.')
+            check('Guide and project rules shown');check('Chat HTML inert',page.evaluate('window.PWNED') is None)
+            page.screenshot(path=str(art/'chat-desktop.png'),animations='disabled')
+            headers={'Authorization':'Bearer '+settings.token}
+            projects=context.request.get(url+'/api/projects',headers=headers).json();pid=projects[0]['id'];chats=context.request.get(url+'/api/conversations?project_id='+pid,headers=headers).json();cid=chats[0]['id']
+            second=context.request.post(url+'/api/projects',headers=headers,data={'name':'Outro projeto','root':str(other)}).json()
+            response=context.request.get(url+f'/api/conversation?project_id={second["id"]}&id={cid}',headers=headers);check('Cross-project conversation blocked',response.status==404)
+            check('Chat API needs token',context.request.get(url+'/api/conversations?project_id='+pid).status==401)
+            secret_response=context.request.post(url+'/api/chat',headers=headers,data={'project_id':pid,'conversation_id':cid,'message':settings.token,'mode':'model'});check('Token rejected before job persistence',secret_response.status==400)
+            page.reload();page.locator('#local-token').fill(settings.token);page.locator('#connect-form button').click();page.get_by_role('navigation',name='Projetos',exact=True).get_by_role('button',name='Produto Atlas').click();page.locator('#conversation-list button').first.click();expect(page.locator('.message.assistant')).to_have_count(1);check('History survives reload')
+            page.locator('#response-mode').select_option('model');sample=model_report['evaluation']['cases'][0];page.locator('#message-input').fill(sample['prompt']);page.locator('#send').click();expect(page.locator('#compose')).to_have_attribute('aria-busy','true');expect(page.locator('#send')).to_be_disabled();expect(page.locator('#busy')).to_be_visible();check('Generation announces progress and blocks duplicate submission');expect(page.locator('.message.assistant')).to_have_count(2,timeout=60000);expect(page.locator('.message.assistant').last).to_contain_text(sample['answer']);expect(page.locator('#send')).to_be_enabled();check('Real local-model answer through queued chat')
+            page.locator('#response-mode').select_option('guide')
+            page.locator('#input-format').select_option('code')
+            check('Code editor disables spelling and capitalization',page.locator('#message-input').get_attribute('spellcheck')=='false' and page.locator('#message-input').get_attribute('autocapitalize')=='off')
+            source='\t// Ação: "não alterar"  \nstring caminho = @"C:\\Projetos\\app";\n/* comentário */\n// `${nome}` &lt; </textarea><script>window.CODE_RAN=1</script> 😃 e\u0301\n'
+            page.locator('#message-input').fill(source)
+            page.locator('#send').click()
+            expect(page.locator('.message.assistant')).to_have_count(3)
+            check('Code renders literally with tabs, accents, comments and trailing newline',page.locator('.message.user .code-content').last.text_content()==source)
+            check('Closing textarea and script stay inert',page.evaluate('window.CODE_RAN') is None)
+            context.grant_permissions(['clipboard-read','clipboard-write'],origin=url)
+            page.locator('.message.user').last.get_by_role('button',name='Copiar mensagem').click()
+            copied=page.evaluate('navigator.clipboard.readText()')
+            check('Copy preserves text (clipboard OS line endings may normalize)',copied.replace('\r\n','\n')==source)
+            fetched=context.request.get(url+f'/api/conversation?project_id={pid}&id={cid}',headers=headers).json()
+            check('API roundtrip preserves exact browser string',fetched['messages'][-2]['content']==source and fetched['messages'][-2]['metadata']['format']=='code')
+            oversized='// '+('á'*8100)
+            page.locator('#message-input').fill(oversized);page.locator('#send').click()
+            expect(page.locator('#notification')).to_contain_text('excede 8.000')
+            check('Oversized code remains in editor without truncation',page.locator('#message-input').input_value()==oversized)
+            expect(page.locator('.message.assistant')).to_have_count(3)
+            page.locator('#message-input').fill('')
+            page.screenshot(path=str(art/'writing-code.png'),animations='disabled')
+            page.locator('#new-chat').click();expect(page.locator('#welcome')).to_be_visible();expect(page.locator('#notification')).to_be_hidden(timeout=10000);page.screenshot(path=str(art/'chat-welcome.png'),animations='disabled')
+            page.set_viewport_size({'width':390,'height':844});check('Mobile has no horizontal overflow',page.evaluate('document.documentElement.scrollWidth<=innerWidth'));page.locator('#open-menu').click();expect(page.locator('#add-project')).to_be_visible();page.locator('#close-menu').click();expect(page.locator('#open-menu')).to_be_focused()
+            small=page.locator('#studio button:visible').evaluate_all('(nodes)=>nodes.filter(e=>{const r=e.getBoundingClientRect();return r.width<24||r.height<24}).map(e=>e.id||e.textContent)')
+            check('Visible mobile buttons have at least 24px width and height',not small)
+            page.screenshot(path=str(art/'chat-mobile.png'),animations='disabled')
+            check('No JavaScript exceptions',not errors)
+            browser.close()
+    finally:server.shutdown();server.server_close();thread.join();app.close()
+(art/'chat-smoke.json').write_text(json.dumps({'passed':len(checks),'checks':checks,'realModel':True,'temporaryDataOnly':True},ensure_ascii=False,indent=2),encoding='utf-8')
+print(json.dumps({'passed':len(checks),'checks':checks},ensure_ascii=True))

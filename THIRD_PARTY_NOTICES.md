@@ -1,5 +1,11 @@
 # Autoria, infraestrutura e dependências
 
+## Distribuição LAN 0.2.0 (17/09/2026)
+
+O pacote Windows LAN acrescenta gateway ASP.NET Core 10, cliente Windows Forms com Microsoft.Web.WebView2 1.0.4191.47 e instalador próprio .NET. Nesta distribuição binária, runtimes .NET 10.0.9 são incluídos pela publicação self-contained, juntamente com seus avisos e licenças; WebView2 possui SDK com avisos incluídos e instalador offline Evergreen da Microsoft com assinatura Authenticode validada. O runtime WebView2 é instalado somente se necessário. Esses componentes são infraestrutura; não contêm um modelo de IA pré-treinado usado pelo LocalAuthor.
+
+As referências abaixo ao ZIP e a runtimes não redistribuídos descrevem o pacote-fonte original. O instalador LAN é um artefato distinto. O compilador Inno Setup não foi instalado nem utilizado: a instalação da ferramenta foi bloqueada pela revisão automática, e o instalador final foi desenvolvido com o SDK .NET existente. A publicação experimental não possui certificado comercial de assinatura de código.
+
 Esta implementação foi elaborada com assistência do ChatGPT nesta conversa, a pedido de Rafael. Não foi copiado um repositório de IA para troca de marca. Isso não significa invenção de Transformer, BPE, AdamW, SQLite ou outras técnicas conhecidas, nem constitui garantia jurídica de exclusividade sobre o código. Antes de distribuir comercialmente, faça revisão de dependências/licenciamento e defina a licença do projeto.
 
 ## O que o projeto implementa
@@ -16,8 +22,8 @@ Lógica de memória, coleta/cache, políticas, fluxo de revisão, API, interface
 | .NET/ASP.NET Core 10 | Host opcional | Código de integração; SDK/runtime não redistribuídos |
 | Git / GitHub CLI | Controle de versão e publicação opcional | Instalados separadamente |
 | Docker | Execução restrita opt-in | Nenhuma imagem ou runtime incluído |
-| Playwright/Chromium | Teste de navegador opcional | Não necessários para iniciar; não redistribuídos |
-| GitHub Actions oficiais | CI remoto opcional | Workflow preparado, não executado nesta entrega |
+| Playwright 1.55.0 / Chromium ou Edge local | Teste de navegador opcional; requirements-dev.txt | Não necessários para iniciar; não redistribuídos |
+| GitHub Actions oficiais | CI remoto opcional | CI inicial verificado; workflow ampliado desta continuação ainda não executado remotamente |
 
 O código NumPy utilizado é infraestrutura de cálculo, não autograd de terceiros nem inteligência pronta. Não usamos PyTorch, TensorFlow, modelos Hugging Face, APIs de IA ou embeddings externos.
 

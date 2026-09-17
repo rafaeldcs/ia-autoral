@@ -1,5 +1,16 @@
 # Publicação privada no GitHub
 
+## Estado observado em 17/09/2026 no notebook
+
+O remoto existente é `https://github.com/rafaeldcs/ia-autoral.git`, HEAD
+`ebe37ff86a7bdc0939a55de4795528391376643e`, com visibilidade **pública**.
+A [execução 35221366039](https://github.com/rafaeldcs/ia-autoral/actions/runs/35221366039)
+aprovou Linux/.NET e falhou no Windows por conexão SQLite aberta e injeção de falha
+no teste de rollback incompatível com caminho curto 8.3. Ambos corrigidos localmente.
+O workflow ampliado ainda não foi publicado; visibilidade privada não foi presumida
+nem alterada. Não use o bootstrap de criação em um repositório que já tem remoto.
+As seções seguintes são o registro e as instruções da entrega inicial a partir do ZIP.
+
 ## Resultado da tentativa nesta conversa
 
 O conector autenticou a conta `rafaeldcs`. As ações expostas permitiram leitura de perfil/repositórios, mas não criação de repositório, commit ou push. Não havia GitHub CLI autenticado neste ambiente para uma rota alternativa. **Nenhum repositório remoto foi criado e nenhum arquivo foi enviado ao GitHub.**

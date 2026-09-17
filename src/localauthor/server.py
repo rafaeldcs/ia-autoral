@@ -16,7 +16,7 @@ from .safety import PathPolicy
 from .util import read_json, write_json, sha256
 
 MAX_BODY = 2_500_000
-STATIC = {"/": "index.html", "/app.js": "app.js", "/styles.css": "styles.css"}
+STATIC = {"/": "chat.html", "/advanced": "index.html", "/app.js": "app.js", "/styles.css": "styles.css", "/chat.js": "chat.js", "/chat.css": "chat.css"}
 
 
 def make_handler(app: Application, ui_path: Path):
@@ -124,6 +124,17 @@ def make_handler(app: Application, ui_path: Path):
                     return {"status": "ok", "version": "0.1.0", "mode": "platform_and_experimental_cpu_model", "offline": app.settings.offline, "model_qualified": False, "gpu_backend": False, "stats": app.store.stats(), "allowed_domains": app.settings.allowed_domains, "runner_enabled": bool(app.settings.docker_image)}
                 if path == "/api/diagnostics": return diagnose(app.settings.home)
                 if path == "/api/projects": return app.store.projects()
+                if path == "/api/conversations": return app.chat.conversations(q["project_id"])
+                if path == "/api/conversation": return app.chat.get(q["project_id"], q["id"])
+                if path == "/api/project-preferences": return app.chat.preferences(q["project_id"])
+                if path == "/api/engineering-report":
+                    file = app.settings.home / "exports/engineering-report.json"
+                    report = read_json(file) if file.exists() else {}
+                    return {k: report[k] for k in ("state", "counts", "evaluation", "limitations") if k in report}
+                if path == "/api/communication-report":
+                    file = app.settings.home / "exports/communication-report.json"
+                    report = read_json(file) if file.exists() else {}
+                    return {**{k: report[k] for k in ("state", "counts", "limitations", "chatEnabled") if k in report}, "evaluation": {k: report.get("evaluation", {}).get(k) for k in ("passed", "total")}}
                 if path == "/api/sources": return app.store.sources(q.get("scope", "global"))
                 if path == "/api/relations": return app.store.relations(q.get("scope", "global"))
                 if path == "/api/tasks": return app.tasks.list()
@@ -145,6 +156,14 @@ def make_handler(app: Application, ui_path: Path):
                     return app.tasks.preview(ident)
             if method == "POST":
                 if path == "/api/projects": return app.store.add_project(body["name"], body["root"])
+                if path == "/api/conversations": return app.chat.create(body["project_id"], body.get("title", "Nova conversa"))
+                if path == "/api/project-preferences": return app.chat.save_preferences(body["project_id"], body["method"], body["wip_limit"], body["definition_of_done"])
+                if path == "/api/chat":
+                    app.chat.get(body["project_id"], body["conversation_id"])
+                    app.chat.validate_message(body["message"], body.get("mode", "guide"), body.get("input_format", "text"))
+                    if body.get("mode") == "model":
+                        return {"job": app.jobs.submit("chat", {k: body[k] for k in ("project_id", "conversation_id", "message", "mode", "input_format") if k in body})}
+                    return app.chat.respond(body["project_id"], body["conversation_id"], body["message"], body.get("mode", "guide"), input_format=body.get("input_format", "text"))
                 if path == "/api/consult": return app.knowledge.consult(body["query"], body.get("scope", "global"), body.get("include_global") is True)
                 if path == "/api/import":
                     scope = body.get("scope", "global")

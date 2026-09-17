@@ -1,5 +1,15 @@
 # Hardware — alvo versus evidência
 
+## Medição no notebook em 17/09/2026
+
+Windows 11, Python 3.14.7, 12 CPUs lógicas, aproximadamente 16 GiB de RAM física,
+RTX 2060 com 6 GiB de VRAM (driver 517.00), volume de aproximadamente 476 GiB com
+225 GiB livres. Valores instantâneos em `reports/hardware-windows.json`.
+SDK .NET 10.0.301 compilou o host e o laboratório. Docker CLI existe, mas o daemon
+estava indisponível. O backend continua CPU; detectar GPU não é testar CUDA.
+Veja [PROGRESS_WINDOWS.md](PROGRESS_WINDOWS.md). As seções seguintes registram a
+estimativa original e o ambiente da primeira entrega.
+
 ## Notebook alvo informado pelo usuário
 
 Intel Core i7 de 10ª geração, 16 GB RAM, SSD de 256 GB, NVIDIA RTX 2060. Não foram medidos modelo exato do processador, VRAM, espaço livre, driver, temperaturas, potência ou desempenho sustentado.

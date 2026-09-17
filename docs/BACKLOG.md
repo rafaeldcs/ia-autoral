@@ -1,5 +1,9 @@
 # Backlog de conclusão — o que realmente falta
 
+Atualização: consulte [PROGRESS_WINDOWS.md](PROGRESS_WINDOWS.md) para o estado de todos
+os 22 itens após a validação no notebook. Esta tabela preserva os critérios de aceite;
+avanços parciais não foram convertidos em itens totalmente concluídos.
+
 Esta lista não transforma documentação em implementação. Prioridade P0 = impede declarar o agente programador pronto; P1 = robustez/escala/experiência; P2 = expansão. Os itens não foram criados como issues remotas, pois não houve escrita no GitHub.
 
 | ID | Prioridade | Entrega faltante | Critério de aceite |

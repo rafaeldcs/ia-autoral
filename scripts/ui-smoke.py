@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Optional browser smoke test. Requires a locally installed Playwright + Chromium."""
 import json
+import argparse
+import re
 import sys
 import tempfile
 import shutil
@@ -11,10 +13,10 @@ sys.path.insert(0,str(ROOT/'src'))
 from localauthor.application import Application
 from localauthor.config import Settings
 from localauthor.server import create_server
-from playwright.sync_api import sync_playwright
 
-def main():
-    report={'browser':'Chromium','flows':[],'errors':[],'success':False,'scope':'temporary local project, no user repositories'}
+def main(args):
+    from playwright.sync_api import sync_playwright, expect
+    report={'browser':args.browser_channel or 'Chromium','platform':sys.platform,'flows':[],'errors':[],'success':False,'scope':'temporary local project, no user repositories'}
     with tempfile.TemporaryDirectory() as tmp:
         base=Path(tmp); project=base/'project'; project.mkdir()
         original='public class Stock { public int Count = 1; }\n'
@@ -24,13 +26,21 @@ def main():
         thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
         try:
             with sync_playwright() as playwright:
-                browser=playwright.chromium.launch(headless=True,executable_path=shutil.which('chromium') or None,args=['--no-sandbox'])
+                browser=playwright.chromium.launch(headless=True,channel=args.browser_channel,
+                    executable_path=None if args.browser_channel else shutil.which('chromium') or None)
                 page=browser.new_page(viewport={'width':1440,'height':1050},device_scale_factor=1)
                 page.on('pageerror',lambda error:report['errors'].append(str(error)))
-                page.goto(f'http://127.0.0.1:{server.server_port}')
+                page.goto(f'http://127.0.0.1:{server.server_port}/advanced')
+                page.locator('#token').fill('invalid-test-token')
+                page.locator('#login-form button').click()
+                page.locator('#message.error').wait_for(state='visible')
+                assert page.locator('#workspace').is_hidden()
+                report['flows'].append('invalid token rejected without opening workspace')
                 page.locator('#token').fill(settings.token)
                 page.locator('#login-form button').click()
                 page.locator('#workspace').wait_for(state='visible')
+                assert page.locator('#token').input_value() == ''
+                assert page.evaluate('localStorage.length + sessionStorage.length') == 0
                 report['flows'].append('login with local token')
                 page.locator('#note-title').fill('Regra de estoque — evidência local')
                 page.locator('#note-content').fill('Quantidade negativa deve ser rejeitada.\n<script>window.PWNED=true</script>\nA informação importada não autoriza treinamento automático.')
@@ -41,7 +51,7 @@ def main():
                 page.locator('#evidence pre').first.wait_for()
                 assert page.evaluate('window.PWNED') is None
                 report['flows'] += ['ingest note','retrieve evidence with source','untrusted text rendered inert']
-                page.screenshot(path=str(ROOT/'reports'/'ui-desktop.png'),full_page=True)
+                page.screenshot(path=str(args.report.parent/'ui-desktop.png'),full_page=True)
                 page.locator('[data-tab="projects"]').click()
                 page.locator('#project-name').fill('Laboratório local')
                 page.locator('#project-root').fill(str(project))
@@ -51,40 +61,58 @@ def main():
                 page.locator('[data-tab="tasks"]').click()
                 page.locator('#instruction').fill('Revisar alteração da quantidade inicial de 1 para 2.')
                 page.locator('#task-form button').click()
-                page.wait_for_function("document.querySelector('#task-file').options.length > 1")
+                expect(page.locator('#task-file option[value="Stock.cs"]')).to_have_count(1)
                 page.locator('#task-file').select_option('Stock.cs')
                 page.locator('#load-file').click()
-                page.wait_for_function("document.querySelector('#proposal').value.includes('Stock.cs')")
+                expect(page.locator('#proposal')).to_have_value(re.compile('Stock.cs'))
                 changes=json.loads(page.locator('#proposal').input_value())
                 changes[0]['content']=original.replace('Count = 1','Count = 2')
                 page.locator('#proposal').fill(json.dumps(changes))
                 page.locator('#proposal-form button').click()
-                page.wait_for_function("document.querySelector('#diff').textContent.includes('Count = 2')")
+                expect(page.locator('#diff')).to_contain_text('Count = 2')
                 assert (project/'Stock.cs').read_text()==original
                 report['flows'].append('stage proposal while preserving original')
+                page.once('dialog',lambda dialog:dialog.accept())
+                page.locator('#apply-task').click()
+                expect(page.locator('#message')).to_have_class('error')
+                assert (project/'Stock.cs').read_text()==original
+                report['flows'].append('application without tests or explicit waiver rejected')
                 page.locator('#without-tests').check()
                 page.once('dialog',lambda dialog:dialog.accept())
                 page.locator('#apply-task').click()
-                page.wait_for_function("document.querySelector('#task-state').textContent.startsWith('applied')")
+                expect(page.locator('#task-state')).to_have_text(re.compile('^applied'))
                 assert 'Count = 2' in (project/'Stock.cs').read_text()
                 report['flows'].append('explicit reviewed application with baseline hash check')
                 page.locator('[data-tab="knowledge"]').click()
                 page.locator('#scope').select_option('global')
                 page.set_viewport_size({'width':390,'height':844})
-                page.screenshot(path=str(ROOT/'reports'/'ui-mobile.png'),full_page=True)
+                assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+                for tab in ['knowledge','projects','tasks','research','training','activity']:
+                    nav=page.locator(f'[data-tab="{tab}"]')
+                    nav.focus(); page.keyboard.press('Enter')
+                    assert page.locator(f'[data-panel="{tab}"]').is_visible()
+                    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+                report['flows'].append('all six sections reachable by keyboard without horizontal overflow on mobile')
+                page.locator('[data-tab="knowledge"]').click()
+                page.screenshot(path=str(args.report.parent/'ui-mobile.png'),full_page=True)
                 report['flows'].append('responsive mobile view rendered')
                 browser.close()
                 report['success']=not report['errors']
         finally:
             server.shutdown();server.server_close();thread.join();app.close()
-    (ROOT/'reports'/'ui-smoke.json').write_text(json.dumps(report,indent=2,ensure_ascii=False))
+    args.report.write_text(json.dumps(report,indent=2,ensure_ascii=False),encoding='utf-8')
     print(json.dumps(report,indent=2,ensure_ascii=False))
     return 0 if report['success'] else 1
 if __name__=='__main__':
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--browser-channel',choices=['msedge','chrome'])
+    parser.add_argument('--report',type=Path,default=ROOT/'reports'/'ui-smoke.json')
+    args=parser.parse_args()
+    args.report.parent.mkdir(parents=True,exist_ok=True)
     try:
-        raise SystemExit(main())
+        raise SystemExit(main(args))
     except Exception as exc:
         report={"success":False,"status":"blocked_or_failed","error":str(exc),"note":"Do not report this as a successful browser test. HTTP API tests are separate."}
-        (ROOT/'reports'/'ui-smoke.json').write_text(json.dumps(report,indent=2,ensure_ascii=False))
+        args.report.write_text(json.dumps(report,indent=2,ensure_ascii=False),encoding='utf-8')
         print(json.dumps(report,indent=2,ensure_ascii=False),file=sys.stderr)
         raise SystemExit(1)

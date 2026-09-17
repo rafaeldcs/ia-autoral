@@ -195,5 +195,8 @@ class Store:
 
     def backup(self, destination: Path) -> None:
         destination.parent.mkdir(parents=True, exist_ok=True)
-        with self.connect() as db, sqlite3.connect(destination) as backup:
-            db.backup(backup)
+        # sqlite3's transaction context commits/rolls back but does not close
+        # the connection. Windows keeps the snapshot locked until it is closed.
+        with self.connect() as db, contextlib.closing(sqlite3.connect(destination)) as backup:
+            with backup:
+                db.backup(backup)

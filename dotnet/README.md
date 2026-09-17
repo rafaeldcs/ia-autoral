@@ -1,4 +1,4 @@
-# Host .NET 10 opcional — não compilado nesta sessão
+# Host .NET 10 opcional — validado no notebook
 
 Esta camada ASP.NET Core serve a mesma interface e encaminha chamadas exclusivamente
 para o núcleo de referência em `127.0.0.1:8765`. Não contém outro modelo e não usa APIs externas.
@@ -9,7 +9,12 @@ para o núcleo de referência em `127.0.0.1:8765`. Não contém outro modelo e n
 3. Execute `dotnet run --project LocalAI.Host --no-build -c Release`.
 4. Abra `http://127.0.0.1:5080` e use o mesmo token local.
 
-O SDK .NET não estava disponível no ambiente de implementação e a tentativa de obtê-lo
-falhou por indisponibilidade de rede. Por isso, **não há evidência de compilação ou execução
-C# nesta entrega**. O workflow inclui um job para compilar esta camada após a publicação.
-Nenhum workflow GitHub foi executado nesta conversa.
+Em 17/09/2026, esta camada e o laboratório foram compilados no notebook com SDK
+10.0.301, sem avisos/erros. `scripts/dotnet-smoke.py` executou onze verificações reais
+de autenticação, origem, proxy JSON, consulta e erro quando o backend fica indisponível.
+Evidência: `reports/dotnet-smoke-windows.json` e `docs/PROGRESS_WINDOWS.md`.
+
+Depois do build, execute na raiz `.venv\Scripts\python.exe scripts/dotnet-smoke.py`.
+O teste cria backend e dados temporários, exige porta 5080 livre e encerra apenas o host
+que ele próprio iniciou. O núcleo continua Python; isso não conclui a migração C#.
+O workflow atualizado inclui Windows/Linux e ainda aguarda publicação/execução remota.

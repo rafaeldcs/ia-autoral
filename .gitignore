@@ -33,3 +33,13 @@ vendor/wheels/
 *.user
 *.suo
 .DS_Store
+
+# Device credentials and private certificate keys
+*.localauthor
+*.pfx
+*.p12
+*.key
+
+# Machine-generated evidence is published by CI as artifacts, not source.
+# Existing tracked baseline reports remain versioned.
+/reports/*

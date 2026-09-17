@@ -7,6 +7,25 @@ from tests.helpers import WorkspaceCase
 
 
 class StoreTests(WorkspaceCase):
+    def test_backup_closes_destination_connection(self):
+        import sqlite3
+        from unittest.mock import patch
+        connections = []
+        class Tracked(sqlite3.Connection):
+            closed_explicitly = False
+            def close(self):
+                self.closed_explicitly = True
+                return super().close()
+        real_connect = sqlite3.connect
+        def connect(*args, **kwargs):
+            connection = real_connect(*args, **kwargs, factory=Tracked)
+            connections.append(connection)
+            return connection
+        with patch("localauthor.store.sqlite3.connect", side_effect=connect):
+            self.store.backup(self.root / "closed.sqlite3")
+        self.assertEqual(len(connections), 2)
+        self.assertTrue(all(connection.closed_explicitly for connection in connections))
+
     def note(self, text="Estoque negativo exige validação.", scope="global", locator="note:stock"):
         return self.store.ingest(scope, locator, "Estoque", text, kind="note")
 

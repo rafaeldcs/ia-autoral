@@ -1,5 +1,9 @@
 # Relatório de entrega — LocalAuthor 0.1.0
 
+> Registro histórico da entrega inicial. A continuação no notebook, correções,
+> evidências Windows/.NET/navegador e estado do GitHub estão em
+> [PROGRESS_WINDOWS.md](PROGRESS_WINDOWS.md). As limitações abaixo são as daquela entrega.
+
 **Data:** 17/09/2026. **Formato:** projeto-fonte executável, testes e documentação. **Status:** protótipo de plataforma + laboratório de modelo CPU; não é a IA programadora completa do planejamento.
 
 ## 1. Resultado da solicitação GitHub

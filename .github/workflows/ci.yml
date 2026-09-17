@@ -11,6 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
+        python: ['3.13', '3.14']
     runs-on: ${{ matrix.os }}
     env:
       PYTHONUTF8: '1'
@@ -20,7 +21,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: ${{ matrix.python }}
           cache: pip
           cache-dependency-path: requirements-training.txt
       - run: python -m pip install -r requirements-training.txt
@@ -28,10 +29,14 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: tests-${{ matrix.os }}
+          name: tests-${{ matrix.os }}-python-${{ matrix.python }}
           path: reports/test-results.json
   dotnet-build:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: '1'
       DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE: 'true'
@@ -40,5 +45,32 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
       - run: dotnet build dotnet/LocalAI.Host/LocalAI.Host.csproj -c Release
       - run: dotnet build examples/laboratory/Laboratory.csproj -c Release
+      - run: python scripts/dotnet-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dotnet-${{ matrix.os }}
+          path: reports/dotnet-smoke.json
+  browser-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python -m playwright install --with-deps chromium
+      - run: python scripts/ui-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-ui
+          path: |
+            reports/ui-smoke.json
+            reports/ui-desktop.png
+            reports/ui-mobile.png

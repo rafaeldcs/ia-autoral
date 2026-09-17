@@ -85,12 +85,17 @@ class TaskTests(WorkspaceCase):
         failed = False
         def fail_once(path, data, mode=0o600):
             nonlocal failed
-            if path == self.project_root/"notes.md" and not failed:
+            # Windows CI may return an 8.3 TEMP path while PathPolicy stores
+            # its canonical long name. Compare resolved paths so the fault
+            # injection actually runs on both forms of the same location.
+            if path.resolve() == (self.project_root/"notes.md").resolve() and not failed:
+                self.assertNotEqual((self.project_root/"Product.cs").read_bytes(), self.original)
                 failed = True
                 raise OSError("Injected disk failure")
             atomic_write(path, data, mode)
         with patch("localauthor.tasks.atomic_write", side_effect=fail_once):
             with self.assertRaises(OSError): self.tasks.apply(self.task["id"], result["proposal_hash"], accept_without_tests=True)
+        self.assertTrue(failed, "The intended write failure must actually be injected.")
         self.assertEqual((self.project_root/"Product.cs").read_bytes(), self.original)
         self.assertEqual((self.project_root/"notes.md").read_bytes(), notes)
         self.assertEqual(self.tasks.get(self.task["id"])["state"], "rolled_back")

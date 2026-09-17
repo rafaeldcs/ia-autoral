@@ -25,7 +25,7 @@ Controles implementados:
 6. Conteúdo externo e arquivos do projeto podem induzir erro humano ou prompt injection. A versão atual não libera geração autônoma; uma integração futura do modelo deve manter o mesmo validador independente.
 7. Excluir uma fonte do banco não apaga sua influência de pesos já treinados. O software informa `weights_unlearned=false`.
 8. A cópia isolada de arquivos é um workspace, não isolamento de processos. O runner nunca executa código no host como fallback.
-9. Testes unitários de segurança não são pentest ou auditoria independente. Não houve teste real de container, Windows, rede hostil ou GPU nesta entrega.
+9. Testes unitários de segurança não são pentest ou auditoria independente. A continuação Windows verificou junctions/hardlinks e recuperação; três testes de symlink ficaram sem privilégio. Container, rede hostil, ACLs e GPU continuam sem auditoria real. Veja `docs/PROGRESS_WINDOWS.md`.
 
 ## Executor de verificações
 
