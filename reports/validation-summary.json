@@ -1,0 +1,13 @@
+{
+  "python_compileall": "passed",
+  "javascript_syntax": "passed",
+  "bash_syntax": "passed",
+  "github_publication_shell_dry_run": "passed_no_network_or_repo_creation",
+  "dotnet_build": "not_run_sdk_unavailable",
+  "windows_powershell": "not_run",
+  "gpu": "not_implemented",
+  "docker_execution": "not_run",
+  "browser_navigation": "blocked_by_administrator",
+  "live_web_collection": "not_run_mocked_transport_tests_only",
+  "github_remote_created": false
+}

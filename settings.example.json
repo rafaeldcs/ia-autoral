@@ -1,0 +1,12 @@
+{
+  "port": 8765,
+  "offline": true,
+  "allowed_domains": ["learn.microsoft.com", "docs.python.org"],
+  "max_file_bytes": 512000,
+  "max_project_files": 1500,
+  "max_snapshot_bytes": 32000000,
+  "max_store_bytes": 256000000,
+  "cache_ttl_seconds": 86400,
+  "docker_image": "",
+  "max_runner_seconds": 90
+}

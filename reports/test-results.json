@@ -1,0 +1,732 @@
+{
+  "at": "2026-09-17T04:21:02.577243+00:00",
+  "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+  "platform": "linux",
+  "tests_run": 119,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "success": true,
+  "elapsed_seconds": 5.805860577999965,
+  "records": [
+    {
+      "test": "tests.test_dataset.DatasetTests.test_exact_duplicate_across_split_blocked",
+      "status": "passed",
+      "seconds": 0.004995800999950006,
+      "detail": null
+    },
+    {
+      "test": "tests.test_dataset.DatasetTests.test_group_cannot_cross_split",
+      "status": "passed",
+      "seconds": 0.0034711690000222006,
+      "detail": null
+    },
+    {
+      "test": "tests.test_dataset.DatasetTests.test_hash_change_detected",
+      "status": "passed",
+      "seconds": 0.003319922000173392,
+      "detail": null
+    },
+    {
+      "test": "tests.test_dataset.DatasetTests.test_near_duplicate_across_split_detected",
+      "status": "passed",
+      "seconds": 0.0037772460000269348,
+      "detail": null
+    },
+    {
+      "test": "tests.test_dataset.DatasetTests.test_permission_required",
+      "status": "passed",
+      "seconds": 0.0034311489998799516,
+      "detail": null
+    },
+    {
+      "test": "tests.test_dataset.DatasetTests.test_provenance_required",
+      "status": "passed",
+      "seconds": 0.003158671000164759,
+      "detail": null
+    },
+    {
+      "test": "tests.test_dataset.DatasetTests.test_valid_manifest_test_text_not_returned",
+      "status": "passed",
+      "seconds": 0.003614923999975872,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_add_multiply_power_gradients",
+      "status": "passed",
+      "seconds": 0.0023051030000260653,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_batched_matmul_gradient",
+      "status": "passed",
+      "seconds": 0.00042032900000776863,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_bpe_round_trip_and_deterministic",
+      "status": "passed",
+      "seconds": 0.002993112000012843,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_broadcast_gradient",
+      "status": "passed",
+      "seconds": 0.00029173600000831357,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_byte_tokenizer_round_trip",
+      "status": "passed",
+      "seconds": 2.796199987642467e-05,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_causal_attention_does_not_see_future",
+      "status": "passed",
+      "seconds": 0.0013174729999718693,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_checkpoint_corruption_detected",
+      "status": "passed",
+      "seconds": 0.0019518829999469745,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_checkpoint_exact_forward_and_rng_resume",
+      "status": "passed",
+      "seconds": 0.01132027299991023,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_crossentropy_gradient",
+      "status": "passed",
+      "seconds": 0.0005133089998707874,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_embedding_repeated_indices_accumulate",
+      "status": "passed",
+      "seconds": 0.00010758100006569293,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_end_to_end_training_manifest_and_resume",
+      "status": "passed",
+      "seconds": 0.02236176799988243,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_gelu_gradient",
+      "status": "passed",
+      "seconds": 0.0005355819998840161,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_large_configuration_rejected_before_allocation",
+      "status": "passed",
+      "seconds": 4.017999981442699e-05,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_layernorm_gradient",
+      "status": "passed",
+      "seconds": 0.0007755020001241064,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_no_grad_does_not_build_graph",
+      "status": "passed",
+      "seconds": 3.4260999882462784e-05,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_optimizer_and_model_learn_tiny_numeric_pattern",
+      "status": "passed",
+      "seconds": 0.19676880099996197,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_parameter_count",
+      "status": "passed",
+      "seconds": 0.00023066499988999567,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_softmax_gradient",
+      "status": "passed",
+      "seconds": 0.0003802799999448325,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_training_cancel_saves_checkpoint",
+      "status": "passed",
+      "seconds": 0.003999668999995265,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_transformer_parameter_gradient",
+      "status": "passed",
+      "seconds": 0.0017825400000219815,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_transpose_reshape_gradient",
+      "status": "passed",
+      "seconds": 0.00039929800004756544,
+      "detail": null
+    },
+    {
+      "test": "tests.test_neural.NeuralTests.test_tuple_reduction_gradient",
+      "status": "passed",
+      "seconds": 0.00027050500011682743,
+      "detail": null
+    },
+    {
+      "test": "tests.test_research.ResearchTests.test_collection_limit",
+      "status": "passed",
+      "seconds": 0.0034814739999546873,
+      "detail": null
+    },
+    {
+      "test": "tests.test_research.ResearchTests.test_conditional_304_does_not_duplicate_content",
+      "status": "passed",
+      "seconds": 0.007128254000008383,
+      "detail": null
+    },
+    {
+      "test": "tests.test_research.ResearchTests.test_dns_mixed_public_private_rejected",
+      "status": "passed",
+      "seconds": 0.0030098679999355227,
+      "detail": null
+    },
+    {
+      "test": "tests.test_research.ResearchTests.test_dns_private_address_blocked",
+      "status": "passed",
+      "seconds": 0.0037400500000330794,
+      "detail": null
+    },
+    {
+      "test": "tests.test_research.ResearchTests.test_dns_public_address_allowed",
+      "status": "passed",
+      "seconds": 0.0029857519998586213,
+      "detail": null
+    },
+    {
+      "test": "tests.test_research.ResearchTests.test_exact_domain_allowlist",
+      "status": "passed",
+      "seconds": 0.0028081949999432254,
+      "detail": null
+    },
+    {
+      "test": "tests.test_research.ResearchTests.test_html_does_not_run_or_store_scripts",
+      "status": "passed",
+      "seconds": 0.005593485999952463,
+      "detail": null
+    },
+    {
+      "test": "tests.test_research.ResearchTests.test_offline_never_calls_network",
+      "status": "passed",
+      "seconds": 0.003405871000040861,
+      "detail": null
+    },
+    {
+      "test": "tests.test_research.ResearchTests.test_pdf_not_silently_processed",
+      "status": "passed",
+      "seconds": 0.004334139999855324,
+      "detail": null
+    },
+    {
+      "test": "tests.test_research.ResearchTests.test_redirect_outside_allowlist_blocked",
+      "status": "passed",
+      "seconds": 0.004607739999983096,
+      "detail": null
+    },
+    {
+      "test": "tests.test_research.ResearchTests.test_rejects_unsafe_scheme_ports_and_credentials",
+      "status": "passed",
+      "seconds": 0.0030457810000825702,
+      "detail": null
+    },
+    {
+      "test": "tests.test_research.ResearchTests.test_robots_disallow_blocks_page",
+      "status": "passed",
+      "seconds": 0.00428918300008263,
+      "detail": null
+    },
+    {
+      "test": "tests.test_research.ResearchTests.test_robots_error_fails_closed",
+      "status": "passed",
+      "seconds": 0.003963344999874607,
+      "detail": null
+    },
+    {
+      "test": "tests.test_research.ResearchTests.test_second_query_reuses_cache_without_http",
+      "status": "passed",
+      "seconds": 0.005619836000050782,
+      "detail": null
+    },
+    {
+      "test": "tests.test_runtime.HttpTests.test_api_requires_token",
+      "status": "passed",
+      "seconds": 0.5066028149999511,
+      "detail": null
+    },
+    {
+      "test": "tests.test_runtime.HttpTests.test_cross_origin_even_with_token_rejected",
+      "status": "passed",
+      "seconds": 0.5070516850000786,
+      "detail": null
+    },
+    {
+      "test": "tests.test_runtime.HttpTests.test_dns_rebinding_host_rejected",
+      "status": "passed",
+      "seconds": 0.5067802020000727,
+      "detail": null
+    },
+    {
+      "test": "tests.test_runtime.HttpTests.test_health_is_explicit_about_model",
+      "status": "passed",
+      "seconds": 0.5068803509998361,
+      "detail": null
+    },
+    {
+      "test": "tests.test_runtime.HttpTests.test_http_ingest_then_retrieve",
+      "status": "passed",
+      "seconds": 0.5087732059998871,
+      "detail": null
+    },
+    {
+      "test": "tests.test_runtime.HttpTests.test_http_path_traversal_rejected",
+      "status": "passed",
+      "seconds": 0.5090001329999723,
+      "detail": null
+    },
+    {
+      "test": "tests.test_runtime.HttpTests.test_options_cannot_enable_cors",
+      "status": "passed",
+      "seconds": 0.5078812630001721,
+      "detail": null
+    },
+    {
+      "test": "tests.test_runtime.HttpTests.test_static_ui_has_csp",
+      "status": "passed",
+      "seconds": 0.5065538880000986,
+      "detail": null
+    },
+    {
+      "test": "tests.test_runtime.HttpTests.test_train_requires_explicit_dataset_approval",
+      "status": "passed",
+      "seconds": 0.506858179000119,
+      "detail": null
+    },
+    {
+      "test": "tests.test_runtime.HttpTests.test_ui_does_not_use_unsafe_html_insertion",
+      "status": "passed",
+      "seconds": 0.5065580359998876,
+      "detail": null
+    },
+    {
+      "test": "tests.test_runtime.RuntimeTests.test_backup_rejects_running_server",
+      "status": "passed",
+      "seconds": 0.003548975000057908,
+      "detail": null
+    },
+    {
+      "test": "tests.test_runtime.RuntimeTests.test_cancel_running_job",
+      "status": "passed",
+      "seconds": 0.009121701000140092,
+      "detail": null
+    },
+    {
+      "test": "tests.test_runtime.RuntimeTests.test_full_backup_restore_regenerates_token",
+      "status": "passed",
+      "seconds": 0.007456838000052812,
+      "detail": null
+    },
+    {
+      "test": "tests.test_runtime.RuntimeTests.test_job_completes_and_result_persists",
+      "status": "passed",
+      "seconds": 0.01700044899985187,
+      "detail": null
+    },
+    {
+      "test": "tests.test_runtime.RuntimeTests.test_restart_marks_running_job_interrupted",
+      "status": "passed",
+      "seconds": 0.0037329710000904015,
+      "detail": null
+    },
+    {
+      "test": "tests.test_runtime.RuntimeTests.test_restore_does_not_overwrite_existing_data",
+      "status": "passed",
+      "seconds": 0.0038547430001472094,
+      "detail": null
+    },
+    {
+      "test": "tests.test_runtime.RuntimeTests.test_restore_rejects_zip_slip",
+      "status": "passed",
+      "seconds": 0.003762023000035697,
+      "detail": null
+    },
+    {
+      "test": "tests.test_runtime.RuntimeTests.test_unknown_job_not_queued",
+      "status": "passed",
+      "seconds": 0.0032260620000670315,
+      "detail": null
+    },
+    {
+      "test": "tests.test_safety.SafetyTests.test_build_configuration_not_editable",
+      "status": "passed",
+      "seconds": 0.0028851810000105615,
+      "detail": null
+    },
+    {
+      "test": "tests.test_safety.SafetyTests.test_config_unknown_field_fails_closed",
+      "status": "passed",
+      "seconds": 0.0030957259998558584,
+      "detail": null
+    },
+    {
+      "test": "tests.test_safety.SafetyTests.test_index_walker_excludes_dependencies",
+      "status": "passed",
+      "seconds": 0.0032778899999357236,
+      "detail": null
+    },
+    {
+      "test": "tests.test_safety.SafetyTests.test_project_does_not_accept_data_folder",
+      "status": "passed",
+      "seconds": 0.003121243999885337,
+      "detail": null
+    },
+    {
+      "test": "tests.test_safety.SafetyTests.test_reads_only_authorized_regular_file",
+      "status": "passed",
+      "seconds": 0.00302545999988979,
+      "detail": null
+    },
+    {
+      "test": "tests.test_safety.SafetyTests.test_rejects_absolute_and_windows_paths",
+      "status": "passed",
+      "seconds": 0.0027736840002035024,
+      "detail": null
+    },
+    {
+      "test": "tests.test_safety.SafetyTests.test_rejects_binary",
+      "status": "passed",
+      "seconds": 0.0035023249999994732,
+      "detail": null
+    },
+    {
+      "test": "tests.test_safety.SafetyTests.test_rejects_hardlink",
+      "status": "passed",
+      "seconds": 0.002999461999934283,
+      "detail": null
+    },
+    {
+      "test": "tests.test_safety.SafetyTests.test_rejects_hidden_credentials_and_git",
+      "status": "passed",
+      "seconds": 0.0028420860001006076,
+      "detail": null
+    },
+    {
+      "test": "tests.test_safety.SafetyTests.test_rejects_large_file",
+      "status": "passed",
+      "seconds": 0.0030625159999999596,
+      "detail": null
+    },
+    {
+      "test": "tests.test_safety.SafetyTests.test_rejects_parent_traversal",
+      "status": "passed",
+      "seconds": 0.002739312999892718,
+      "detail": null
+    },
+    {
+      "test": "tests.test_safety.SafetyTests.test_rejects_symlink_directory",
+      "status": "passed",
+      "seconds": 0.003001073999939763,
+      "detail": null
+    },
+    {
+      "test": "tests.test_safety.SafetyTests.test_rejects_symlink_file",
+      "status": "passed",
+      "seconds": 0.0027711100001397426,
+      "detail": null
+    },
+    {
+      "test": "tests.test_safety.SafetyTests.test_rejects_symlink_root",
+      "status": "passed",
+      "seconds": 0.0026019269998869277,
+      "detail": null
+    },
+    {
+      "test": "tests.test_safety.SafetyTests.test_rejects_unsupported_extension",
+      "status": "passed",
+      "seconds": 0.0027764679998654174,
+      "detail": null
+    },
+    {
+      "test": "tests.test_safety.SafetyTests.test_rejects_windows_reserved_names",
+      "status": "passed",
+      "seconds": 0.002859352000086801,
+      "detail": null
+    },
+    {
+      "test": "tests.test_safety.SafetyTests.test_secret_scanner",
+      "status": "passed",
+      "seconds": 0.002782878000061828,
+      "detail": null
+    },
+    {
+      "test": "tests.test_safety.SafetyTests.test_test_file_edit_needs_explicit_approval",
+      "status": "passed",
+      "seconds": 0.002736609000066892,
+      "detail": null
+    },
+    {
+      "test": "tests.test_store.StoreTests.test_add_relation_requires_same_scope",
+      "status": "passed",
+      "seconds": 0.004416172999981427,
+      "detail": null
+    },
+    {
+      "test": "tests.test_store.StoreTests.test_consult_is_not_fabricated_model_answer",
+      "status": "passed",
+      "seconds": 0.0036772969999674388,
+      "detail": null
+    },
+    {
+      "test": "tests.test_store.StoreTests.test_content_quota_rolls_back",
+      "status": "passed",
+      "seconds": 0.005071303999784504,
+      "detail": null
+    },
+    {
+      "test": "tests.test_store.StoreTests.test_current_version_only_in_search",
+      "status": "passed",
+      "seconds": 0.004984785000033298,
+      "detail": null
+    },
+    {
+      "test": "tests.test_store.StoreTests.test_delete_cascades_evidence",
+      "status": "passed",
+      "seconds": 0.005960917000038535,
+      "detail": null
+    },
+    {
+      "test": "tests.test_store.StoreTests.test_empty_search",
+      "status": "passed",
+      "seconds": 0.0025956069998755993,
+      "detail": null
+    },
+    {
+      "test": "tests.test_store.StoreTests.test_global_scope_does_not_include_another_project",
+      "status": "passed",
+      "seconds": 0.005134429999998247,
+      "detail": null
+    },
+    {
+      "test": "tests.test_store.StoreTests.test_global_scope_requires_explicit_inclusion",
+      "status": "passed",
+      "seconds": 0.004616623999936564,
+      "detail": null
+    },
+    {
+      "test": "tests.test_store.StoreTests.test_index_cancel",
+      "status": "passed",
+      "seconds": 0.0034585700000207,
+      "detail": null
+    },
+    {
+      "test": "tests.test_store.StoreTests.test_index_twice_and_skip_secret",
+      "status": "passed",
+      "seconds": 0.008264846999963993,
+      "detail": null
+    },
+    {
+      "test": "tests.test_store.StoreTests.test_ingest_and_search_has_lines_and_hash",
+      "status": "passed",
+      "seconds": 0.003955074000032255,
+      "detail": null
+    },
+    {
+      "test": "tests.test_store.StoreTests.test_ingest_idempotent",
+      "status": "passed",
+      "seconds": 0.004350664999947185,
+      "detail": null
+    },
+    {
+      "test": "tests.test_store.StoreTests.test_model_relation_not_self_verified",
+      "status": "passed",
+      "seconds": 0.003898118000051909,
+      "detail": null
+    },
+    {
+      "test": "tests.test_store.StoreTests.test_no_fts_syntax_injection",
+      "status": "passed",
+      "seconds": 0.00441961799992896,
+      "detail": null
+    },
+    {
+      "test": "tests.test_store.StoreTests.test_project_scope_not_leaked_to_global",
+      "status": "passed",
+      "seconds": 0.004912386999876617,
+      "detail": null
+    },
+    {
+      "test": "tests.test_store.StoreTests.test_relation_stale_evidence_flag",
+      "status": "passed",
+      "seconds": 0.005042931999923894,
+      "detail": null
+    },
+    {
+      "test": "tests.test_store.StoreTests.test_reverting_content_reuses_historical_version",
+      "status": "passed",
+      "seconds": 0.004674219999969864,
+      "detail": null
+    },
+    {
+      "test": "tests.test_store.StoreTests.test_sqlite_backup_restores_search",
+      "status": "passed",
+      "seconds": 0.004665868000074624,
+      "detail": null
+    },
+    {
+      "test": "tests.test_store.StoreTests.test_stale_source_requests_update",
+      "status": "passed",
+      "seconds": 0.004044727000064086,
+      "detail": null
+    },
+    {
+      "test": "tests.test_tasks.TaskTests.test_build_success_not_equivalent_to_tests",
+      "status": "passed",
+      "seconds": 0.009330573999932312,
+      "detail": null
+    },
+    {
+      "test": "tests.test_tasks.TaskTests.test_duplicate_paths_rejected",
+      "status": "passed",
+      "seconds": 0.006444590999990396,
+      "detail": null
+    },
+    {
+      "test": "tests.test_tasks.TaskTests.test_explicit_approval_applies_crlf",
+      "status": "passed",
+      "seconds": 0.011583606999920448,
+      "detail": null
+    },
+    {
+      "test": "tests.test_tasks.TaskTests.test_failure_on_second_file_rolls_back_first",
+      "status": "passed",
+      "seconds": 0.013969520000046032,
+      "detail": null
+    },
+    {
+      "test": "tests.test_tasks.TaskTests.test_feedback_does_not_train",
+      "status": "passed",
+      "seconds": 0.00557581999987633,
+      "detail": null
+    },
+    {
+      "test": "tests.test_tasks.TaskTests.test_human_change_after_snapshot_preserved",
+      "status": "passed",
+      "seconds": 0.009420647999832,
+      "detail": null
+    },
+    {
+      "test": "tests.test_tasks.TaskTests.test_new_file_has_null_baseline",
+      "status": "passed",
+      "seconds": 0.010768595999934405,
+      "detail": null
+    },
+    {
+      "test": "tests.test_tasks.TaskTests.test_outside_write_rejected",
+      "status": "passed",
+      "seconds": 0.006620814999905633,
+      "detail": null
+    },
+    {
+      "test": "tests.test_tasks.TaskTests.test_recovery_not_available_for_applied_task",
+      "status": "passed",
+      "seconds": 0.011461775000043417,
+      "detail": null
+    },
+    {
+      "test": "tests.test_tasks.TaskTests.test_reject_leaves_original_untouched",
+      "status": "passed",
+      "seconds": 0.008960690000094473,
+      "detail": null
+    },
+    {
+      "test": "tests.test_tasks.TaskTests.test_requires_test_or_explicit_untested_approval",
+      "status": "passed",
+      "seconds": 0.00841230700007145,
+      "detail": null
+    },
+    {
+      "test": "tests.test_tasks.TaskTests.test_revised_proposal_restores_removed_staged_file",
+      "status": "passed",
+      "seconds": 0.010672443000203202,
+      "detail": null
+    },
+    {
+      "test": "tests.test_tasks.TaskTests.test_runner_command_has_os_isolation_flags",
+      "status": "passed",
+      "seconds": 0.005980206000003818,
+      "detail": null
+    },
+    {
+      "test": "tests.test_tasks.TaskTests.test_runner_disabled_without_pinned_image",
+      "status": "passed",
+      "seconds": 0.007792430000108652,
+      "detail": null
+    },
+    {
+      "test": "tests.test_tasks.TaskTests.test_runner_mount_is_readonly_and_work_is_temporary",
+      "status": "passed",
+      "seconds": 0.0056402570000955166,
+      "detail": null
+    },
+    {
+      "test": "tests.test_tasks.TaskTests.test_runner_rejects_arbitrary_command",
+      "status": "passed",
+      "seconds": 0.005278374999988955,
+      "detail": null
+    },
+    {
+      "test": "tests.test_tasks.TaskTests.test_snapshot_preserves_crlf_and_original",
+      "status": "passed",
+      "seconds": 0.005264203000024281,
+      "detail": null
+    },
+    {
+      "test": "tests.test_tasks.TaskTests.test_staged_tampering_is_detected",
+      "status": "passed",
+      "seconds": 0.009486637000009068,
+      "detail": null
+    },
+    {
+      "test": "tests.test_tasks.TaskTests.test_staging_does_not_modify_original",
+      "status": "passed",
+      "seconds": 0.007442806000199198,
+      "detail": null
+    },
+    {
+      "test": "tests.test_tasks.TaskTests.test_stale_proposal_approval_rejected",
+      "status": "passed",
+      "seconds": 0.011064840000017284,
+      "detail": null
+    },
+    {
+      "test": "tests.test_tasks.TaskTests.test_wrong_baseline_hash_rejected",
+      "status": "passed",
+      "seconds": 0.006419092999976783,
+      "detail": null
+    }
+  ],
+  "limitations": [
+    "Não é teste no notebook do usuário.",
+    "GPU, .NET e execução Docker real não são validadas por esta suíte.",
+    "Testes numéricos usam padrões minúsculos; não demonstram capacidade de programação."
+  ]
+}

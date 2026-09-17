@@ -1,0 +1,3 @@
+# Dependência matemática local, não um modelo ou um framework de autograd.
+# Versão efetivamente usada nos testes desta entrega; não declarada como a mais recente.
+numpy==2.3.5

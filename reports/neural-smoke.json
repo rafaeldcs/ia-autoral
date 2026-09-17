@@ -1,0 +1,24 @@
+{
+  "at": "2026-09-17T04:20:56.212130+00:00",
+  "kind": "controlled_numerical_overfit",
+  "seed": 42,
+  "device": "CPU",
+  "dtype": "float64",
+  "numpy": "2.3.5",
+  "parameter_count": 3016,
+  "steps": 90,
+  "tokens_processed": 720,
+  "initial_loss": 5.54711319600224,
+  "final_loss": 0.017043394157468344,
+  "training_positions_correct": 8,
+  "training_positions_total": 8,
+  "elapsed_seconds": 0.1742982639998445,
+  "successful_numeric_smoke": true,
+  "programming_qualified": false,
+  "weights_exported": false,
+  "limitations": [
+    "Mesmo padrão usado para ajuste e medição: overfit deliberado, não generalização.",
+    "Nenhum desafio de C# foi resolvido por este experimento.",
+    "Medição no container, não no notebook ou RTX 2060 do usuário."
+  ]
+}

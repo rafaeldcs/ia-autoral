@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "dataset_id": "substitua-por-seu-corpus-revisado",
+  "records": [
+    {"path": "train/exercicio-001.txt", "split": "train", "group": "familia-a", "sha256": "CALCULE_O_SHA256_DOS_BYTES_REAIS", "training_allowed": true, "provenance": {"kind": "human-authored", "owner": "PREENCHA_O_TITULAR_REAL", "license_or_permission": "DESCREVA_A_AUTORIZACAO_REAL"}},
+    {"path": "validation/exercicio-002.txt", "split": "validation", "group": "familia-b", "sha256": "CALCULE_O_SHA256_DOS_BYTES_REAIS", "training_allowed": true, "provenance": {"kind": "human-authored", "owner": "PREENCHA_O_TITULAR_REAL", "license_or_permission": "DESCREVA_A_AUTORIZACAO_REAL"}}
+  ]
+}

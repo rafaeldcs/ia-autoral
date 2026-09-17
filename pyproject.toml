@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "localauthor"
+version = "0.1.0"
+description = "Laboratório local de memória, revisão de código e modelo autoral CPU"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+training = ["numpy==2.3.5"]
+
+[project.scripts]
+localauthor = "localauthor.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
