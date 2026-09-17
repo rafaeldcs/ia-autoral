@@ -11,6 +11,10 @@ using Microsoft.Web.WebView2.WinForms;
 namespace LocalAuthor.Client;
 static class Program {
  [STAThread] static void Main(string[] args) {
+  if(args.Length==3&&args[0]=="--password-setup-smoke"){
+   Console.InputEncoding=System.Text.Encoding.UTF8;
+   try{var connection=Connection.Import(args[1]);RemotePublication.SetPassword(connection,Console.ReadLine()??"",CancellationToken.None).GetAwaiter().GetResult();var status=RemotePublication.Status(connection,CancellationToken.None).GetAwaiter().GetResult();File.WriteAllText(args[2],JsonSerializer.Serialize(new{passed=status?.PublicationPasswordConfigured==true}));}catch(Exception e){File.WriteAllText(args[2],JsonSerializer.Serialize(new{passed=false,error=e.GetType().Name}));Environment.ExitCode=1;}return;
+  }
   if(args.Length==2&&args[0]=="--startup-check"){
    try{File.WriteAllText(args[1],JsonSerializer.Serialize(WindowsStartup.CheckInIsolatedRegistry(Environment.ProcessPath!)));}catch(Exception e){File.WriteAllText(args[1],JsonSerializer.Serialize(new{passed=false,error=e.GetType().Name}));Environment.ExitCode=1;}return;
   }

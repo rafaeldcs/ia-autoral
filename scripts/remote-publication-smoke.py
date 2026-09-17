@@ -3,6 +3,7 @@ import hashlib, http.client, json, os, socket, ssl, subprocess, sys, tempfile, t
 import base64, secrets, sqlite3
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+import xml.etree.ElementTree as ET
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'src'))
 from localauthor.application import Application
@@ -18,7 +19,7 @@ gateway=ROOT/'build/lan-server/LocalAuthor.Lan.exe'
 client=ROOT/'build/lan-client/LocalAuthor.Client.exe'
 binary=client.read_bytes()
 digest=hashlib.sha256(binary).hexdigest().upper()
-version='0.3.3.0'
+version=ET.parse(ROOT/'dotnet/LocalAuthor.Client/LocalAuthor.Client.csproj').find('.//Version').text+'.0'
 password=secrets.token_urlsafe(32)
 password_header=base64.b64encode(password.encode()).decode()
 with tempfile.TemporaryDirectory(prefix='localauthor-publish-check-') as tmp:

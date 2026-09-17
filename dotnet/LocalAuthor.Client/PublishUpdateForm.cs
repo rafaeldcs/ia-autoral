@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Net.Http.Json;
 using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 using LocalAuthor.Connectivity;
 
 namespace LocalAuthor.Client;
@@ -18,8 +20,13 @@ static class RemotePublication {
  public static async Task<bool> IsAllowed(Connection connection,CancellationToken cancel)=>(await Status(connection,cancel))?.CanPublishUpdates==true;
  public static async Task SetPassword(Connection connection,string password,CancellationToken cancel){
   using var client=ClientUpdates.CreateClient(connection);
-  using var response=await client.PostAsJsonAsync("/api/publication-password",new{password},cancel);
+  // JsonContent streams with no Content-Length. The gateway requires a bounded,
+  // declared payload; buffered UTF-8 supplies the exact byte length, including accents.
+  using var content=new StringContent(JsonSerializer.Serialize(new{password}),Encoding.UTF8,"application/json");
+  using var response=await client.PostAsync("/api/publication-password",content,cancel);
   if(!response.IsSuccessStatusCode)throw new InvalidOperationException((int)response.StatusCode==409?"A senha já foi cadastrada neste servidor. Use a senha existente ao publicar.":"Não foi possível cadastrar. Use de 12 a 256 caracteres e confira a conexão.");
+  var permission=await Status(connection,cancel);
+  if(permission?.PublicationPasswordConfigured!=true)throw new InvalidOperationException("O cadastro foi enviado, mas não foi possível confirmar. Confira a conexão antes de tentar novamente.");
  }
  public static async Task<ClientRelease> Inspect(string path, CancellationToken cancel) {
   var info=FileVersionInfo.GetVersionInfo(path);
@@ -87,21 +94,31 @@ sealed class PublishUpdateForm : Form {
 sealed class PublicationPasswordForm : Form {
  readonly TextBox password=new(){Width=460,UseSystemPasswordChar=true,MaxLength=256};
  readonly TextBox confirm=new(){Width=460,UseSystemPasswordChar=true,MaxLength=256};
- readonly Label message=new(){Text="Crie a senha usada para publicar atualizações neste servidor. Ela será exigida em qualquer computador. Use de 12 a 256 caracteres.",AutoSize=true,MaximumSize=new Size(460,0)};
+ readonly Label message=new(){Text="Esta senha autoriza publicar atualizações para os computadores conectados. Ela não é necessária para conversar com a IA. Use de 12 a 256 caracteres.",AutoSize=true,MaximumSize=new Size(460,0)};
  readonly Button save=new(){Text="Salvar senha",AutoSize=true};
- bool saving;
+ bool saving,saved;
  public PublicationPasswordForm(Connection connection){
-  Text="Primeiro acesso — senha de publicação";ClientSize=new Size(520,340);Font=new Font("Segoe UI",10);StartPosition=FormStartPosition.CenterParent;
+  Text="Primeiro acesso — senha de publicação";ClientSize=new Size(540,430);Font=new Font("Segoe UI",10);StartPosition=FormStartPosition.CenterParent;AcceptButton=save;
   var panel=new FlowLayoutPanel{Dock=DockStyle.Fill,Padding=new Padding(24),FlowDirection=FlowDirection.TopDown,WrapContents=false,AutoScroll=true};
-  foreach(Control control in new Control[]{message,new Label{Text="Nova senha",AutoSize=true},password,new Label{Text="Confirmar senha",AutoSize=true},confirm,save}){control.Margin=new Padding(0,0,0,10);panel.Controls.Add(control);}Controls.Add(panel);
+  var passwordLabel=new Label{Text="Nova senha",AutoSize=true};var confirmLabel=new Label{Text="Confirmar senha",AutoSize=true};
+  var later=new Button{Text="Agora não — abrir a IA",AutoSize=true};
+  foreach(Control control in new Control[]{message,passwordLabel,password,confirmLabel,confirm,save,later}){control.Margin=new Padding(0,0,0,10);panel.Controls.Add(control);}Controls.Add(panel);
+  later.Click+=(_,_)=>{if(!saving){DialogResult=DialogResult.Cancel;Close();}};
   FormClosing+=(_,e)=>e.Cancel=saving;
   FormClosed+=(_,_)=>{password.Clear();confirm.Clear();};
   save.Click+=async(_,_)=>{
-   if(password.Text.Length<12||password.Text!=confirm.Text){message.Text="Use pelo menos 12 caracteres e repita a mesma senha nos dois campos.";return;}
-   saving=true;save.Enabled=false;
-   try{using var timeout=new CancellationTokenSource(TimeSpan.FromSeconds(15));await RemotePublication.SetPassword(connection,password.Text,timeout.Token);saving=false;DialogResult=DialogResult.OK;Close();}
-   catch(Exception e){message.Text=e is HttpRequestException or TaskCanceledException?"Não foi possível conectar ao servidor. Tente novamente.":e.Message;}
-   finally{saving=false;save.Enabled=true;password.Clear();confirm.Clear();}
+   if(saved){DialogResult=DialogResult.OK;Close();return;}
+   if(password.Text.Length<12||string.IsNullOrWhiteSpace(password.Text)){message.Text="A senha precisa ter de 12 a 256 caracteres e não pode conter apenas espaços.";password.Focus();return;}
+   if(password.Text!=confirm.Text){message.Text="As senhas estão diferentes. Corrija a confirmação; os campos foram mantidos.";confirm.Focus();return;}
+   saving=true;save.Enabled=later.Enabled=password.Enabled=confirm.Enabled=false;save.Text="Salvando…";message.Text="Salvando no servidor e verificando a confirmação…";
+   try{
+    using var timeout=new CancellationTokenSource(TimeSpan.FromSeconds(15));await RemotePublication.SetPassword(connection,password.Text,timeout.Token);
+    saved=true;password.Clear();confirm.Clear();password.Visible=confirm.Visible=passwordLabel.Visible=confirmLabel.Visible=later.Visible=false;
+    message.Text="Senha de publicação salva e confirmada no servidor.\n\nUse essa senha quando publicar uma atualização. Agora você pode abrir sua IA.";
+    message.ForeColor=Color.FromArgb(27,119,80);save.Text="Abrir minha IA";
+   }
+   catch(Exception e){message.Text=e is HttpRequestException or TaskCanceledException?"Não foi possível confirmar o cadastro no servidor. Seus campos foram mantidos; confira a conexão e tente novamente.":e.Message;}
+   finally{saving=false;save.Enabled=later.Enabled=password.Enabled=confirm.Enabled=true;if(!saved)save.Text="Salvar senha";}
   };
  }
 }

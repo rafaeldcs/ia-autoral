@@ -4,6 +4,7 @@ import http.client
 import json
 import os
 from pathlib import Path
+import xml.etree.ElementTree as ET
 import shutil
 import socket
 import ssl
@@ -45,6 +46,7 @@ def wait_file(path, timeout=50):
 gateway = ROOT / 'build/lan-server/LocalAuthor.Lan.exe'
 old = ROOT / 'build/update-fixture/LocalAuthor.Client.exe'
 new = ROOT / 'build/lan-client/LocalAuthor.Client.exe'
+version = ET.parse(ROOT/'dotnet/LocalAuthor.Client/LocalAuthor.Client.csproj').find('.//Version').text+'.0'
 broken = ROOT / 'build/update-failure/LocalAuthor.UpdateFailureFixture.exe'
 with tempfile.TemporaryDirectory(prefix='localauthor-update-check-') as temp:
     base = Path(temp)
@@ -130,7 +132,7 @@ with tempfile.TemporaryDirectory(prefix='localauthor-update-check-') as temp:
         check('Publishing identical release is idempotent', True)
         refused = subprocess.run(['powershell', '-NoProfile', '-File', str(publisher), '-ClientPath', str(old), '-DataRoot', str(data)], creationflags=FLAGS, capture_output=True, timeout=30)
         check('Publisher refuses version downgrade', refused.returncode != 0 and json.loads((releases / 'current.json').read_text(encoding='utf-8-sig'))['Sha256'] == sha(new))
-        digest = publish(new, '0.3.3.0')
+        digest = publish(new, version)
         check('Package requires device authentication', request('/api/client-update/package?sha256=' + digest, '')[0] == 401)
         check('Package traversal rejected', request('/api/client-update/package?sha256=../../server.pfx')[0] == 400)
         check('Authenticated manifest exposes version and digest only', set(json.loads(request('/api/client-update')[1])) == {'version', 'sha256', 'size'})
@@ -148,13 +150,13 @@ with tempfile.TemporaryDirectory(prefix='localauthor-update-check-') as temp:
         check('Old executable remains recoverable', any(sha(p) == sha(old) for p in executable.parent.glob('*.previous')))
         check('Adjacent configuration remains untouched', (executable.parent / 'connection-preserved.txt').read_text() == 'configuration untouched')
         check('Verified download removed after success', not (job / 'download.exe').exists())
-        publish(new, '0.3.3.0', corrupt=True)
+        publish(new, version, corrupt=True)
         attempt('corrupt-package', expected_success=False)
         publish(new, '0.3.9.0')
         attempt('wrong-executable-version', expected_success=False)
         publish(new, '0.1.0.0')
         attempt('downgrade', expected_success=False)
-        publish(new, '0.3.3.0')
+        publish(new, version)
         wrong = dict(connection)
         wrong['CertificateSha256'] = 'A' * 64
         bad_pair = base / 'wrong.localauthor'

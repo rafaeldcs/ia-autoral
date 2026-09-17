@@ -23,7 +23,7 @@ O registro de cada tentativa fica em `%LOCALAPPDATA%\LocalAuthorClient\updates\<
 ## Publicar uma versão no servidor
 
 1. Atualize `Version` no projeto `dotnet/LocalAuthor.Client/LocalAuthor.Client.csproj`. Cada publicação diferente precisa de versão maior.
-2. Compile e teste: `powershell -File scripts/build-lan.ps1`, `powershell -File scripts/test-client-update.ps1` e `python scripts/run-tests.py`. A suíte de atualização desta entrega usa a versão 0.3.2, um cliente anterior de teste 0.2.99 e um executável 0.4.0 que falha intencionalmente; ajuste as versões dos cenários ao mudar a versão de produção.
+2. Compile e teste: `powershell -File scripts/build-lan.ps1`, `powershell -File scripts/test-client-update.ps1` e `python scripts/run-tests.py`. A suíte lê a versão atual do projeto do cliente e usa um cliente anterior de teste 0.2.99 e um executável 0.4.0 que falha intencionalmente; ajuste as versões dos cenários quando esses valores deixarem de representar versões anteriores e posteriores à produção.
 3. Publique: `powershell -File scripts/lan/Publish-ClientUpdate.ps1`.
 
 O script publica somente o executável público do cliente, sem chave ou instalador personalizado. Pacotes são identificados pelo hash; o manifesto atual é substituído após a cópia e conferência, preservando o manifesto anterior. A publicação fica em `%LOCALAPPDATA%\LocalAuthor\lan\client-releases`. O gateway atualizado atende apenas clientes autenticados, nas mesmas regras de rede das demais APIs. As próximas publicações não exigem reiniciar o gateway.
@@ -31,3 +31,10 @@ O script publica somente o executável público do cliente, sem chave ou instala
 Esta alteração acrescenta distribuição de versões ao gateway existente e um modo auxiliar ao cliente; não introduz serviços externos. Atualiza o executável do cliente Windows x64 e seu runtime incluído. Não atualiza automaticamente o servidor, o WebView2 ou os pesos da IA. WebView2 Evergreen mantém seu próprio mecanismo de atualização.
 
 Referência técnica: [substituição de arquivo com backup — Microsoft](https://learn.microsoft.com/en-us/dotnet/api/system.io.file.replace?view=net-10.0).
+## Correção do cadastro de senha — cliente 0.3.4
+
+O botão **Salvar senha** agora envia JSON UTF-8 com tamanho declarado, compatível com o limite do gateway. Antes, `PostAsJsonAsync` enviava conteúdo sem `Content-Length`, recusado pelo servidor antes de gravar no SQLite. O problema foi reproduzido com o método .NET real em um servidor isolado e corrigido sem alterar a senha do servidor de uso.
+
+Após salvar, o cliente confirma o estado no servidor e mostra **Senha de publicação salva e confirmada no servidor**, com o botão **Abrir minha IA**. Erros preservam os campos. O diálogo explica que a senha serve para publicar atualizações; **Agora não — abrir a IA** permite conversar sem cadastrá-la, mas a publicação continua protegida.
+
+O instalador conectado e a atualização do cliente são versão 0.3.4. Uma janela antiga já aberta precisa ser fechada para a instalação local. O servidor da IA permanece ligado. Teste de regressão: `scripts/password-setup-smoke.py`, com senha aleatória Unicode apenas no servidor temporário; verifica cadastro, hash, recusa de sobrescrita e preservação da senha original. Evidências anteriores e posteriores: `reports/password-setup-before-fix.json` e `reports/password-setup-native.json`.
