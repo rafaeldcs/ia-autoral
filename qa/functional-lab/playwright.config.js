@@ -1,0 +1,1 @@
+module.exports={testDir:'/tmp/lab',workers:1,retries:0,timeout:60000,use:{headless:true,browserName:'chromium',launchOptions:{args:['--no-sandbox']}},reporter:[['json',{outputFile:'/tmp/lab/result.json'}]],outputDir:'/tmp/lab/output'};

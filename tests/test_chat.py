@@ -1,4 +1,5 @@
 import threading
+import hashlib
 from unittest.mock import patch
 from localauthor.application import Application
 from localauthor.errors import PolicyError, NotFoundError
@@ -115,10 +116,43 @@ class ChatTests(WorkspaceCase):
             with self.assertRaises(PolicyError):
                 self.chat.respond(self.project['id'],self.conversation['id'],'Olá','model')
             self.assertEqual(self.chat.get(self.project['id'],self.conversation['id'])['messages'],[])
-            model.generate.return_value=[97]*120
+            model.generate.return_value=[97]*220
             reply=self.chat._generate('Olá')
             self.assertTrue(reply['possibly_truncated'])
             self.assertIn('incompleta',reply['notice'])
-            self.assertEqual(reply['content'],'a'*120)
+            self.assertEqual(reply['content'],'a'*220)
             model.generate.return_value=list('Ação concluída.'.encode())
             self.assertEqual(self.chat._generate('Olá')['content'],'Ação concluída.')
+
+    def test_chat_keeps_complete_test_longer_than_old_output_budget(self):
+        checkpoint=self.settings.home/'models/candidate.npz'
+        write_json(self.settings.home/'exports/engineering-report.json', {'state':'evaluated','selectedCheckpoint':str(checkpoint)})
+        source='[Fact]public async Task Check(){await Client.PutAsync("/version/43",null);var r=await Client.PutAsync("/version/43",null);Assert.Equal(409,(int)r.StatusCode);}'
+        model=Mock();model.config=SimpleNamespace(context_length=256)
+        model.generate.side_effect=lambda prompt, max_tokens, **kw: list(source.encode())[:max_tokens]
+        with patch('localauthor.nn.checkpoint.load_checkpoint',return_value=(model,None,ByteTokenizer(),None,None)):
+            result=self.chat.respond(self.project['id'],self.conversation['id'],'Teste conflito','model')
+        reply=result['messages'][-1]
+        self.assertEqual(reply['content'],source)
+        self.assertFalse(reply['metadata']['possibly_truncated'])
+        self.assertIn('Assert.Equal(409',reply['content'])
+
+    def test_functional_candidate_requires_execution_and_fault_detection(self):
+        path=self.settings.home/'exports/functional-testing-report.json'
+        checkpoint=self.settings.home/'models/functional.npz'
+        checkpoint.parent.mkdir(exist_ok=True)
+        checkpoint.write_bytes(b'qualified checkpoint fixture')
+        report={'state':'evaluated','selectedCheckpoint':str(checkpoint),'scope':'orbit-functional-lab','chatEnabled':True,
+                'checkpointHash':hashlib.sha256(checkpoint.read_bytes()).hexdigest()}
+        for counts in [{}, {'total':36,'passed':36,'faultsDetected':35}]:
+            write_json(path,{**report,'functionalTests':counts})
+            with self.assertRaises(PolicyError):self.chat._generate('Teste JS h: Login viewer.')
+        write_json(path,{**report,'functionalTests':{'total':36,'passed':36,'faultsDetected':36}})
+        model=Mock();model.config=SimpleNamespace(context_length=256);model.generate.return_value=list(b'expect(await h.me()).toBe(200);')
+        with patch('localauthor.nn.checkpoint.load_checkpoint',return_value=(model,None,ByteTokenizer(),None,None)) as load:
+            result=self.chat._generate('Teste JS h: Login viewer.')
+        load.assert_called_once_with(checkpoint)
+        self.assertEqual(result['skill'],'orbit_functional_tests')
+        self.assertIn('sandbox',result['notice'])
+        checkpoint.write_bytes(b'changed checkpoint')
+        with self.assertRaises(PolicyError):self.chat._generate('Teste JS h: Login viewer.')

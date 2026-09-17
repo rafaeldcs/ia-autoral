@@ -1,5 +1,7 @@
 # Auditoria da capacidade de testar — 17/09/2026
 
+> Registro da auditoria inicial, preservado. A correção de truncamento, o treinamento funcional e as novas execuções estão em [verificação posterior](FULL_VERIFICATION_20260917.md). O chat corrigido passou 36/36 casos antigos; os quatro pedidos livres continuam sem resposta utilizável. O novo laboratório cobre nove contratos explícitos do Orbit, sem qualificação geral.
+
 O modelo local ainda não demonstrou capacidade de testar um sistema completo de forma autônoma. A aprovação de exercícios de laboratório não significa cobertura dos requisitos do Orbit ou do aplicativo LocalAuthor.
 
 ## Resultados desta execução

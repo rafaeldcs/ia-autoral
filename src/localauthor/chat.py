@@ -1,5 +1,6 @@
 from __future__ import annotations
 import json
+import hashlib
 import threading
 import uuid
 from pathlib import Path
@@ -21,6 +22,10 @@ CREATE TABLE IF NOT EXISTS messages(
 CREATE INDEX IF NOT EXISTS ix_conversations_project ON conversations(project_id,updated_at);
 CREATE INDEX IF NOT EXISTS ix_messages_conversation ON messages(conversation_id,id);
 """
+
+# Keep the application at the same output budget as the evaluated code course.
+# The model context is a rolling window, not an output-length limit.
+MODEL_OUTPUT_TOKENS = 220
 
 
 class ChatService:
@@ -135,6 +140,17 @@ class ChatService:
         communication_file = self.settings.home / "exports" / "communication-report.json"
         if communication_file.exists() and read_json(communication_file).get("chatEnabled") is True:
             report_file = communication_file
+        functional = message.startswith("Teste JS h:")
+        if functional:
+            report_file = self.settings.home / "exports" / "functional-testing-report.json"
+            if not report_file.exists():
+                raise PolicyError("O modelo de testes funcionais ainda não foi aprovado no laboratório.")
+            certification = read_json(report_file)
+            checks = certification.get("functionalTests", {})
+            if not (certification.get("chatEnabled") is True
+                    and certification.get("scope") == "orbit-functional-lab"
+                    and checks.get("total") == checks.get("passed") == checks.get("faultsDetected") == 36):
+                raise PolicyError("O modelo de testes funcionais ainda não foi aprovado no laboratório.")
         if not report_file.exists():
             report_file = self.settings.home / "exports/jira-experimental/generalization-report.json"
         if not report_file.exists():
@@ -146,18 +162,22 @@ class ChatService:
         relative = checkpoint.relative_to(self.settings.home / "models")
         if checkpoint.is_symlink() or not checkpoint.resolve().is_relative_to((self.settings.home / "models").resolve()):
             raise PolicyError("Checkpoint fora da pasta de modelos.")
+        if functional and hashlib.sha256(checkpoint.read_bytes()).hexdigest() != report.get("checkpointHash"):
+            raise PolicyError("O modelo funcional foi alterado depois da avaliação.")
         from .nn.checkpoint import load_checkpoint
         model, _, tokenizer, _, _ = load_checkpoint(checkpoint)
         prompt = [tokenizer.bos_id] + tokenizer.encode(message)
         if len(prompt) > model.config.context_length:
             raise PolicyError("Pedido excede o contexto do modelo.")
-        generated = model.generate(prompt, max_tokens=120, temperature=.05, seed=31)
+        generated = model.generate(prompt, max_tokens=MODEL_OUTPUT_TOKENS, temperature=.05, seed=31)
         try:
             content = tokenizer.decode(generated)
         except UnicodeError as exc:
             raise PolicyError("O modelo produziu texto UTF-8 inválido. Nenhum caractere foi substituído e nenhuma resposta foi salva.") from exc
-        truncated = len(generated) >= 120
+        truncated = len(generated) >= MODEL_OUTPUT_TOKENS
         notice = "Geração experimental só desta mensagem; histórico e arquivos não foram enviados ao modelo. Não executada nem aplicada."
+        if functional:
+            notice = "Teste Playwright para o laboratório Orbit; requer os auxiliares h documentados. A resposta ainda precisa passar pela sandbox. " + notice
         if truncated:
             notice = "Saída possivelmente incompleta: atingiu o limite de geração. Não use como código pronto. " + notice
-        return {"origin": "local_model", "content": content or "[O modelo encerrou sem produzir texto.]", "model": str(relative), "sources": [], "history_used": False, "possibly_truncated": truncated, "notice": notice}
+        return {"origin": "local_model", "content": content or "[O modelo encerrou sem produzir texto.]", "model": str(relative), "sources": [], "history_used": False, "possibly_truncated": truncated, "skill": "orbit_functional_tests" if functional else "experimental_general", "notice": notice}
