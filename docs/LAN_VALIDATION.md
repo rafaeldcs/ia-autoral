@@ -1,5 +1,13 @@
 # Entrega da rede local — 17/09/2026
 
+## Instalação local e acesso direto — 0.3.4
+
+A instalação principal foi atualizada de 0.3.3 para 0.3.4 pelo instalador conectado. A configuração DPAPI existente foi preservada byte a byte. O executável instalado abriu o chat no teste nativo com conexão salva, autenticação e certificado verificados, sem seleção de arquivo. Evidências: `reports/password-fix-local-install.json` e `reports/saved-connection-local-check.json`.
+
+A Área de Trabalho deste computador passou a ter um único atalho de uso do LocalAuthor, apontando para `%LOCALAPPDATA%\Programs\LocalAuthorClient\LocalAuthor.Client.exe`, sem argumentos de teste. O servidor continua acessível pelo menu Iniciar. Materiais de entrega e relatórios antigos foram retirados da Área de Trabalho e preservados em `%LOCALAPPDATA%\LocalAuthor\desktop-archive\20260917`; projetos e modelos não foram movidos. O instalador conectado atual continua em `%LOCALAPPDATA%\LocalAuthor\lan\private-installers`, fora do Git.
+
+Esta verificação confirma o acesso automático nesta máquina. A descoberta requer o vínculo autorizado já fornecido pelo instalador e a presença do servidor na mesma rede; não comprova operação em outro computador físico ou em outra rede pela internet.
+
 ## Inicialização com Windows — 0.3.3
 
 O instalador único configura por padrão a abertura do cliente no login do usuário atual, via HKCU Run, com caminho entre aspas e argumento `--startup`. O cliente atualizado registra essa preferência na instalação padrão quando ainda não há escolha anterior; executáveis temporários não se registram. A opção desmarcada no instalador é preservada nas atualizações e a desinstalação remove a entrada. Nenhuma política de inicialização bloqueada pelo Windows é alterada.
