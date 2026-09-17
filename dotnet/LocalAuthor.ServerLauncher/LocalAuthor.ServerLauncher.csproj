@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Version>0.1.0</Version>
+    <ApplicationManifest>../LocalAuthor.Client/app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup><Compile Include="../Shared/LanDiscovery.cs" Link="LanDiscovery.cs" /></ItemGroup>
+</Project>

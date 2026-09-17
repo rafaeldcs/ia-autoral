@@ -7,6 +7,7 @@ if ((Get-Item -LiteralPath $installRoot).Attributes -band [IO.FileAttributes]::R
 if ([Windows.Forms.MessageBox]::Show('Remover o aplicativo? Projetos no servidor e conexão pessoal serão preservados.', 'LocalAuthor', 'YesNo', 'Question') -ne 'Yes') { exit }
 if (Get-Process -Name LocalAuthor.Client -ErrorAction SilentlyContinue) { [Windows.Forms.MessageBox]::Show('Feche o LocalAuthor antes de desinstalar.'); exit 1 }
 $manifest = Get-Content -LiteralPath (Join-Path $installRoot 'payload-manifest.json') -Raw | ConvertFrom-Json
+Remove-ItemProperty -LiteralPath 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name LocalAuthorClient -ErrorAction SilentlyContinue
 foreach ($name in $manifest.PSObject.Properties.Name) {
     if ([IO.Path]::GetFileName($name) -ne $name -or $name.Contains(':')) { throw 'Manifesto inválido.' }
     $target = [IO.Path]::GetFullPath((Join-Path $installRoot $name))

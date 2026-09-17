@@ -6,6 +6,8 @@ files={
  'LocalAuthor.Client.exe':root/'build/lan-client/LocalAuthor.Client.exe',
  'Desinstalar.ps1':root/'scripts/lan/Desinstalar.ps1',
  'LEIA-ME.md':root/'docs/LAN_INSTALL.md',
+ 'LAN_UPDATES.md':root/'docs/LAN_UPDATES.md',
+ 'LAN_DISCOVERY.md':root/'docs/LAN_DISCOVERY.md',
  'THIRD_PARTY_NOTICES.md':root/'THIRD_PARTY_NOTICES.md',
 }
 licenses=Path('C:/Program Files/dotnet')

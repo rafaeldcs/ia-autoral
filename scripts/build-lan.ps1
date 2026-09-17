@@ -15,4 +15,6 @@ if ($LASTEXITCODE -ne 0) { throw 'Falha ao preparar payload.' }
 & dotnet publish dotnet/LocalAuthor.Setup/LocalAuthor.Setup.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o build/lan-setup --nologo
 if ($LASTEXITCODE -ne 0) { throw 'Falha ao gerar instalador.' }
 Copy-Item -LiteralPath build/lan-setup/LocalAuthor.Setup.exe -Destination dist/lan/Instalar-LocalAuthor-Windows-x64.exe
+& (Join-Path $PSScriptRoot 'build-server-launcher.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Falha ao gerar aplicativo do servidor.' }
 Get-FileHash -Algorithm SHA256 dist/lan/Instalar-LocalAuthor-Windows-x64.exe | Format-List

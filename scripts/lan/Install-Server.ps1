@@ -17,7 +17,7 @@ if (-not (Test-Path -LiteralPath $python)) { throw 'Ambiente Python do servidor 
 $runtime = @{SourceRoot=$SourceRoot;Python=$python;Gateway=$gateway}
 $runtime | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $dataRoot 'runtime.json') -Encoding UTF8
 if (-not (Test-Path -LiteralPath (Join-Path $dataRoot 'server.json'))) {
-    & $gateway init --data $dataRoot --home (Join-Path $env:LOCALAPPDATA 'LocalAuthor') --bind $BindAddress --prefix $address.PrefixLength
+    & $gateway init --data $dataRoot --home (Join-Path $env:LOCALAPPDATA 'LocalAuthor') --bind $BindAddress --prefix $address.PrefixLength --discover
     if ($LASTEXITCODE -ne 0) { throw 'Falha ao configurar HTTPS.' }
 }
 $startup = Join-Path $runtimeRoot 'Start-Server.ps1'
@@ -41,5 +41,9 @@ $requestFirewall | Set-Content -LiteralPath (Join-Path $runtimeRoot 'Request-Fir
 $shortcut=$shell.CreateShortcut((Join-Path $delivery 'Liberar rede local (Administrador).lnk'))
 $shortcut.TargetPath='powershell.exe';$shortcut.Arguments='-NoProfile -ExecutionPolicy Bypass -File "'+(Join-Path $runtimeRoot 'Request-Firewall.ps1')+'"';$shortcut.Save()
 Start-Process -FilePath powershell.exe -ArgumentList @('-NoProfile','-WindowStyle','Hidden','-ExecutionPolicy','Bypass','-File',('"'+$startup+'"'),'-Supervise') -WindowStyle Hidden | Out-Null
+$launcher = Join-Path $SourceRoot 'build\server-launcher\LocalAuthor.ServerLauncher.exe'
+if (Test-Path -LiteralPath $launcher) {
+    & (Join-Path $PSScriptRoot 'Install-ServerLauncher.ps1') -Executable $launcher
+}
 Write-Output ('Servidor preparado. Atalhos em: '+$delivery)
 Write-Output 'A regra de firewall exige executar Liberar rede local como administrador.'

@@ -6,6 +6,8 @@ $config = Get-Content -LiteralPath (Join-Path $dataRoot 'server.json') -Raw | Co
 $mutex = [Threading.Mutex]::new($false, 'Local\LocalAuthorLanSupervisor')
 if (-not $mutex.WaitOne(0)) { Write-Output 'Supervisor já está ativo.'; exit }
 function Ensure-Servers {
+    $runtime = Get-Content -LiteralPath (Join-Path $dataRoot 'runtime.json') -Raw | ConvertFrom-Json
+    $config = Get-Content -LiteralPath (Join-Path $dataRoot 'server.json') -Raw | ConvertFrom-Json
     $backendListener = Get-NetTCPConnection -State Listen -LocalPort $config.BackendPort -ErrorAction SilentlyContinue
     if (-not $backendListener) {
         $lockFile = Join-Path $config.BackendHome 'server.lock'

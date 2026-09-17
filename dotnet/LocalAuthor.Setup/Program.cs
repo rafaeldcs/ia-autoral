@@ -4,13 +4,17 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text.Json;
 using Microsoft.Win32;
+using LocalAuthor.Connectivity;
 
 namespace LocalAuthor.Setup;
 static class Program {
  [STAThread] static void Main(string[] args) {
   ApplicationConfiguration.Initialize();
+  if(args.Length==2&&args[0]=="--install-local"){
+   try{Installer.Extract(Installer.Destination);Installer.EnsureWebView().GetAwaiter().GetResult();var provisioned=Installer.ConfigureConnection(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"LocalAuthorClient"));Installer.Register();WindowsStartup.Configure(Path.Combine(Installer.Destination,"LocalAuthor.Client.exe"),true);File.WriteAllText(args[1],JsonSerializer.Serialize(new{passed=true,provisioned,startWithWindows=true,path=Installer.Destination}));}catch(Exception e){File.WriteAllText(args[1],JsonSerializer.Serialize(new{passed=false,error=e.GetType().Name}));Environment.ExitCode=1;}return;
+  }
   if(args.Length==2&&args[0]=="--test-install") {
-   try {var root=Path.Combine(Path.GetTempPath(),"LocalAuthor-setup-"+Guid.NewGuid().ToString("N"));var count=Installer.Extract(root);File.WriteAllText(args[1],JsonSerializer.Serialize(new{passed=true,files=count,path=root}));}
+   try {var root=Path.Combine(Path.GetTempPath(),"LocalAuthor-setup-"+Guid.NewGuid().ToString("N"));var count=Installer.Extract(root);var home=Path.Combine(root,"client-data");var provisioned=Installer.ConfigureConnection(home);var encrypted=provisioned!="created"||Installer.VerifySavedConnection(home);var saved=provisioned=="created"?File.ReadAllBytes(Path.Combine(home,"connection.bin")):[];var second=Installer.ConfigureConnection(home);bool preserved=provisioned!="created"||(second=="preserved"&&saved.SequenceEqual(File.ReadAllBytes(Path.Combine(home,"connection.bin"))));File.WriteAllText(args[1],JsonSerializer.Serialize(new{passed=encrypted&&preserved,files=count,path=root,clientHome=home,provisioned,encrypted,preserved}));}
    catch(Exception e){File.WriteAllText(args[1],JsonSerializer.Serialize(new{passed=false,error=e.GetType().Name}));Environment.ExitCode=1;}return;
   }
   Application.Run(new SetupForm());
@@ -18,6 +22,31 @@ static class Program {
 }
 static class Installer {
  public static readonly string Destination=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"Programs","LocalAuthorClient");
+ public static bool HasConnection=>Assembly.GetExecutingAssembly().GetManifestResourceNames().Contains("connection.localauthor");
+
+ static byte[] ReadConnection() {
+  using var source=Assembly.GetExecutingAssembly().GetManifestResourceStream("connection.localauthor") ?? throw new InvalidDataException("Conexão não incluída.");
+  if(source.Length>65536)throw new InvalidDataException("Conexão inválida.");
+  using var memory=new MemoryStream();source.CopyTo(memory);var bytes=memory.ToArray();Connection.Parse(bytes).Validate();return bytes;
+ }
+ public static string ConfigureConnection(string home) {
+  if(!HasConnection)return "not-included";
+  // Validate the package before writing anything. Never silently replace an existing connection.
+  var bytes=ReadConnection();Directory.CreateDirectory(home);
+  if((File.GetAttributes(home)&FileAttributes.ReparsePoint)!=0)throw new IOException("Pasta de configuração não pode ser um link.");
+  var destination=Path.Combine(home,"connection.bin");
+  if(File.Exists(destination))return "preserved";
+  var encrypted=ProtectedData.Protect(bytes,null,DataProtectionScope.CurrentUser);
+  var pending=destination+"."+Guid.NewGuid().ToString("N")+".tmp";
+  try {using(var output=new FileStream(pending,FileMode.CreateNew,FileAccess.Write,FileShare.None))output.Write(encrypted);File.Move(pending,destination,false);}
+  finally{if(File.Exists(pending))File.Delete(pending);}
+  return "created";
+ }
+ public static bool VerifySavedConnection(string home) {
+  var expected=Connection.Parse(ReadConnection());var encrypted=File.ReadAllBytes(Path.Combine(home,"connection.bin"));
+  var actual=Connection.Parse(ProtectedData.Unprotect(encrypted,null,DataProtectionScope.CurrentUser));actual.Validate();
+  return actual==expected&&!System.Text.Encoding.UTF8.GetString(encrypted).Contains(expected.AccessKey,StringComparison.Ordinal);
+ }
  public static int Extract(string root) {
   root=Path.GetFullPath(root);Directory.CreateDirectory(root);
   if((File.GetAttributes(root)&FileAttributes.ReparsePoint)!=0)throw new IOException("A pasta não pode ser um link.");
@@ -55,21 +84,23 @@ static class Installer {
   dynamic shell=Activator.CreateInstance(Type.GetTypeFromProgID("WScript.Shell")!)!;
   dynamic shortcut=shell.CreateShortcut(menu);shortcut.TargetPath=Path.Combine(Destination,"LocalAuthor.Client.exe");shortcut.WorkingDirectory=Destination;shortcut.Description="Sua IA local pela rede";shortcut.Save();
   using var registry=Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall\LocalAuthorClient");
-  registry.SetValue("DisplayName","LocalAuthor — Cliente de rede");registry.SetValue("DisplayVersion","0.2.0");registry.SetValue("Publisher","LocalAuthor experimental");registry.SetValue("InstallLocation",Destination);
+  registry.SetValue("DisplayName","LocalAuthor — Cliente de rede");registry.SetValue("DisplayVersion",Assembly.GetExecutingAssembly().GetName().Version!.ToString());registry.SetValue("Publisher","LocalAuthor experimental");registry.SetValue("InstallLocation",Destination);
   registry.SetValue("UninstallString","powershell.exe -NoProfile -ExecutionPolicy Bypass -File \""+Path.Combine(Destination,"Desinstalar.ps1")+"\"");registry.SetValue("NoModify",1);registry.SetValue("NoRepair",1);
  }
 }
 sealed class SetupForm : Form {
  bool installed;
+ readonly CheckBox startWithWindows=new(){Text="Abrir LocalAuthor ao entrar no Windows",AutoSize=true,Checked=WindowsStartup.Preferred};
  readonly Button install=new(){Text="Instalar LocalAuthor",AutoSize=true,Height=44};
  readonly Label message=new(){AutoSize=true,MaximumSize=new Size(500,0),Text="Instalação para este usuário do Windows.\n\nO aplicativo acessa a IA do seu servidor pela rede local.\n.NET está incluído. WebView2 será instalado se necessário, sem download.\n\nDepois, importe o arquivo de conexão criado no servidor.\nNenhuma chave de acesso está incluída neste instalador."};
  public SetupForm() {
-  Text="Instalar LocalAuthor";ClientSize=new Size(560,350);StartPosition=FormStartPosition.CenterScreen;Font=new Font("Segoe UI",11);FormBorderStyle=FormBorderStyle.FixedDialog;MaximizeBox=false;
-  var panel=new FlowLayoutPanel{Dock=DockStyle.Fill,FlowDirection=FlowDirection.TopDown,Padding=new Padding(24),WrapContents=false};message.Margin=new Padding(0,0,0,20);panel.Controls.Add(message);panel.Controls.Add(install);Controls.Add(panel);
+  if(Installer.HasConnection)message.Text="Instalação para este usuário do Windows.\n\nEste instalador já está conectado ao seu servidor LocalAuthor.\n.NET e WebView2 estão incluídos.\n\nAo abrir o aplicativo, a conexão será automática.\nUse esta cópia privada apenas no computador autorizado.";
+  Text="Instalar LocalAuthor";ClientSize=new Size(560,400);StartPosition=FormStartPosition.CenterScreen;Font=new Font("Segoe UI",11);FormBorderStyle=FormBorderStyle.FixedDialog;MaximizeBox=false;
+  var panel=new FlowLayoutPanel{Dock=DockStyle.Fill,FlowDirection=FlowDirection.TopDown,Padding=new Padding(24),WrapContents=false};message.Margin=new Padding(0,0,0,20);panel.Controls.Add(message);panel.Controls.Add(startWithWindows);panel.Controls.Add(install);Controls.Add(panel);
   install.Click+=async(_,_)=>{
    if(installed){Close();return;}
    install.Enabled=false;message.Text="Preparando arquivos e verificando WebView2…";
-   try{Installer.Extract(Installer.Destination);await Installer.EnsureWebView();Installer.Register();installed=true;message.Text="Instalação concluída. Abra LocalAuthor pelo menu Iniciar e importe seu arquivo de conexão.\n\nPara remover, use Aplicativos instalados no Windows.";install.Text="Fechar";install.Enabled=true;}
+   try{Installer.Extract(Installer.Destination);await Installer.EnsureWebView();var connection=Installer.ConfigureConnection(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"LocalAuthorClient"));Installer.Register();WindowsStartup.Configure(Path.Combine(Installer.Destination,"LocalAuthor.Client.exe"),startWithWindows.Checked);installed=true;message.Text=connection=="created"?"Instalação concluída. Abra LocalAuthor pelo menu Iniciar: a conexão com seu servidor já está configurada.":connection=="preserved"?"Instalação concluída. Sua conexão anterior foi preservada. Abra LocalAuthor pelo menu Iniciar.":"Instalação concluída. Abra LocalAuthor pelo menu Iniciar e importe seu arquivo de conexão.";message.Text+="\n\nPara remover, use Aplicativos instalados no Windows.";install.Text="Fechar";install.Enabled=true;}
    catch(Exception e){message.Text="Não foi possível concluir: "+e.Message;install.Enabled=true;}
   };
  }

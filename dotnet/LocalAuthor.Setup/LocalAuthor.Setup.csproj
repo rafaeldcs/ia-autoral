@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
- <PropertyGroup><OutputType>WinExe</OutputType><TargetFramework>net10.0-windows</TargetFramework><UseWindowsForms>true</UseWindowsForms><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings><Version>0.2.0</Version></PropertyGroup>
+ <PropertyGroup><OutputType>WinExe</OutputType><TargetFramework>net10.0-windows</TargetFramework><UseWindowsForms>true</UseWindowsForms><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings><Version>0.3.3</Version></PropertyGroup>
  <ItemGroup><EmbeddedResource Include="../../build/client-payload.zip" LogicalName="payload.zip" /><EmbeddedResource Include="../../build/downloads/MicrosoftEdgeWebView2RuntimeInstallerX64.exe" LogicalName="webview.exe" /></ItemGroup>
-</Project>
+ <ItemGroup><Compile Include="../Shared/Connection.cs" Link="Connection.cs" /></ItemGroup>
+ <ItemGroup><Compile Remove="obj/**;bin/**" /></ItemGroup>
+ <ItemGroup Condition="'$(ConnectionFile)' != ''"><EmbeddedResource Include="$(ConnectionFile)" LogicalName="connection.localauthor" /></ItemGroup>
+ <ItemGroup><Compile Include="../Shared/WindowsStartup.cs" Link="WindowsStartup.cs" /></ItemGroup></Project>

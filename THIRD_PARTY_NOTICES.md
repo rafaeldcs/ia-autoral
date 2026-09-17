@@ -1,5 +1,9 @@
 # Autoria, infraestrutura e dependências
 
+## Senha de publicação — 0.3.2
+
+O gateway acrescenta Microsoft.Data.Sqlite 10.0.12 e suas dependências SQLitePCLRaw/SQLite para um banco local de autorização de publicação, sem serviço externo. O hash utiliza PBKDF2-HMAC-SHA256 da biblioteca padrão .NET, salt aleatório e 600.000 iterações. A senha original não é persistida. Referência do pacote: https://www.nuget.org/packages/Microsoft.Data.Sqlite/10.0.12 . O banco fica fora do repositório, separado dos projetos e dos modelos existentes.
+
 ## Distribuição LAN 0.2.0 (17/09/2026)
 
 O pacote Windows LAN acrescenta gateway ASP.NET Core 10, cliente Windows Forms com Microsoft.Web.WebView2 1.0.4191.47 e instalador próprio .NET. Nesta distribuição binária, runtimes .NET 10.0.9 são incluídos pela publicação self-contained, juntamente com seus avisos e licenças; WebView2 possui SDK com avisos incluídos e instalador offline Evergreen da Microsoft com assinatura Authenticode validada. O runtime WebView2 é instalado somente se necessário. Esses componentes são infraestrutura; não contêm um modelo de IA pré-treinado usado pelo LocalAuthor.
