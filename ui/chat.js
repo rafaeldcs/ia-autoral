@@ -44,10 +44,10 @@ async function renderConversations() { if (!state.project)
     list.append(node);
 } }
 async function selectProject(project) { if (state.busy)
-    return; state.project = project; state.conversation = null; $('project-heading').textContent = project.name; $('folder-path').textContent = project.root; $('welcome-copy').textContent = 'Converse sobre ' + project.name + '. Comece com o problema, combine o critério de pronto e planeje como testar.'; $('sidebar').classList.remove('open'); renderProjects(); resetChat(); }
+    return; hideBrowserPanel(); state.project = project; state.conversation = null; $('project-heading').textContent = project.name; $('folder-path').textContent = project.root; $('welcome-copy').textContent = 'Converse sobre ' + project.name + '. Comece com o problema, combine o critério de pronto e planeje como testar.'; $('sidebar').classList.remove('open'); renderProjects(); resetChat(); }
 function renderMessages() { const list = $('messages'); list.replaceChildren(); const messages = state.conversation?.messages || []; $('welcome').hidden = messages.length > 0; for (const message of messages) {
     const box = el('article', '', `message ${message.role}`);
-    const names = { project_guide: 'Guia do projeto · orientação estruturada', retrieval_only: 'Memória local · trechos recuperados', local_model: 'IA local · geração experimental', investigation_memory: 'Sistema investigado · evidências observadas' };
+    const names = { project_guide: 'Guia do projeto · orientação estruturada', retrieval_only: 'Memória local · trechos recuperados', local_model: 'IA local · geração experimental', investigation_memory: 'Sistema investigado · evidências observadas', browser_session: 'Navegador da IA · sessão de investigação' };
     const code = message.metadata.format === 'code';
     box.append(el('div', message.role === 'user' ? 'Você' : names[message.metadata.origin] || 'Assistente', 'message-label'), el(code ? 'pre' : 'div', message.content, code ? 'message-content code-content' : 'message-content'));
     const copy = el('button', 'Copiar mensagem', 'copy-message');
@@ -57,6 +57,7 @@ function renderMessages() { const list = $('messages'); list.replaceChildren(); 
         toast('Mensagem copiada sem alterar o texto.');
     });
     box.append(copy);
+    if(message.metadata.browser_session_id) { const view=el('button','Acompanhar investigação','copy-message'); view.onclick=handle(()=>openBrowserSession(message.metadata.browser_session_id)); box.append(view); }
     for (const source of message.metadata.sources || []) {
         if (!source.url.startsWith('https://'))
             continue;
@@ -74,7 +75,7 @@ $('connect-form').onsubmit = handle(async () => { state.token = $('local-token')
     await selectProject(state.projects[0]);
 else
     $('add-project').focus(); });
-$('logout').onclick = () => { state.token = ''; state.project = null; state.conversation = null; state.projects = []; $('messages').replaceChildren(); $('project-list').replaceChildren(); $('conversation-list').replaceChildren(); $('studio').hidden = true; $('connect').hidden = false; $('local-token').focus(); };
+$('logout').onclick = () => { hideBrowserPanel(); state.token = ''; state.project = null; state.conversation = null; state.projects = []; $('messages').replaceChildren(); $('project-list').replaceChildren(); $('conversation-list').replaceChildren(); $('studio').hidden = true; $('connect').hidden = false; $('local-token').focus(); };
 $('open-menu').onclick = () => { $('sidebar').classList.add('open'); $('close-menu').focus(); };
 $('close-menu').onclick = () => { $('sidebar').classList.remove('open'); $('open-menu').focus(); };
 $('start-project').onclick = () => $('add-project').click();
@@ -86,7 +87,7 @@ $('new-chat').onclick = handle(async () => { if (!state.project)
     throw Error('Adicione uma pasta de projeto primeiro.'); resetChat(); });
 for (const button of document.querySelectorAll('[data-prompt]'))
     button.onclick = () => { $('message-input').value = button.dataset.prompt; $('response-mode').value = button.dataset.mode || 'guide'; modeNotice(); updateInputCount(); $('message-input').focus(); toast('Exemplo preenchido. Edite a mensagem ou clique em Enviar.'); };
-function modeNotice() { const modes = { investigation: 'Consulta as telas já observadas neste projeto, com data e origem. Não navega agora. Não envie senhas no chat.', guide: 'Guias estruturados e referências. Não é geração neural. Ctrl + Enter para enviar.', knowledge: 'Consulta apenas fontes deste projeto. Não inclui conversas ou fontes de outros projetos.', model: 'Laboratório: pedido curto, sem histórico nem arquivos no contexto. A saída pode estar errada e não é executada.' }; $('mode-notice').textContent = modes[$('response-mode').value]; }
+function modeNotice() { const modes = { browser: 'Envie um endereço HTTPS para abrir o navegador da IA e acompanhar as capturas. Isso autoriza conexão ao site nesta sessão. Nunca envie senhas no chat.', investigation: 'Consulta as telas já observadas neste projeto, com data e origem. Não navega agora. Não envie senhas no chat.', guide: 'Guias estruturados e referências. Não é geração neural. Ctrl + Enter para enviar.', knowledge: 'Consulta apenas fontes deste projeto. Não inclui conversas ou fontes de outros projetos.', model: 'Laboratório: pedido curto, sem histórico nem arquivos no contexto. A saída pode estar errada e não é executada.' }; $('mode-notice').textContent = modes[$('response-mode').value]; }
 $('response-mode').onchange = () => { modeNotice(); updateInputCount(); };
 function updateInputCount() {
     const value = $('message-input').value;
@@ -135,6 +136,8 @@ $('compose').onsubmit = handle(async () => { if (state.busy)
             throw Error('Geração ainda em andamento. Consulte Atividade nas ferramentas avançadas.');
     }
     state.conversation = response;
+    const browserMessage=response.messages?.at(-1)?.metadata?.browser_session_id;
+    if(browserMessage) await openBrowserSession(browserMessage);
     $('message-input').value = '';
     updateInputCount();
     renderMessages();
@@ -151,3 +154,132 @@ document.addEventListener('keydown', event => { if (event.key === 'Escape')
     $('sidebar').classList.remove('open'); });
 
 updateAvailability();
+
+// Browser workspace: snapshots come from the server's isolated LocalAuthor tool.
+const browserState = {id:null, project:null, row:null, timer:null, selected:null, generation:0};
+function hideBrowserPanel() {
+    clearTimeout(browserState.timer); browserState.generation++;
+    browserState.id=null; browserState.row=null; browserState.selected=null;
+    $('browser-panel').hidden=true; document.body.classList.remove('browser-visible');
+    $('browser-login-dialog').close(); $('browser-login-form').reset();
+    $('browser-image').removeAttribute('src'); $('browser-image').hidden=true;
+    $('browser-links').replaceChildren(); $('browser-frames').replaceChildren();
+    $('browser-tools').hidden=true; $('browser-open-form').hidden=false; $('browser-start').disabled=false;
+    $('browser-status').textContent='Informe um endereço ou escolha uma sessão para continuar.';
+    $('browser-current-url').textContent=''; $('browser-interpretation').textContent='';
+}
+async function browserSessionList() {
+    const project=state.project?.id;
+    if(!project) throw Error('Escolha um projeto antes de investigar um site.');
+    const rows=await api('/api/browser/sessions?project_id='+project);
+    if(state.project?.id!==project) return;
+    const select=$('browser-sessions'); select.replaceChildren(el('option','Escolha uma sessão'));
+    select.firstChild.value='';
+    for(const row of rows) { const option=el('option',new URL(row.url).hostname+' · '+new Date(row.created_at).toLocaleString('pt-BR')); option.value=row.id; select.append(option); }
+    select.value=browserState.id || '';
+    return rows;
+}
+async function openBrowserPanel(resume=true) {
+    if(!state.project) throw Error('Adicione ou escolha um projeto primeiro.');
+    $('browser-panel').hidden=false; document.body.classList.add('browser-visible');
+    browserState.project=state.project.id;
+    const rows=await browserSessionList();
+    const active=rows?.find(r=>['starting','busy','ready'].includes(r.state));
+    if(resume && active && !browserState.id) {
+        browserState.id=active.id; browserState.generation++;
+        $('browser-sessions').value=active.id;
+        await pollBrowser(browserState.generation);
+    }
+}
+async function openBrowserSession(id) {
+    await openBrowserPanel(false); clearTimeout(browserState.timer);
+    browserState.id=id; browserState.selected=null; browserState.generation++;
+    $('browser-sessions').value=id;
+    await pollBrowser(browserState.generation);
+}
+async function showBrowserFrame(number) {
+    const row=browserState.row, project=browserState.project, id=browserState.id;
+    const frame=row?.frames.find(f=>f.number===number);
+    if(!frame) return;
+    browserState.selected=number;
+    $('browser-current-url').textContent=frame.url;
+    $('browser-interpretation').textContent='Leitura da IA: '+frame.interpretation.description+' (categoria prevista; descrição fixa).'+(frame.truncated?' A lista de controles excedeu o limite desta observação.':'');
+    if(frame.blockedRequests?.length) $('browser-interpretation').textContent+=' Conexões bloqueadas: '+frame.blockedRequests.join(', ')+'.';
+    if(frame.reason) $('browser-interpretation').textContent+=' '+frame.reason;
+    $('browser-image').hidden=true;
+    if(frame.file) {
+        const artifact=await api(`/api/browser/image?project_id=${project}&id=${id}&frame=${number}`);
+        if(browserState.id!==id || browserState.selected!==number || browserState.project!==project) return;
+        $('browser-image').src=artifact.data; $('browser-image').hidden=false;
+    }
+    const latest=row.frames.at(-1)?.number===number && row.state==='ready';
+    $('browser-links').replaceChildren();
+    for(const control of frame.controls.filter(c=>c.safe)) {
+        const button=el('button',control.name+(control.visited?' · visitado':''));
+        button.disabled=!latest;
+        button.onclick=handle(()=>browserAction('link',{target:control.id}));
+        $('browser-links').append(button);
+    }
+    $('browser-login').disabled=!latest || !frame.loginAvailable;
+    for(const button of document.querySelectorAll('[data-browser-action]')) button.disabled=button.dataset.browserAction==='stop' ? !['starting','busy','ready'].includes(row.state) : !latest;
+}
+async function pollBrowser(generation) {
+    const id=browserState.id, project=browserState.project;
+    if(!id || generation!==browserState.generation || state.project?.id!==project) return;
+    try {
+        const row=await api(`/api/browser/session?project_id=${project}&id=${id}`);
+        if(generation!==browserState.generation) return;
+        const previous=browserState.row;
+        browserState.row=row;
+        const names={starting:'Preparando navegador isolado…',busy:'A IA está trabalhando. Você pode encerrar a sessão.',ready:'Pronto para a próxima ação.',stopped:'Sessão encerrada.',failed:'Não foi possível concluir.',interrupted:'Sessão interrompida.'};
+        $('browser-status').textContent=(row.error || names[row.state])+' '+row.frames.length+' observação(ões).';
+        $('browser-tools').hidden=false;
+        $('browser-login').disabled=row.state!=='ready' || !row.frames.at(-1)?.loginAvailable;
+        $('browser-start').disabled=['starting','busy','ready'].includes(row.state);
+        $('browser-open-form').hidden=['starting','busy','ready'].includes(row.state);
+        const frames=$('browser-frames'); frames.replaceChildren();
+        for(const frame of row.frames) {
+            const button=el('button',frame.number+' · '+frame.title);
+            button.setAttribute('aria-pressed',String(frame.number===browserState.selected));
+            button.onclick=handle(()=>showBrowserFrame(frame.number)); frames.append(button);
+        }
+        if(row.frames.length && (row.frames.length!==previous?.frames.length || browserState.selected===null)) await showBrowserFrame(row.frames.at(-1).number);
+        else if(row.frames.length && row.state!==previous?.state) await showBrowserFrame(browserState.selected);
+        for(const button of document.querySelectorAll('[data-browser-action]')) {
+            if(button.dataset.browserAction==='stop') button.disabled=!['starting','busy','ready'].includes(row.state);
+            else if(row.state!=='ready') button.disabled=true;
+        }
+        if(['starting','busy','ready'].includes(row.state)) browserState.timer=setTimeout(()=>pollBrowser(generation),1200);
+    } catch(error) { $('browser-status').textContent=error.message; }
+}
+async function browserAction(action, fields={}) {
+    const row=browserState.row;
+    if(!row) return;
+    const command=action==='stop' ? {action} : {action,snapshot:row.frames.at(-1)?.snapshot,...fields};
+    await api('/api/browser/action',{project_id:browserState.project,id:row.id,command});
+    clearTimeout(browserState.timer); await pollBrowser(browserState.generation);
+}
+$('open-browser').onclick=handle(openBrowserPanel);
+$('browser-close').onclick=()=>{ hideBrowserPanel(); $('open-browser').focus(); };
+$('browser-sessions').onchange=handle(()=>{if($('browser-sessions').value) return openBrowserSession($('browser-sessions').value);});
+$('browser-open-form').onsubmit=handle(async()=>{
+    $('browser-start').disabled=true;
+    try {
+        const row=await api('/api/browser/start',{project_id:state.project.id,url:$('browser-url').value.trim(),allow_network:true,
+            asset_hosts:$('browser-hosts').value.split(',').map(s=>s.trim()).filter(Boolean),
+            auth_hosts:$('browser-auth-hosts').value.split(',').map(s=>s.trim()).filter(Boolean)});
+        await openBrowserSession(row.id);
+    } finally { if(!['starting','busy','ready'].includes(browserState.row?.state)) $('browser-start').disabled=false; }
+});
+for(const button of document.querySelectorAll('[data-browser-action]')) button.onclick=handle(()=>browserAction(button.dataset.browserAction));
+$('browser-login').onclick=()=>{
+    $('browser-login-form').reset();
+    $('browser-login-origin').textContent='Destino: '+new URL(browserState.row.frames.at(-1).url).origin;
+    $('browser-login-dialog').showModal(); $('browser-username').focus();
+};
+$('browser-login-form').onsubmit=handle(async()=>{
+    const credentials={username:$('browser-username').value,password:$('browser-password').value};
+    $('browser-login-form').reset(); $('browser-login-dialog').close();
+    try { await browserAction('login',credentials); }
+    finally {credentials.username='';credentials.password='';}
+});

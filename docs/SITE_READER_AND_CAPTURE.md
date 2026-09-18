@@ -55,8 +55,9 @@ local de dados: PNG por página, `captures.json` com decisão e hash do artefato
 `runtime.json` com evidência do executor. Captura recusada ou falha fica registrada
 e o comando retorna erro. Sucesso exige evidência para todas as URLs solicitadas.
 
-Este recurso está disponível por comando experimental. Não foi adicionado um
-botão ao chat nem regenerado o instalador de desktop nesta entrega.
+O comando experimental permanece disponível. A evolução posterior adicionou
+um [painel de navegador ao chat](BROWSER_WORKSPACE.md), com capturas, navegação
+limitada e login explícito. Essa evolução continua sem qualificação universal.
 
 ## Treino, respostas e auditoria
 

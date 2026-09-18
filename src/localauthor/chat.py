@@ -3,6 +3,7 @@ import json
 import hashlib
 import threading
 import uuid
+import re
 from pathlib import Path
 from .engineering import DONE, QUALITY, SOURCES, guidance
 from .errors import PolicyError, NotFoundError
@@ -87,7 +88,7 @@ class ChatService:
     def validate_message(self, message, mode, input_format="text"):
         if not isinstance(message, str) or not 1 <= len(message.strip()) <= 8000:
             raise PolicyError("Mensagem deve ter de 1 a 8.000 caracteres.")
-        if mode not in {"guide", "knowledge", "model", "investigation"}:
+        if mode not in {"guide", "knowledge", "model", "investigation", "browser"}:
             raise PolicyError("Modo de conversa inválido.")
         if input_format not in {"text", "code"}:
             raise PolicyError("Formato deve ser texto ou código.")
@@ -111,7 +112,15 @@ class ChatService:
             if len(conversation["messages"]) >= 200:
                 raise PolicyError("Conversa cheia. Inicie outra conversa.")
             project = self.store.project(project_id)
-            if mode == "model":
+            if mode == "browser":
+                urls = re.findall(r'https://[^\s<>"\)]+', message)
+                if len(urls) != 1:
+                    raise PolicyError('Neste modo, envie um único endereço HTTPS. Não inclua usuário ou senha.')
+                session = self.browser.start(project_id, urls[0], allow_network=True)
+                response = {'origin':'browser_session', 'browser_session_id':session['id'],
+                            'content':'Abri uma sessão de investigação para '+urls[0]+'. Acompanhe as capturas no painel Navegador da IA. Use Investigar próximos links para solicitar navegação guiada pelos modelos locais.',
+                            'notice':'Leitura experimental: destinos observados, capturas próprias e hipóteses de finalidade. Não garante compreender qualquer site.', 'sources':[]}
+            elif mode == "model":
                 response = self._generate(message)
             elif mode == "investigation":
                 response = self.investigations.answer(project_id, message)

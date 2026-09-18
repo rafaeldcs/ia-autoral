@@ -103,6 +103,14 @@ class HttpTests(WorkspaceCase):
     def test_api_requires_token(self):
         self.assertEqual(self.request("GET", "/api/health", auth=False)[0], 401)
 
+    def test_browser_endpoints_require_auth_and_explicit_network_permission(self):
+        for path in ('/api/browser/sessions','/api/browser/session','/api/browser/image'):
+            self.assertEqual(self.request('GET',path,auth=False)[0],401)
+        self.assertEqual(self.request('POST','/api/browser/start',{'project_id':self.project['id'],
+                         'url':'https://example.org/'})[0],400)
+        status, _, result=self.request('GET','/api/browser/sessions?project_id='+self.project['id'])
+        self.assertEqual((status,result),(200,[]))
+
     def test_health_is_explicit_about_model(self):
         status, headers, data = self.request("GET", "/api/health")
         self.assertEqual(status, 200)

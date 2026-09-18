@@ -120,6 +120,9 @@ def make_handler(app: Application, ui_path: Path):
 
         def _route(self, method, path, q, body):
             if method == "GET":
+                if path == "/api/browser/sessions": return app.browser.list(q['project_id'])
+                if path == "/api/browser/session": return app.browser.get(q['project_id'], q['id'])
+                if path == "/api/browser/image": return app.browser.image(q['project_id'], q['id'], int(q['frame']))
                 if path == "/api/health":
                     return {"status": "ok", "version": "0.1.0", "mode": "platform_and_experimental_cpu_model", "offline": app.settings.offline, "model_qualified": False, "gpu_backend": False, "stats": app.store.stats(), "allowed_domains": app.settings.allowed_domains, "runner_enabled": bool(app.settings.docker_image)}
                 if path == "/api/diagnostics": return diagnose(app.settings.home)
@@ -156,6 +159,10 @@ def make_handler(app: Application, ui_path: Path):
                         return {"path": q["path"], "sha256": sha256(raw), "content": raw.decode("utf-8")}
                     return app.tasks.preview(ident)
             if method == "POST":
+                if path == "/api/browser/start":
+                    return app.browser.start(body['project_id'], body['url'], body.get('allow_network'), body.get('asset_hosts'), body.get('auth_hosts'))
+                if path == "/api/browser/action":
+                    return app.browser.act(body['project_id'], body['id'], body['command'])
                 if path == "/api/projects": return app.store.add_project(body["name"], body["root"])
                 if path == "/api/investigations": return app.chat.investigations.create(body["project_id"], body["name"], body["origin"])
                 if path == "/api/investigations/observe": return app.chat.investigations.observe(body["project_id"], body["investigation_id"], body["screen"])

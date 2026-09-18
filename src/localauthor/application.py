@@ -11,6 +11,7 @@ from .jobs import JobQueue
 from .safety import PathPolicy
 from .errors import PolicyError
 from .chat import ChatService
+from .browser_workspace import BrowserWorkspace
 
 
 class Application:
@@ -19,6 +20,8 @@ class Application:
         self.store = Store(settings.home / "memory.sqlite3", settings.max_store_bytes)
         self.knowledge = KnowledgeService(self.store, settings)
         self.chat = ChatService(self.store, settings, self.knowledge)
+        self.browser = BrowserWorkspace(settings, self.store)
+        self.chat.browser = self.browser
         self.research = ResearchService(self.store, settings)
         self.tasks = TaskService(self.store, settings)
         self.runner = SandboxRunner(settings, self.tasks)
@@ -50,4 +53,5 @@ class Application:
         self.jobs.start()
 
     def close(self):
+        self.browser.close()
         self.jobs.close()

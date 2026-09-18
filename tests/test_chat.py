@@ -11,6 +11,15 @@ from tests.helpers import WorkspaceCase
 
 
 class ChatTests(WorkspaceCase):
+    def test_browser_mode_records_session_without_claiming_completion(self):
+        with patch.object(self.app.browser, 'start', return_value={'id':'a'*32}) as start:
+            result=self.chat.respond(self.project['id'],self.conversation['id'],'Investigue https://example.org/','browser')
+            start.assert_called_once_with(self.project['id'],'https://example.org/',allow_network=True)
+            self.assertEqual(result['messages'][-1]['metadata']['browser_session_id'],'a'*32)
+            self.assertIn('Não garante',result['messages'][-1]['metadata']['notice'])
+        with self.assertRaises(PolicyError):
+            self.chat.respond(self.project['id'],self.conversation['id'],'https://a.test/ https://b.test/','browser')
+
     def setUp(self):
         super().setUp()
         self.app = Application(self.settings)

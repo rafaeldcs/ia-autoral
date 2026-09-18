@@ -40,3 +40,13 @@ button:disabled{cursor:not-allowed}
 }
 
 /* Keep the composer visible in desktop windows with limited height. */ .welcome{min-height:0;overflow:auto;flex:1}.compose-wrap{flex-shrink:0}
+
+.browser-panel{position:fixed;right:0;top:0;bottom:0;width:52vw;background:#f8f9fc;border-left:1px solid #dce0ea;z-index:15;display:flex;flex-direction:column;padding:18px;gap:12px;overflow:auto;box-sizing:border-box}
+.browser-heading{display:flex;justify-content:space-between;align-items:center}.browser-heading strong{font-size:17px}.browser-heading small{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+.browser-panel button{border:1px solid #b8b2ce;border-radius:7px;padding:8px 11px;background:white;text-align:left}.browser-panel button:hover{border-color:var(--accent);background:#eeebfa}.browser-panel .primary{background:var(--accent);color:white}
+.browser-panel form{display:grid;gap:10px}.browser-panel p{font-size:12px;line-height:1.5;margin:4px 0}.browser-panel summary{cursor:pointer;font-size:12px;padding:8px 0}.browser-history-label{margin-top:4px}
+.browser-panel .primary:hover{background:#5543b6;color:white}
+.browser-tools{display:flex;flex-wrap:wrap;gap:7px}.browser-tools button{font-size:12px}.browser-evidence{min-width:0}.browser-evidence img{display:block;width:100%;height:auto;border:1px solid #dce0ea;border-radius:6px;background:white}.browser-limit{color:var(--muted)}
+#browser-current-url{overflow-wrap:anywhere;font-family:Consolas,monospace}#browser-frames{display:flex;gap:6px;overflow:auto;margin:12px 0}#browser-frames button{flex:0 0 auto;max-width:170px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}#browser-frames button[aria-pressed="true"]{border:2px solid var(--accent)}#browser-links{display:flex;flex-wrap:wrap;gap:6px}#browser-links button{font-size:12px;max-width:100%;overflow-wrap:anywhere}
+.browser-visible .main{margin-right:52vw}.browser-visible .conversation-rail{display:none}.browser-visible .sidebar{width:175px}.browser-visible .main{margin-left:175px}.browser-visible .main header{padding:0 14px;gap:8px;flex-wrap:wrap}.browser-visible .welcome{padding:20px}.browser-visible .welcome h1{font-size:26px}.browser-visible .suggestions{grid-template-columns:1fr}.browser-visible .compose-wrap{padding:12px}.browser-visible .header-actions{display:flex;gap:5px}
+@media(max-width:1000px){.browser-panel{width:100%;z-index:18}.browser-visible .main{margin-right:0;margin-left:0}.browser-visible .sidebar{width:245px}}

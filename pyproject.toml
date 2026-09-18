@@ -19,4 +19,4 @@ localauthor = "localauthor.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-localauthor = ["capture_browser.cjs"]
+localauthor = ["capture_browser.cjs", "live_browser.cjs"]
