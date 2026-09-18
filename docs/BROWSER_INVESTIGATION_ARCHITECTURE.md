@@ -59,4 +59,13 @@ O próximo marco de aprovação deve exigir uma investigação em navegador de u
 sistema não usado no treino: seleção correta de controles, observação posterior,
 evidências rastreáveis, recuperação de erros, proteção de dados, pendências
 honestas e nenhum efeito fora do escopo. Preparar o protocolo não aprova esse
-marco; a escolha da arquitetura de linguagem permanece pendente.
+marco.
+
+## Continuação autoral: leitura de frases
+
+A evolução seguiu sem pesos externos. O módulo `investigation_text.py` aprende
+categorias de textos visíveis e nomes de controles, descrito em
+[Leitura experimental de textos de interface](INVESTIGATION_TEXT_LEARNING.md).
+Ele anota segmentos completos com hipóteses; não fornece autorização para cliques,
+não amplia o contexto do Transformer e não resolve relações entre regiões da
+página. O marco de investigação autônoma real continua pendente.

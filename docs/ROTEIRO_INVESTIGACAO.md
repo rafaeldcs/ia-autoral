@@ -130,3 +130,11 @@ de carregamento de páginas ou desempenho da ShopAir.
 Todos os pontos definidos **deste laboratório** foram aprovados. A navegação de
 sites reais e a compreensão livre continuam sem aprovação. O candidato fica
 preservado para evolução; não é promovido silenciosamente ao chat geral.
+
+## Etapa seguinte: aprender a ler frases observadas
+
+O curso adicional de [leitura de interface](INVESTIGATION_TEXT_LEARNING.md)
+treinou dois especialistas a partir de texto, com 36/36 casos de validação e
+64/64 de auditoria após correções. O documento preserva os erros intermediários,
+separa os testes de software das previsões aprendidas e descreve o uso experimental.
+As relações entre regiões e a navegação autônoma permanecem pendentes.
