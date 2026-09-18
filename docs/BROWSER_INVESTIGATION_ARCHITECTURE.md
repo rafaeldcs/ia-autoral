@@ -31,8 +31,11 @@ persistido nessa medição. A navegação foi de Codex, não do modelo.
 7. Ao encerrar, controles descobertos e não visitados continuam como pendências.
    Encerramento não é sinônimo de cobertura total.
 
-Não há executor de navegador instalado, conexão nova com serviço de IA ou modelo
-externo adicionado nesta etapa. O protocolo não interpreta uma anotação da página
+Na etapa inicial deste protocolo não havia executor de navegador conectado.
+Agora existe um executor separado de capturas públicas, descrito em
+[Leitor e captura própria](SITE_READER_AND_CAPTURE.md); ele ainda não executa os
+cliques e a investigação geral deste protocolo. Nenhum serviço de IA ou modelo
+externo foi adicionado. O protocolo não interpreta uma anotação da página
 como autorização. A identificação de controles de navegação é responsabilidade
 do adaptador confiável, não uma declaração livre do modelo ou do site.
 

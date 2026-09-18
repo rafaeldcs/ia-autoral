@@ -3,6 +3,7 @@ import argparse
 import json
 import os
 import sys
+import subprocess
 from pathlib import Path
 from .config import Settings, default_home
 from .errors import LocalAIError
@@ -41,6 +42,11 @@ def main(argv=None) -> int:
     restore_p = sub.add_parser("restore")
     restore_p.add_argument("archive", type=Path)
     restore_p.add_argument("destination", type=Path)
+    capture_p = sub.add_parser("capture", help="Capturas públicas pelo navegador isolado do LocalAuthor (experimental).")
+    capture_p.add_argument("urls", nargs="+")
+    capture_p.add_argument("--policy-report", type=Path, required=True)
+    capture_p.add_argument("--asset-host", action="append", default=[])
+    capture_p.add_argument("--allow-network", action="store_true", help="Autoriza rede apenas nesta captura, sem alterar a configuração offline.")
     args = parser.parse_args(argv)
     try:
         if args.command == "restore":
@@ -89,6 +95,15 @@ def main(argv=None) -> int:
             ids = tokenizer.encode(args.prompt)
             out = model.generate(ids, args.max_tokens)
             print_json({"experimental_completion": tokenizer.decode(out, errors="replace"), "programming_qualified": False, "notice": "Saída experimental; não é proposta autorizada nem solução verificada."})
+        elif args.command == "capture":
+            if settings.offline and not args.allow_network:
+                raise ValueError("Captura requer rede. Use --allow-network para autorizar apenas esta execução.")
+            from .browser_capture import capture
+            try:
+                print_json(capture(args.urls, args.policy_report, settings.home, args.asset_host))
+            except (subprocess.SubprocessError, RuntimeError) as exc:
+                raise ValueError("Captura não concluída; sem alternativa no host. " +
+                                 (str(exc) if isinstance(exc, RuntimeError) else "Verifique o Docker e o relatório da execução.")) from exc
         elif args.command == "backup":
             from .backup import backup_home
             print_json(backup_home(settings, args.output))
