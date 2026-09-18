@@ -8,6 +8,7 @@ from .engineering import DONE, QUALITY, SOURCES, guidance
 from .errors import PolicyError, NotFoundError
 from .safety import PathPolicy, reject_secrets
 from .util import utcnow, read_json
+from .investigation import InvestigationService
 
 CHAT_SCHEMA = """
 CREATE TABLE IF NOT EXISTS project_preferences(
@@ -31,6 +32,7 @@ MODEL_OUTPUT_TOKENS = 220
 class ChatService:
     def __init__(self, store, settings, knowledge):
         self.store, self.settings, self.knowledge = store, settings, knowledge
+        self.investigations = InvestigationService(store, settings)
         self.lock = threading.Lock()
         with store.connect() as db:
             db.executescript(CHAT_SCHEMA)
@@ -85,7 +87,7 @@ class ChatService:
     def validate_message(self, message, mode, input_format="text"):
         if not isinstance(message, str) or not 1 <= len(message.strip()) <= 8000:
             raise PolicyError("Mensagem deve ter de 1 a 8.000 caracteres.")
-        if mode not in {"guide", "knowledge", "model"}:
+        if mode not in {"guide", "knowledge", "model", "investigation"}:
             raise PolicyError("Modo de conversa inválido.")
         if input_format not in {"text", "code"}:
             raise PolicyError("Formato deve ser texto ou código.")
@@ -111,6 +113,8 @@ class ChatService:
             project = self.store.project(project_id)
             if mode == "model":
                 response = self._generate(message)
+            elif mode == "investigation":
+                response = self.investigations.answer(project_id, message)
             elif mode == "knowledge":
                 result = self.knowledge.consult(message[:1000], project_id, False)
                 response = {"origin": "retrieval_only", "content": "\n\n".join(f"{e['title']} — linhas {e['start_line']}–{e['end_line']}\n{e['text']}" for e in result["evidence"])[:12000] or "Ainda não encontrei fontes locais para esse pedido. Importe notas ou indexe a pasta nas ferramentas avançadas.", "evidence": result["evidence"], "sources": [], "researched_now": False}

@@ -124,6 +124,7 @@ def make_handler(app: Application, ui_path: Path):
                     return {"status": "ok", "version": "0.1.0", "mode": "platform_and_experimental_cpu_model", "offline": app.settings.offline, "model_qualified": False, "gpu_backend": False, "stats": app.store.stats(), "allowed_domains": app.settings.allowed_domains, "runner_enabled": bool(app.settings.docker_image)}
                 if path == "/api/diagnostics": return diagnose(app.settings.home)
                 if path == "/api/projects": return app.store.projects()
+                if path == "/api/investigations": return app.chat.investigations.list(q["project_id"])
                 if path == "/api/conversations": return app.chat.conversations(q["project_id"])
                 if path == "/api/conversation": return app.chat.get(q["project_id"], q["id"])
                 if path == "/api/project-preferences": return app.chat.preferences(q["project_id"])
@@ -156,6 +157,8 @@ def make_handler(app: Application, ui_path: Path):
                     return app.tasks.preview(ident)
             if method == "POST":
                 if path == "/api/projects": return app.store.add_project(body["name"], body["root"])
+                if path == "/api/investigations": return app.chat.investigations.create(body["project_id"], body["name"], body["origin"])
+                if path == "/api/investigations/observe": return app.chat.investigations.observe(body["project_id"], body["investigation_id"], body["screen"])
                 if path == "/api/conversations": return app.chat.create(body["project_id"], body.get("title", "Nova conversa"))
                 if path == "/api/project-preferences": return app.chat.save_preferences(body["project_id"], body["method"], body["wip_limit"], body["definition_of_done"])
                 if path == "/api/chat":

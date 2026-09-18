@@ -47,7 +47,7 @@ async function selectProject(project) { if (state.busy)
     return; state.project = project; state.conversation = null; $('project-heading').textContent = project.name; $('folder-path').textContent = project.root; $('welcome-copy').textContent = 'Converse sobre ' + project.name + '. Comece com o problema, combine o critério de pronto e planeje como testar.'; $('sidebar').classList.remove('open'); renderProjects(); resetChat(); }
 function renderMessages() { const list = $('messages'); list.replaceChildren(); const messages = state.conversation?.messages || []; $('welcome').hidden = messages.length > 0; for (const message of messages) {
     const box = el('article', '', `message ${message.role}`);
-    const names = { project_guide: 'Guia do projeto · orientação estruturada', retrieval_only: 'Memória local · trechos recuperados', local_model: 'IA local · geração experimental' };
+    const names = { project_guide: 'Guia do projeto · orientação estruturada', retrieval_only: 'Memória local · trechos recuperados', local_model: 'IA local · geração experimental', investigation_memory: 'Sistema investigado · evidências observadas' };
     const code = message.metadata.format === 'code';
     box.append(el('div', message.role === 'user' ? 'Você' : names[message.metadata.origin] || 'Assistente', 'message-label'), el(code ? 'pre' : 'div', message.content, code ? 'message-content code-content' : 'message-content'));
     const copy = el('button', 'Copiar mensagem', 'copy-message');
@@ -85,8 +85,8 @@ $('project-create').onsubmit = handle(async () => { const project = await api('/
 $('new-chat').onclick = handle(async () => { if (!state.project)
     throw Error('Adicione uma pasta de projeto primeiro.'); resetChat(); });
 for (const button of document.querySelectorAll('[data-prompt]'))
-    button.onclick = () => { $('message-input').value = button.dataset.prompt; $('response-mode').value = 'guide'; modeNotice(); updateInputCount(); $('message-input').focus(); toast('Exemplo preenchido. Edite a mensagem ou clique em Enviar.'); };
-function modeNotice() { const modes = { guide: 'Guias estruturados e referências. Não é geração neural. Ctrl + Enter para enviar.', knowledge: 'Consulta apenas fontes deste projeto. Não inclui conversas ou fontes de outros projetos.', model: 'Laboratório: pedido curto, sem histórico nem arquivos no contexto. A saída pode estar errada e não é executada.' }; $('mode-notice').textContent = modes[$('response-mode').value]; }
+    button.onclick = () => { $('message-input').value = button.dataset.prompt; $('response-mode').value = button.dataset.mode || 'guide'; modeNotice(); updateInputCount(); $('message-input').focus(); toast('Exemplo preenchido. Edite a mensagem ou clique em Enviar.'); };
+function modeNotice() { const modes = { investigation: 'Consulta as telas já observadas neste projeto, com data e origem. Não navega agora. Não envie senhas no chat.', guide: 'Guias estruturados e referências. Não é geração neural. Ctrl + Enter para enviar.', knowledge: 'Consulta apenas fontes deste projeto. Não inclui conversas ou fontes de outros projetos.', model: 'Laboratório: pedido curto, sem histórico nem arquivos no contexto. A saída pode estar errada e não é executada.' }; $('mode-notice').textContent = modes[$('response-mode').value]; }
 $('response-mode').onchange = () => { modeNotice(); updateInputCount(); };
 function updateInputCount() {
     const value = $('message-input').value;
