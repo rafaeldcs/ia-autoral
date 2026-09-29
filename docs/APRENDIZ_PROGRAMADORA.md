@@ -1,5 +1,7 @@
 # Aprendiz de programação: primeira correção nova e guiada
 
+Atualização posterior: a investigação restrita por ferramentas foi avaliada a partir de relatos, sem indicação de arquivo/função durante os episódios. Resultados e limites em [Investigação de código](INVESTIGACAO_PROGRAMACAO.md). Isso não transforma a primeira rodada abaixo em investigação autônoma retroativamente.
+
 Rodada de 29/09/2026. **O LocalAuthor ainda não é uma programadora autônoma geral.** Esta entrega acrescenta uma família de código e um fluxo auditável de investigação guiada, geração, testes e revisão. O alvo real é o saravaAPP/MeuTerreiro.
 
 ## Problema e autoria

@@ -1,5 +1,7 @@
 # Lições da simulação administrativa do MeuTerreiro
 
+Investigação por relato: uma política neural local passou 112 episódios restritos e conduziu um replay do erro antigo de data em 12 ações, sem indicação de arquivo/função durante a execução. Ela escolhe ferramentas de um catálogo fechado; o parser, o executor e os contratos são do professor. Três candidatos foram reprovados e outro também teve sobreposição de dados detectada antes da ativação. O relatório [Investigação de código](INVESTIGACAO_PROGRAMACAO.md) distingue snapshots reservados, regressões, linguagem já avaliada e capacidades ainda não demonstradas.
+
 Nova rodada: o especialista de data ausente gerou uma correção nova do saravaAPP e sua asserção de regressão, com teste vermelho/verde e aplicação revisada. Codex forneceu o diagnóstico e a estrutura do teste; a investigação não foi autônoma. A política de contexto agora admite módulos `.mjs` e componentes `.jsx` com os mesmos controles de caminhos/segredos. Consulte [Aprendiz de programação](APRENDIZ_PROGRAMADORA.md) para resultados, lições do executor e capacidades ainda pendentes.
 
 Atualização posterior: o modelo geral continua reprovado para programação autônoma, mas foi treinado e ativado um especialista generativo restrito a blocos Caddy e condições C# de nulidade. Ele gerou os três alvos do projeto e passou em compilação/testes reais. Veja [qualificação de correções](QUALIFICACAO_CORRECOES.md); não confundir esse resultado com qualificação geral nem com o classificador de etapas descrito abaixo.
