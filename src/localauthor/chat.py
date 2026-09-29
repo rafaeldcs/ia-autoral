@@ -146,6 +146,9 @@ class ChatService:
             return self.get(project_id, conversation_id)
 
     def _generate(self, message):
+        from .date_repair import PREFIX as DATE_PREFIX, propose as propose_date
+        if message.startswith(DATE_PREFIX):
+            return propose_date(self.settings.home, message)
         from .code_repair import PREFIXES, propose
         if message.startswith(PREFIXES):
             return propose(self.settings.home, message)

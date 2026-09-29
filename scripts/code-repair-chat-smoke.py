@@ -5,13 +5,17 @@ ROOT=Path(__file__).resolve().parents[1];sys.path[:0]=[str(ROOT/'src')]
 from localauthor.config import Settings
 from localauthor.application import Application
 from localauthor.server import create_server
-p=argparse.ArgumentParser();p.add_argument('--model',type=Path,required=True);p.add_argument('--output',type=Path,required=True);args=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--model',type=Path,required=True);p.add_argument('--date-model',type=Path);p.add_argument('--output',type=Path,required=True);args=p.parse_args()
 if not Path('/.dockerenv').exists():raise RuntimeError('Sandbox required')
 with tempfile.TemporaryDirectory() as tmp:
     home=Path(tmp)/'home';settings=Settings.load(home);settings.port=18765
     destination=home/'models'/args.model.name;destination.mkdir()
     for name in ('best-validation.npz','best-validation.npz.sha256'):shutil.copyfile(args.model/name,destination/name)
     shutil.copyfile(args.model/'qualification.json',home/'exports/code-repair-qualification.json')
+    if args.date_model:
+        date_destination=home/'models'/args.date_model.name;date_destination.mkdir()
+        for name in ('best-validation.npz','best-validation.npz.sha256'):shutil.copyfile(args.date_model/name,date_destination/name)
+        shutil.copyfile(args.date_model/'qualification.json',home/'exports/date-repair-qualification.json')
     project_root=Path(tmp)/'project';project_root.mkdir()
     app=Application(settings);app.store.add_project('Laboratório de correções',str(project_root))
     server=create_server(app,ROOT/'ui');app.start();thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
@@ -40,6 +44,16 @@ const {chromium}=require('/opt/node_modules/playwright');
   await page.setViewportSize({width:390,height:844});check('Mobile page has no horizontal overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
   await page.waitForTimeout(300);await page.locator('.message.assistant').last().scrollIntoViewIfNeeded();
   await page.screenshot({path:process.env.QA_OUTPUT+'/csharp-chat-mobile.png',fullPage:true,animations:'disabled'});
+  if(process.env.QA_DATE_MODEL==='1'){
+   await page.getByRole('button',{name:'Testar data ausente e regressão',exact:true}).click();
+   check('Date exercise supplies a problem without the answer',!(await page.locator('#message-input').inputValue()).includes('if ('));
+   await page.locator('#send').click();await page.waitForFunction(()=>document.querySelectorAll('.message.assistant pre').length===3);
+   check('Weights generate date guard and regression assertion',await page.locator('.message.assistant pre').last().innerText()==='if (value == null) return "Data indisponível";\nassert.equal(formatDate(null), "Data indisponível");');
+   check('Guided investigation limitation is visible',(await page.locator('.message.assistant small').last().innerText()).includes('investigação guiada'));
+   check('Date reply fits mobile viewport',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+   await page.locator('.message.assistant').last().scrollIntoViewIfNeeded();
+   await page.screenshot({path:process.env.QA_OUTPUT+'/date-chat-mobile.png',fullPage:true,animations:'disabled'});
+  }
   report.success=true;
  }catch(error){report.failure=error.message;process.exitCode=1;}
  finally{await browser.close();fs.writeFileSync(process.env.QA_OUTPUT+'/chat-smoke.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report));}
@@ -49,7 +63,7 @@ const {chromium}=require('/opt/node_modules/playwright');
     script=script.replace('\\\\n','\\n')
     try:
         result=subprocess.run(['node','-e',script],text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=90,
-            env={**os.environ,'QA_TOKEN_PATH':str(home/'api.token'),'QA_OUTPUT':str(args.output)})
+            env={**os.environ,'QA_TOKEN_PATH':str(home/'api.token'),'QA_OUTPUT':str(args.output),'QA_DATE_MODEL':'1' if args.date_model else '0'})
         print(result.stdout);code=result.returncode
     finally:server.shutdown();server.server_close();app.close()
 raise SystemExit(code)

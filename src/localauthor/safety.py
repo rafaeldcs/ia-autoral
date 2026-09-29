@@ -5,8 +5,8 @@ from pathlib import Path, PureWindowsPath
 from .errors import PolicyError
 
 IGNORED = {".git", ".github", ".svn", "node_modules", "bin", "obj", ".venv", "venv", "__pycache__", ".idea", ".vs", "checkpoints", ".localauthor"}
-READ_EXT = {".md", ".txt", ".html", ".htm", ".cs", ".csproj", ".sln", ".py", ".json", ".ts", ".tsx", ".js", ".css", ".xml", ".yml", ".yaml"}
-EDIT_EXT = {".md", ".txt", ".cs", ".py", ".ts", ".tsx", ".js", ".css", ".html"}
+READ_EXT = {".md", ".txt", ".html", ".htm", ".cs", ".csproj", ".sln", ".py", ".json", ".ts", ".tsx", ".js", ".mjs", ".jsx", ".css", ".xml", ".yml", ".yaml"}
+EDIT_EXT = {".md", ".txt", ".cs", ".py", ".ts", ".tsx", ".js", ".mjs", ".jsx", ".css", ".html"}
 SENSITIVE_NAMES = {"credentials", "secrets.json", "id_rsa", "id_ed25519", "api.token", "nuget.config", ".npmrc"}
 SECRET_PATTERNS = [
     re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),

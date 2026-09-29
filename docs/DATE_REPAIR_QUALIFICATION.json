@@ -1,0 +1,43 @@
+{
+  "sourceAuthor": "local neural model",
+  "functionalChecks": 9,
+  "gates": {
+    "heldout": {
+      "total": 13,
+      "passed": 13
+    },
+    "behavior": {
+      "total": 113,
+      "passed": 113
+    },
+    "redGreen": {
+      "total": 14,
+      "passed": 14
+    },
+    "negativeControls": {
+      "total": 13,
+      "passed": 13
+    },
+    "projectRegression": {
+      "total": 196,
+      "passed": 196
+    }
+  },
+  "testAssertionAuthor": "local neural model",
+  "dotnetTests": 138,
+  "checkpointHash": "2aaff29ed2570eaa6d93b85f71cc987675cff75eb26d2dcaad3209ebf29e9ba0",
+  "scope": "javascript-missing-date-guard-v1",
+  "limitations": [
+    "Reserved combinations from one taught family, not general problem solving",
+    "No autonomous diagnosis or multi-file planning",
+    "Private weights do not travel via Git"
+  ],
+  "localAuthorTests": 234,
+  "investigation": "teacher-guided",
+  "generalProgrammingQualified": false,
+  "nextBuild": true,
+  "dotnetPublish": true,
+  "testWrapperAuthor": "Codex",
+  "functionalTestAuthor": "Codex",
+  "chatChecks": 10
+}

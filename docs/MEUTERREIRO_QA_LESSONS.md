@@ -1,5 +1,7 @@
 # Lições da simulação administrativa do MeuTerreiro
 
+Nova rodada: o especialista de data ausente gerou uma correção nova do saravaAPP e sua asserção de regressão, com teste vermelho/verde e aplicação revisada. Codex forneceu o diagnóstico e a estrutura do teste; a investigação não foi autônoma. A política de contexto agora admite módulos `.mjs` e componentes `.jsx` com os mesmos controles de caminhos/segredos. Consulte [Aprendiz de programação](APRENDIZ_PROGRAMADORA.md) para resultados, lições do executor e capacidades ainda pendentes.
+
 Atualização posterior: o modelo geral continua reprovado para programação autônoma, mas foi treinado e ativado um especialista generativo restrito a blocos Caddy e condições C# de nulidade. Ele gerou os três alvos do projeto e passou em compilação/testes reais. Veja [qualificação de correções](QUALIFICACAO_CORRECOES.md); não confundir esse resultado com qualificação geral nem com o classificador de etapas descrito abaixo.
 
 Escopo autorizado: centro fictício com cinco médiuns, sete perfis de acesso, mensalidade de R$ 100, banco isolado e nenhum pagamento real. A tradição religiosa não altera as regras técnicas de saldo, autorização ou auditoria; não inferir práticas religiosas dos dados administrativos.
