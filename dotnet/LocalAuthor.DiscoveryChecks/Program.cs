@@ -12,6 +12,9 @@ int Port(){using var s=new UdpClient(new IPEndPoint(IPAddress.Any,0));return ((I
 var local=LanDiscovery.Interfaces().First();
 Check("Public addresses are not discovery peers",!LanDiscovery.LocalPeer(IPAddress.Parse("8.8.8.8")));
 Check("Current interface subnet is permitted",LanDiscovery.Allows(local.Address,local.Address));
+Check("Local server works without a network interface",LanDiscovery.Allows(IPAddress.Loopback,IPAddress.Loopback));
+Check("LAN peer cannot impersonate a loopback connection",!LanDiscovery.Allows(IPAddress.Loopback,local.Address));
+Check("Loopback peer cannot use a LAN origin",!LanDiscovery.Allows(local.Address,IPAddress.Loopback));
 Check("Broadcast address follows subnet prefix",LanDiscovery.Broadcast(IPAddress.Parse("192.168.2.31"),24).ToString()=="192.168.2.255");
 Check("Invalid subnet prefix fails closed",!LanDiscovery.SameSubnet(local.Address,local.Address,0));
 using var rsa=RSA.Create(2048);

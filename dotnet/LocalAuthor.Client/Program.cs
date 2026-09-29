@@ -11,6 +11,9 @@ using Microsoft.Web.WebView2.WinForms;
 namespace LocalAuthor.Client;
 static class Program {
  [STAThread] static void Main(string[] args) {
+  if(args.Length==4&&args[0]=="--local-startup-smoke"){
+   try{var local=new LocalServerConnection(args[1],args[2]);var value=local.PrepareAsync(_=>{},CancellationToken.None).GetAwaiter().GetResult();File.WriteAllText(args[3],JsonSerializer.Serialize(new{passed=value!=null,local=local.UsingLocalServer,server=value?.Server}));if(value==null)Environment.ExitCode=1;}catch(Exception e){File.WriteAllText(args[3],JsonSerializer.Serialize(new{passed=false,error=e.GetType().Name}));Environment.ExitCode=1;}return;
+  }
   if(args.Length==3&&args[0]=="--password-setup-smoke"){
    Console.InputEncoding=System.Text.Encoding.UTF8;
    try{var connection=Connection.Import(args[1]);RemotePublication.SetPassword(connection,Console.ReadLine()??"",CancellationToken.None).GetAwaiter().GetResult();var status=RemotePublication.Status(connection,CancellationToken.None).GetAwaiter().GetResult();File.WriteAllText(args[2],JsonSerializer.Serialize(new{passed=status?.PublicationPasswordConfigured==true}));}catch(Exception e){File.WriteAllText(args[2],JsonSerializer.Serialize(new{passed=false,error=e.GetType().Name}));Environment.ExitCode=1;}return;
@@ -41,7 +44,7 @@ static class Program {
 }
 sealed class ClientForm : Form {
  readonly string home=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"LocalAuthorClient");
- readonly Label status=new(){AutoSize=true,Text="Importe o arquivo de conexão criado no servidor.",Margin=new Padding(12)};
+ readonly Label status=new(){AutoSize=true,Text="Preparando sua conexão…",Margin=new Padding(12)};
  readonly Button import=new(){Text="Conectar ao servidor…",AutoSize=true,Height=36};
  readonly Button reconnect=new(){Text="Reconectar",AutoSize=true,Height=36};
  readonly Button forget=new(){Text="Esquecer conexão",AutoSize=true,Height=36};
@@ -55,6 +58,8 @@ sealed class ClientForm : Form {
  readonly System.Windows.Forms.Timer updateTimer=new(){Interval=300000};
  bool checkingUpdate,applyingUpdate;DateTime nextUpdate=DateTime.MinValue;
  bool automaticAttempt;
+ readonly LocalServerConnection localServer;
+ bool loadingSaved;
  readonly CancellationTokenSource shutdown=new();
  readonly string? smokeFile;readonly string? reportFile;
  readonly string? automaticTestReport;
@@ -62,26 +67,31 @@ sealed class ClientForm : Form {
   Text="LocalAuthor — IA da sua rede";Width=1280;Height=880;MinimumSize=new Size(700,550);StartPosition=FormStartPosition.CenterScreen;
   Font=new Font("Segoe UI",10);BackColor=Color.White;
   var top=new FlowLayoutPanel{Dock=DockStyle.Top,AutoSize=true,Padding=new Padding(8),WrapContents=true};top.Controls.AddRange([import,reconnect,forget,publishUpdate,status,updateStatus,postponeUpdate]);
-  content.Controls.Add(new Label{Dock=DockStyle.Fill,Text="Sua IA, em outros computadores.\n\nNo servidor, crie um arquivo de conexão para este dispositivo.\nClique em Conectar ao servidor e selecione esse arquivo.\n\nProjetos e conversas continuam armazenados no servidor.",TextAlign=ContentAlignment.MiddleCenter,Font=new Font("Segoe UI",16)});
+  content.Controls.Add(new Label{Dock=DockStyle.Fill,Text="Conectando à sua IA…\n\nSe o servidor está neste computador, ele será iniciado automaticamente.\nSeus projetos e conversas permanecem no servidor.",TextAlign=ContentAlignment.MiddleCenter,Font=new Font("Segoe UI",16)});
   Controls.Add(content);Controls.Add(top);
   int i=Array.IndexOf(args,"--smoke");if(i>=0){smokeFile=args[i+1];reportFile=args[i+2];Opacity=0;ShowInTaskbar=false;}
   int savedIndex=Array.IndexOf(args,"--smoke-saved");if(savedIndex>=0){home=Path.GetFullPath(args[savedIndex+1]);reportFile=args[savedIndex+2];Opacity=0;ShowInTaskbar=false;}
   int autoIndex=Array.IndexOf(args,"--auto-update-smoke");if(autoIndex>=0){smokeFile=Path.GetFullPath(args[autoIndex+1]);automaticTestReport=Path.GetFullPath(args[autoIndex+2]);home=Path.Combine(Path.GetDirectoryName(automaticTestReport)!,"isolated-client-data");Opacity=0;ShowInTaskbar=false;}
+  int localIndex=Array.IndexOf(args,"--smoke-local-server");
+  if(localIndex>=0){home=Path.GetFullPath(args[localIndex+2]);reportFile=args[localIndex+3];Opacity=0;ShowInTaskbar=false;}
+  // Existing isolated smoke modes must never enroll into the real user's server.
+  var localData=localIndex>=0?Path.GetFullPath(args[localIndex+1]):reportFile!=null||automaticTestReport!=null?home:Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+  localServer=new LocalServerConnection(localData,home);
   Directory.CreateDirectory(home);
   NetworkChange.NetworkAddressChanged+=NetworkChanged;
-  retryTimer.Tick+=async(_,_)=>{if(connection==null||connecting||applyingUpdate)return;try{if(await ServerLocator.ProbeAsync(connection,shutdown.Token))return;}catch(System.Security.Authentication.AuthenticationException){retryTimer.Stop();status.Text="Acesso revogado. Solicite uma conexão atualizada.";return;}catch(OperationCanceledException){return;}automaticAttempt=true;try{await Connect(connection);}finally{automaticAttempt=false;}};
+  retryTimer.Tick+=async(_,_)=>{if(connecting||loadingSaved||applyingUpdate)return;try{if(connection!=null&&browser!=null&&await ServerLocator.ProbeAsync(connection,shutdown.Token))return;}catch(System.Security.Authentication.AuthenticationException){retryTimer.Stop();status.Text="Acesso revogado. Solicite uma conexão atualizada.";return;}catch(OperationCanceledException){return;}automaticAttempt=true;try{if(connection==null||localServer.UsingLocalServer)await LoadSaved();else await Connect(connection);}finally{automaticAttempt=false;}};
   updateTimer.Tick+=async(_,_)=>await CheckForUpdates();
   publishUpdate.Click+=async(_,_)=>{if(connection==null||connecting||checkingUpdate)return;publishing=true;try{if(!await EnsurePublicationPassword())return;using var form=new PublishUpdateForm(connection);form.ShowDialog(this);}finally{publishing=false;}};
   postponeUpdate.Click+=(_,_)=>{nextUpdate=DateTime.UtcNow.AddMinutes(30);updateStatus.Text="Atualização adiada por 30 minutos.";};
   if(reportFile==null)retryTimer.Start();
   if(reportFile==null)updateTimer.Start();
   FormClosed+=(_,_)=>{NetworkChange.NetworkAddressChanged-=NetworkChanged;retryTimer.Stop();retryTimer.Dispose();updateTimer.Stop();updateTimer.Dispose();shutdown.Cancel();browser?.Dispose();};
-  import.Click+=async (_,_)=>{using var picker=new OpenFileDialog{Title="Escolha sua conexão privada",Filter="Conexão LocalAuthor|*.localauthor"};if(picker.ShowDialog(this)==DialogResult.OK)await ConnectFile(picker.FileName);};
-  reconnect.Click+=async (_,_)=>{if(connection!=null)await Connect(connection);else await LoadSaved();};
+  import.Click+=async (_,_)=>{if(localServer.UsingLocalServer||localServer.IsConfigured&&connection==null){await LoadSaved();return;}using var picker=new OpenFileDialog{Title="Escolha sua conexão privada",Filter="Conexão LocalAuthor|*.localauthor"};if(picker.ShowDialog(this)==DialogResult.OK)await ConnectFile(picker.FileName);};
+  reconnect.Click+=async (_,_)=>{if(connection!=null&&!localServer.UsingLocalServer)await Connect(connection);else await LoadSaved();};
   forget.Click+=(_,_)=>{if(MessageBox.Show(this,"Remover a conexão salva neste computador? Os projetos permanecem no servidor.","Esquecer conexão",MessageBoxButtons.YesNo,MessageBoxIcon.Question)!=DialogResult.Yes)return;File.Delete(Path.Combine(home,"connection.bin"));connection=null;browser?.Dispose();browser=null;status.Text="Conexão removida. Importe outra para continuar.";};
   Shown+=async (_,_)=>{
    int updated=Array.IndexOf(args,"--updated");if(updated>=0)UpdateInstaller.Acknowledge(args[updated+1]);
-   if(smokeFile!=null)await ConnectFile(smokeFile);else await LoadSaved();
+   automaticAttempt=true;try{if(smokeFile!=null)await ConnectFile(smokeFile);else await LoadSaved();}finally{automaticAttempt=false;}
    if(reportFile==null){
     if(automaticTestReport==null)await EnsurePublicationPassword();
     for(int attempt=0;attempt<40&&!IsDisposed;attempt++){if(await SafeToRestart())break;await Task.Delay(250);}
@@ -132,10 +142,20 @@ sealed class ClientForm : Form {
   finally{checkingUpdate=false;applyingUpdate=false;if(!IsDisposed){postponeUpdate.Visible=false;import.Enabled=reconnect.Enabled=forget.Enabled=true;if(browser!=null)browser.Enabled=true;}}
  }
  void NetworkChanged(object? sender,EventArgs args){if(IsDisposed||!IsHandleCreated)return;try{BeginInvoke(new Action(()=>{if(!IsDisposed)status.Text="Rede alterada. Vou procurar seu servidor automaticamente…";}));}catch(InvalidOperationException){}}
- async Task LoadSaved(){try{var file=Path.Combine(home,"connection.bin");if(File.Exists(file))await Connect(Connection.Parse(ProtectedData.Unprotect(File.ReadAllBytes(file),null,DataProtectionScope.CurrentUser)));else if(reportFile!=null)await Failure(new FileNotFoundException("Conexão salva ausente."));}catch(Exception e){await Failure(e);}}
+ async Task LoadSaved(){
+  if(loadingSaved)return;loadingSaved=true;import.Enabled=reconnect.Enabled=false;
+  try{
+   var selected=await localServer.PrepareAsync(text=>status.Text=text,shutdown.Token);
+   import.Text=localServer.UsingLocalServer?"Abrir IA deste computador":"Conectar ao servidor…";forget.Visible=!localServer.UsingLocalServer;
+   if(selected!=null)await Connect(selected);
+   else if(reportFile!=null)await Failure(new FileNotFoundException("Conexão salva ausente."));
+   else status.Text="Servidor não configurado neste computador. Instale o aplicativo vinculado ao seu servidor.";
+  }catch(Exception e){await Failure(e);}finally{loadingSaved=false;if(!IsDisposed)import.Enabled=reconnect.Enabled=true;}
+ }
  async Task ConnectFile(string path){try{await Connect(Connection.Import(path));}catch(Exception e){await Failure(e);}}
  async Task Failure(Exception error) {
-  status.Text="Não foi possível conectar. Confira se o servidor está ligado e na mesma rede.";
+  status.Text=localServer.UsingLocalServer?"A IA deste computador ainda não respondeu. Nova tentativa automática; diagnóstico em LocalAuthor/lan.":"Não foi possível conectar. Confira se o servidor está ligado e na mesma rede.";
+  if(error is System.Security.Authentication.AuthenticationException){retryTimer.Stop();status.Text="Acesso revogado. Solicite uma conexão atualizada.";}
   if(reportFile!=null){await File.WriteAllTextAsync(reportFile,JsonSerializer.Serialize(new{passed=false,error=error.GetType().Name}));Environment.ExitCode=1;Close();}
   else if(!automaticAttempt && error is not HttpRequestException && error is not OperationCanceledException) MessageBox.Show(this,error is HttpRequestException ? "Conexão recusada, certificado diferente ou acesso revogado. Confira o servidor e importe uma conexão atualizada." : error.Message,"LocalAuthor",MessageBoxButtons.OK,MessageBoxIcon.Information);
  }
@@ -155,7 +175,7 @@ sealed class ClientForm : Form {
    var uri=selected.Validate();
    connection=selected;
    try{publishUpdate.Enabled=await RemotePublication.IsAllowed(selected,shutdown.Token);}catch{publishUpdate.Enabled=false;}
-   if(reportFile==null) File.WriteAllBytes(Path.Combine(home,"connection.bin"),ProtectedData.Protect(JsonSerializer.SerializeToUtf8Bytes(selected),null,DataProtectionScope.CurrentUser));
+   if(reportFile==null) LocalServerConnection.Save(home,selected);
    browser?.Dispose();content.Controls.Clear();browser=new WebView2{Dock=DockStyle.Fill};content.Controls.Add(browser);
    var profile=Path.Combine(home,smokeFile==null?"browser":"smoke-browser");
    var environment=await CoreWebView2Environment.CreateAsync(null,profile);

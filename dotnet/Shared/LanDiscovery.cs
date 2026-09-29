@@ -13,7 +13,9 @@ static class LanDiscovery {
   for(int i=0;i<4;i++){int bits=Math.Clamp(prefix-i*8,0,8),mask=bits==0?0:255<<(8-bits);if((x[i]&mask)!=(y[i]&mask))return false;}return true;
  }
  public static bool LocalPeer(IPAddress remote) => IsPrivate(remote)&&Interfaces().Any(n=>SameSubnet(remote,n.Address,n.Prefix));
- public static bool Allows(IPAddress local,IPAddress remote) => IsPrivate(remote)&&Interfaces().Any(n=>n.Address.Equals(local)&&SameSubnet(remote,local,n.Prefix));
+ public static bool Allows(IPAddress local,IPAddress remote) =>
+  (IPAddress.IsLoopback(local)&&IPAddress.IsLoopback(remote)) ||
+  IsPrivate(remote)&&Interfaces().Any(n=>n.Address.Equals(local)&&SameSubnet(remote,local,n.Prefix));
  public static IPAddress Broadcast(IPAddress address,int prefix) {var b=address.GetAddressBytes();for(int i=0;i<4;i++){int bits=Math.Clamp(prefix-i*8,0,8);b[i]=(byte)(b[i]|(255>>bits));}return new IPAddress(b);}
  public static async Task RespondAsync(string fingerprint,int httpsPort,int discoveryPort,CancellationToken cancel) {
   using var udp=new UdpClient(new IPEndPoint(IPAddress.Any,discoveryPort));var budget=new Queue<DateTime>();

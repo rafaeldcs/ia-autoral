@@ -68,7 +68,19 @@ Na entrega inicial, o gateway usava exclusivamente **192.168.1.240:8443**, com c
 
 Não houve substituição dos pesos, alteração do banco ou reinício do backend existente. Guias Python novos de rodadas anteriores ainda dependem de reinício normal do backend. O supervisor foi registrado em HKCU Run: inicia após login deste usuário, verifica a cada 30 segundos e inicia processos ausentes; não é serviço de boot.
 
-## Testes executados
+## Correção de inicialização local — 2026-09-29
+
+Cliente/instalador 0.3.5: reconhecimento da instalação no próprio servidor, início do supervisor com espera pela saúde e conexão HTTPS por loopback sem importação manual. O gateway mantém autenticação, pin do certificado e restrições de rede. Sem novas dependências.
+
+- `scripts/local-server-startup-smoke.py`: **11 verificações aprovadas**, incluindo inicialização lenta com perfil vazio e chat WebView2 autenticado, uma única inscrição de dispositivo, proteção DPAPI, reutilização, conexão de outro servidor preservada, revogação, corrupção e instalação incompleta. Dados temporários; nenhum arquivo de conexão fornecido pelo usuário.
+- `LocalAuthor.DiscoveryChecks`: **15 verificações aprovadas** de descoberta UDP, HTTPS, identidade, revogação e separação de loopback/rede local.
+- `scripts/run-tests.py --allow-unavailable-symlinks`: **214 aprovados, zero falhas, três testes de symlink indisponíveis por privilégio do Windows**, 217 no total.
+- Instalador executado e cliente instalado verificado com abertura real do chat, TLS e autenticação. Comando registrado no Windows conferido; preferência de desativação e entradas de outros aplicativos preservadas no teste isolado de Registro.
+- Evidências locais ignoradas pelo Git: `reports/local-server-startup-smoke.json`, `reports/local-server-desktop.json`, `reports/startup-fix-installed-chat.json`, `reports/startup-fix-registry.json` e `reports/startup-fix-unit-tests.json`.
+
+O teste nesta máquina começou com backend e gateway desligados. O aplicativo os iniciou e abriu o chat. O Windows não foi reiniciado; outro computador físico e troca física de rede não foram testados nesta rodada. As verificações históricas abaixo não foram todas repetidas nesta correção.
+
+## Testes executados anteriormente
 
 `scripts/lan-smoke.py`: **23 verificações de integração**, servidor e projeto temporários:
 
