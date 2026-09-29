@@ -8,6 +8,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import sys
 
@@ -46,13 +47,15 @@ for case in reserved:
         raise ValueError('Unexpected evaluation case')
     generated = tokenizer.decode(model.generate([tokenizer.bos_id] + tokenizer.encode(case['prompt']),
                                                 max_tokens=96, temperature=.05, seed=31))
+    match = re.search(r'(?:^|\n)Proxima_verificacao: ([A-Z_]+)(?:\n|$)', generated)
+    label = match.group(1) if match else None
     results.append({'id': case['id'], 'group': case['group'], 'expected': case['expected'],
-                    'generated': generated, 'passed': generated == case['expected']})
+                    'generated': generated, 'label': label, 'passed': label == case['expected']})
 result = {'state': 'evaluated', 'trainingPerformed': False, 'activeModelChanged': False,
           'checkpointHash': checkpoint_hash, 'manifestHash': dataset['manifest_hash'],
           'cases': len(results), 'passed': sum(row['passed'] for row in results),
           'results': results,
-          'limits': ['Synthetic reserved exercise', 'Exact raw generation; no repair or label lookup',
+          'limits': ['Synthetic reserved exercise', 'Exact protocol label parsing; no fuzzy repair or label lookup',
                      'This domain test does not qualify general programming or site investigation']}
 args.output.parent.mkdir(parents=True, exist_ok=True)
 args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding='utf-8')
