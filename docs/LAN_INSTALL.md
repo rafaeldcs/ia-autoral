@@ -1,5 +1,7 @@
 # LocalAuthor pela rede local — Windows x64
 
+Para instalar sem importar arquivo e manter a rede atualizada, siga o [passo a passo da versão 0.3.5](PASSO_A_PASSO_REDE_LOCAL.md). O guia distingue conhecimento compartilhado, atualização do servidor pelo GitHub e publicação do aplicativo Windows.
+
 O computador atual executa a IA e armazena projetos, modelos e conversas. O cliente acessa esse mesmo workspace via HTTPS; não precisa de Python, SDK .NET, banco, GPU ou modelos próprios. O instalador contém .NET e o instalador offline do WebView2. Esta distribuição é para Windows x64; não foi criada versão para macOS, Linux ou Windows ARM.
 
 ## Outro computador

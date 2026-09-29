@@ -8,6 +8,7 @@ files={
  'LEIA-ME.md':root/'docs/LAN_INSTALL.md',
  'LAN_UPDATES.md':root/'docs/LAN_UPDATES.md',
  'LAN_DISCOVERY.md':root/'docs/LAN_DISCOVERY.md',
+ 'PASSO_A_PASSO_REDE_LOCAL.md':root/'docs/PASSO_A_PASSO_REDE_LOCAL.md',
  'THIRD_PARTY_NOTICES.md':root/'THIRD_PARTY_NOTICES.md',
 }
 licenses=Path('C:/Program Files/dotnet')
