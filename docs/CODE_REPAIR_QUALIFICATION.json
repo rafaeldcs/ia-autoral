@@ -1,0 +1,58 @@
+{
+  "counts": {
+    "train": 93,
+    "validation": 7,
+    "test": 9,
+    "project": 3
+  },
+  "proposalHash": "5400c65a05a75707dad81788a42c096bd456622e80bfb26d892041461ae4c509",
+  "generalProgrammingQualified": false,
+  "gates": {
+    "heldout": {
+      "total": 9,
+      "passed": 9
+    },
+    "project": {
+      "total": 3,
+      "passed": 3
+    },
+    "caddy": {
+      "total": 9,
+      "passed": 9
+    },
+    "csharp": {
+      "total": 3,
+      "passed": 3
+    },
+    "mutations": {
+      "total": 10,
+      "passed": 10
+    }
+  },
+  "state": "qualified_scoped",
+  "scope": "caddy-block-and-csharp-null-guard-v1",
+  "projectRegression": {
+    "passed": 138,
+    "apiPublished": true,
+    "total": 138
+  },
+  "localAuthorTests": {
+    "skipped": 0,
+    "passed": 225,
+    "total": 225
+  },
+  "author": {
+    "application": "Mechanical substitution in disposable baseline",
+    "proposals": "Local neural Transformer",
+    "teacher": "Codex",
+    "review": "Codex"
+  },
+  "selectedStep": 1500,
+  "date": "2026-09-29",
+  "checkpointHash": "6008cee62a16b8490d6b7e57b31bafcd6279ccd8650deb605d779a700833e1a5",
+  "parameters": 103936,
+  "chat": {
+    "total": 6,
+    "passed": 6
+  }
+}

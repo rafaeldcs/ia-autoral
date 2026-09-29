@@ -146,6 +146,9 @@ class ChatService:
             return self.get(project_id, conversation_id)
 
     def _generate(self, message):
+        from .code_repair import PREFIXES, propose
+        if message.startswith(PREFIXES):
+            return propose(self.settings.home, message)
         # This tiny model has no qualified general conversation or tool use capability.
         if len(message.encode("utf-8")) > 180:
             raise PolicyError("O experimento neural aceita pedidos curtos de até 180 bytes. Use os outros modos para mensagens longas.")
