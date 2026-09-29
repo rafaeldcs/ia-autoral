@@ -1,0 +1,50 @@
+{
+  "date": "2026-09-29",
+  "state": "qualified_scoped",
+  "scope": "terreiro-qa-scheduler-normalized-v2",
+  "productRevision": "f02754d74f0ca0d74a901a21b930fe887857f317",
+  "productCodeChanged": false,
+  "weightsUpdated": true,
+  "checkpoint": "terreiro-qa-reinforced-20260929/qa-policy.npz",
+  "checkpointHash": "8a916d70b1d2361ae85ca9fed2ca4ce782c731764e0733a5a17890fa0bdac65a",
+  "trainingExamples": 2048,
+  "validationExamples": 512,
+  "heldoutPassed": 512,
+  "heldoutTotal": 512,
+  "originalRegressionPassed": 256,
+  "originalRegressionTotal": 256,
+  "receiptChallengesBefore": 10,
+  "receiptChallengesAfter": 12,
+  "receiptChallengesTotal": 12,
+  "receiptChallengesAreRetrospective": true,
+  "productUnitTests": {
+    "javascript": 196,
+    "dotnet": 138,
+    "processor": 18
+  },
+  "localAuthorTests": 254,
+  "functionalChecks": {
+    "browser": 505,
+    "followup": 51,
+    "interactions": 6,
+    "http": 277
+  },
+  "screenshots": 313,
+  "builds": [
+    "Next",
+    "dotnet publish"
+  ],
+  "finalNeuralAction": "REPORT",
+  "gallery": "http://127.0.0.1:3190/replay-20260929/",
+  "limitations": [
+    "Reviewed tutor-authored scripts; model selects bounded QA stages",
+    "No arbitrary-site autonomy or neural screenshot interpretation",
+    "No production load, real banking or physical mobile push test",
+    "General language model remains unqualified"
+  ],
+  "authors": {
+    "tests": "Codex",
+    "runner": "LocalAuthor Docker worker",
+    "stageProposals": "LocalAuthor neural QA policy"
+  }
+}

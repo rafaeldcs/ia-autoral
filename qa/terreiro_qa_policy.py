@@ -82,3 +82,42 @@ def curriculum():
                 seen.add(key)
                 splits[split].append({'id': key, 'state': state, 'action': action})
     return splits
+
+
+def reinforcement_curriculum(excluded=()):
+    """Fresh synthetic priority examples, including revoked scope after success.
+
+    Dense completion states were underrepresented in the first course. Mix
+    sparse, dense and random histories; keep complete state IDs disjoint.
+    Observed receipt challenges and the original held-out set are reserved.
+    """
+    rng = np.random.default_rng(300926)
+    splits = {name: [] for name in ('train', 'validation', 'test')}
+    seen = set(excluded)
+    for action in ACTIONS:
+        for split, count in [('train', 128), ('validation', 32), ('test', 32)]:
+            accepted = 0
+            while accepted < count:
+                state = {k: bool(rng.integers(2)) for k in FIELDS}
+                pattern = int(rng.integers(4))
+                if pattern < 2:
+                    for stage in STAGES:
+                        state[stage] = bool(pattern)
+                    # Keep a mixture of exact extremes and near-extremes.
+                    if rng.integers(2):
+                        state[STAGES[int(rng.integers(len(STAGES)))]] = not bool(pattern)
+                state['authorized'] = action != 'STOP_SCOPE'
+                if action != 'STOP_SCOPE':
+                    state['failure'] = action == 'INVESTIGATE_FAILURE'
+                if action.startswith('CHECK_') or action == 'REPORT':
+                    stop = STAGES.index(action[6:].lower()) if action != 'REPORT' else len(STAGES)
+                    for i, stage in enumerate(STAGES):
+                        if i <= stop:
+                            state[stage] = i < stop
+                key = ''.join(str(int(state[k])) for k in FIELDS)
+                if key in seen or teacher(state) != action:
+                    continue
+                seen.add(key)
+                splits[split].append({'id': key, 'state': state, 'action': action})
+                accepted += 1
+    return splits
