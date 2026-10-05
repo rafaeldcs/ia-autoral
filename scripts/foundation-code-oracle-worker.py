@@ -24,7 +24,8 @@ def run(argv, cwd, *, data=None, seconds=40):
     result = subprocess.run(argv, cwd=cwd, input=data, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                             text=True, timeout=seconds, shell=False)
     if result.returncode or len(result.stdout) > 100000 or len(result.stderr) > 100000:
-        raise PolicyError("Child execution rejected: " + str(result.returncode) + "; " + result.stderr[-1500:])
+        raise PolicyError("Child execution rejected: " + str(result.returncode)
+                          + "; stdout: " + result.stdout[-4000:] + "; stderr: " + result.stderr[-1500:])
     return result.stdout
 
 

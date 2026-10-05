@@ -3,6 +3,7 @@ import importlib.util
 import json
 from pathlib import Path
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 from localauthor.errors import PolicyError
 
@@ -11,6 +12,10 @@ worker=importlib.util.module_from_spec(spec); spec.loader.exec_module(worker)
 
 
 class OracleControlTests(unittest.TestCase):
+    def test_compilation_error_feedback_keeps_stdout_and_stderr(self):
+        with patch.object(worker.subprocess,"run",return_value=SimpleNamespace(returncode=1,stdout="CS0103 fixture missing symbol",stderr="SDK warning fixture")):
+            with self.assertRaisesRegex(PolicyError,"CS0103.*SDK warning"):
+                worker.run(["dotnet","build"],Path("fixture"))
     def test_unverified_sandbox_rejects_before_reading_candidate_or_input(self):
         with patch.object(worker,"require_isolated_process",side_effect=PolicyError("fixture")), patch.object(worker,"read_object") as read:
             with self.assertRaises(PolicyError):worker.main()

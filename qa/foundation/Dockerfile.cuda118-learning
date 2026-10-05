@@ -1,0 +1,7 @@
+# Explicit acquisition stage; no weights, no automatic runtime downloads.
+# Separate from CPU environment: CUDA 11.8 compatibility must be tested.
+FROM localauthor-foundation-learning:2
+USER root
+RUN python3 -m pip install --no-cache-dir --upgrade torch==2.5.1+cu118 torchvision==0.20.1+cu118 --index-url https://download.pytorch.org/whl/cu118 && python3 -m pip check
+USER 10001:10001
+ENV HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1 DO_NOT_TRACK=1
