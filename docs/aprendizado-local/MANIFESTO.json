@@ -1,0 +1,227 @@
+{
+  "schema": 1,
+  "package": "LocalAuthor — Aprendizado Local",
+  "version": "1.1",
+  "prepared_on": "2026-10-05",
+  "repository": "rafaeldcs/ia-autoral",
+  "source_commit": "dd8a1376ad89230461fd85b2fcb5b5507590dcec",
+  "repository_path": "docs/aprendizado-local",
+  "purpose": "Documentação para executor local; não executa treinamento nem limpeza sozinha",
+  "md_count": 29,
+  "original_md_count": 28,
+  "runtime_knowledge_count": 7,
+  "files": [
+    {
+      "path": "00_COMECE_AQUI.md",
+      "bytes": 6261,
+      "sha256": "e869916266d31fcaf1ecc739a491f88afad32431f4a8b69854156ce64c4e1327",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    },
+    {
+      "path": "01_PROMPT_MESTRE_EXECUTOR_LOCAL.md",
+      "bytes": 7418,
+      "sha256": "99e44fe5e9fa7e9c0c8b46d45a1a47c0c0646f3b202b1950b6786a7b3f667d2d",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    },
+    {
+      "path": "99_CONFERENCIA_E_LIMPEZA.md",
+      "bytes": 7068,
+      "sha256": "999bfecee3d45da8415bda2ba9fac5edf01a20a7673242ca9a3b87dd26953583",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    },
+    {
+      "path": "FONTES_E_COMPATIBILIDADE.md",
+      "bytes": 6070,
+      "sha256": "92ce0f320e28f30d66dc481e18529c4fa4e791d2eba53126da8d4bbfaec08edb",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    },
+    {
+      "path": "avaliacao/PROTOCOLO_AVALIADOR.md",
+      "bytes": 4159,
+      "sha256": "81a035fd00859ceb543842a3dde517ec47e6c476d8db38027f476a1dca97703f",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    },
+    {
+      "path": "conhecimento/01_IDENTIDADE_E_CONFIABILIDADE.md",
+      "bytes": 2975,
+      "sha256": "993a1373fe5b29a7ee4e12a5a15a286449ee631a324144e3cf7fbb0a6f8c4bab",
+      "importar_como_conhecimento": true,
+      "training_allowed": false
+    },
+    {
+      "path": "conhecimento/02_CONVERSA_CONTEXTO_E_FONTES.md",
+      "bytes": 3186,
+      "sha256": "6972f25d1820472566f065ee5f4e645a395605ce7c062f472d8acaf8fd779914",
+      "importar_como_conhecimento": true,
+      "training_allowed": false
+    },
+    {
+      "path": "conhecimento/03_CSHARP_DOTNET_SQL.md",
+      "bytes": 3921,
+      "sha256": "b1c91dccae1e090095082fd2af3cd9e99cc7919ab8e89a0862a333ecd6c4fd21",
+      "importar_como_conhecimento": true,
+      "training_allowed": false
+    },
+    {
+      "path": "conhecimento/04_FRONTEND_APIS_E_INTEGRACOES.md",
+      "bytes": 3307,
+      "sha256": "fdd6e30230d143efece7868a10e4c2e310a36576d37768b2f6abf6e36d582056",
+      "importar_como_conhecimento": true,
+      "training_allowed": false
+    },
+    {
+      "path": "conhecimento/05_DEBUG_TESTES_E_FERRAMENTAS.md",
+      "bytes": 3171,
+      "sha256": "d3c7f1ffafff30d25ea2885fbd6e709ba6f65dbd9d9791c63b98d1482c86a01a",
+      "importar_como_conhecimento": true,
+      "training_allowed": false
+    },
+    {
+      "path": "conhecimento/06_CRIACAO_VISUAL.md",
+      "bytes": 3628,
+      "sha256": "18e794c290ff356c0cf6c00b0f4f320c293f58a12d2d9f13a66061b920194c0a",
+      "importar_como_conhecimento": true,
+      "training_allowed": false
+    },
+    {
+      "path": "conhecimento/07_MEMORIA_E_APRENDIZADO.md",
+      "bytes": 3029,
+      "sha256": "8b527a6c848ffc87eb8ee82a6f7d48c60e744a62f3ce36c1cf7ef1cf6d673192",
+      "importar_como_conhecimento": true,
+      "training_allowed": false
+    },
+    {
+      "path": "curriculo/01_CURRICULO_TEXTO_CODIGO.md",
+      "bytes": 4976,
+      "sha256": "9e48c1e62c5e7c65e404191bdfe07fc3b09b86eb7761373f47841be203c79600",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    },
+    {
+      "path": "curriculo/02_CURRICULO_VISUAL.md",
+      "bytes": 3723,
+      "sha256": "bd4dccbccad0511a097de9d001a588837dc2c6af8772a7d267cf8ab726ad2f01",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    },
+    {
+      "path": "curriculo/03_EXEMPLOS_DIDATICOS.md",
+      "bytes": 5758,
+      "sha256": "48a3d841629f2e2d1d06b08ef5af8c1073d641ebe240a52cf2a36bb390bf31e2",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    },
+    {
+      "path": "estado/ESTADO_EXECUCAO.template.md",
+      "bytes": 4309,
+      "sha256": "c8a3c5ad694693ab709104cddd325f2addf26793cbfd547c4237ebc5be789fa4",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    },
+    {
+      "path": "estado/EXPERIMENTO.template.md",
+      "bytes": 2515,
+      "sha256": "897612f0236dbc2cf042403efd8e08cdc204a6af5666585cea53565ed1ad33d0",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    },
+    {
+      "path": "estado/FONTES_DIREITOS.template.md",
+      "bytes": 1819,
+      "sha256": "997f10630e13ef19155d32d8afddd34b495e71c9fbbe291781af943a0deb9647",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    },
+    {
+      "path": "estado/RELATORIO_FINAL.template.md",
+      "bytes": 3275,
+      "sha256": "e7c226299e4fbcf085d1d2bc7e881d93beaac854e47697022a2c6974efcec908",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    },
+    {
+      "path": "execucao/01_ESTADO_E_CRITERIOS_DE_CONCLUSAO.md",
+      "bytes": 5804,
+      "sha256": "bd20ef2854db93ac47792e0f42f7b19fffcfde417b829dadef452eea4f50d66b",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    },
+    {
+      "path": "execucao/02_PREPARACAO_WINDOWS.md",
+      "bytes": 7002,
+      "sha256": "b79507a32689988f1156d38c56a40156c58eba4040d841d3e523c19d5e02a26c",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    },
+    {
+      "path": "execucao/03_MODELOS_LOCAIS_E_HOMOLOGACAO.md",
+      "bytes": 5947,
+      "sha256": "7f1b226b637b2bfbc0b768d2b268eb1c804fb625fdabd354294e8837f82220b1",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    },
+    {
+      "path": "execucao/04_IMPORTACAO_CONHECIMENTO.md",
+      "bytes": 5830,
+      "sha256": "16f23e6517365970a85d38950864f37f1892db002ea7dcd9c30c1e59c11bbec3",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    },
+    {
+      "path": "execucao/05_IMPLEMENTACAO_DO_APRENDIZADO.md",
+      "bytes": 6940,
+      "sha256": "4810221a23353b96b34fa0aa200ae6bb61966e732127d570a99d825cdae6c672",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    },
+    {
+      "path": "execucao/06_CURADORIA_E_DATASETS.md",
+      "bytes": 6376,
+      "sha256": "09b3c511b98452336b0f93833e47dcd5497b3e0d57a4f7dcddc457fd0b5b8384",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    },
+    {
+      "path": "execucao/07_TREINAMENTO_TEXTO_CODIGO.md",
+      "bytes": 5788,
+      "sha256": "397d89e1b57f669f1e55467cb81191a553b759b0b7470b62aee078cc6faf1330",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    },
+    {
+      "path": "execucao/08_TREINAMENTO_IMAGENS.md",
+      "bytes": 5193,
+      "sha256": "8cb42d9ce26394859522d52a2108a7899f11cac59b7a8b17b98bd36a59dbca51",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    },
+    {
+      "path": "execucao/09_AVALIACAO_PROMOCAO_ROLLBACK.md",
+      "bytes": 4904,
+      "sha256": "606cab4e2cfcfab50cd15d64569a66b30190852179b50cbd20f982a8cc993fa0",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    },
+    {
+      "path": "execucao/10_OPERACAO_E_EVOLUCAO.md",
+      "bytes": 5008,
+      "sha256": "989c58e1c14c24a620ead339235d31d2a613776773f8d535e80ed9dea6e6e847",
+      "importar_como_conhecimento": false,
+      "training_allowed": false
+    }
+  ],
+  "cleanup_protocol": "99_CONFERENCIA_E_LIMPEZA.md",
+  "cleanup_control_files": [
+    "MANIFESTO.json",
+    "SHA256SUMS.txt",
+    "VALIDACAO_DOCUMENTAL.json"
+  ],
+  "real_models_executed_in_documentation_task": false,
+  "weights_trained_in_documentation_task": false,
+  "cleanup_executed": false
+}
