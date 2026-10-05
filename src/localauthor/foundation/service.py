@@ -79,21 +79,22 @@ class FoundationService:
                 "code" if input_format == "code" else "text", message, content, metadata)
             return result
 
-    def create_image(self, project_id: str, prompt: str, cancel=None) -> dict:
+    def create_image(self, project_id: str, prompt: str, cancel=None, *, options=None) -> dict:
+        from .visual import ImageOptions, verify_png
+        profile = ImageOptions.parse(options)
         project_id = identifier(project_id)
         if not isinstance(prompt, str) or not prompt.strip() or len(prompt) > 8000:
             raise PolicyError("Descrição de imagem vazia ou excessiva.")
         with self._lock:
             spec, engine = self._engine("image", cancel)
-            image = engine.generate(prompt, cancel)
+            image = engine.generate(prompt, cancel) if options is None else engine.generate(prompt, cancel, options=profile.metadata())
             check_cancel(cancel)
-            if getattr(image, "size", None) != (512, 512):
+            if getattr(image, "size", None) != (profile.width, profile.height):
                 raise PolicyError("Pipeline retornou dimensões inesperadas.")
             buffer = io.BytesIO()
             image.save(buffer, format="PNG")
             raw = buffer.getvalue()
-            if not raw.startswith(b"\x89PNG\r\n\x1a\n") or len(raw) > 8000000:
-                raise PolicyError("Artefato visual inválido ou excessivo.")
+            verify_png(raw, (profile.width, profile.height))
             base = local_path(self.home / "foundation" / "artifacts")
             used = 0
             def fail_walk(error):
@@ -111,7 +112,7 @@ class FoundationService:
             result = {"origin": "foundation_image", "content": "Imagem gerada pelo LocalAuthor com o modelo visual local registrado.",
                 "sources": [], "model": spec.provenance(), "artifact_id": run_id,
                 "artifact_sha256": hashlib.sha256(raw).hexdigest(),
-                "width": 512, "height": 512, "seed": 31, "steps": 20,
+                **profile.metadata(),
                 "notice": "Geração visual não é capacidade do Nemotron textual. Revise a imagem; não houve treinamento nem edição dos seus arquivos."}
             fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
             try:
@@ -140,5 +141,7 @@ class FoundationService:
         if (len(raw) > 8000000 or not raw.startswith(b"\x89PNG\r\n\x1a\n")
                 or hashlib.sha256(raw).hexdigest() != row["metadata"].get("artifact_sha256")):
             raise PolicyError("Integridade da imagem não confere.")
+        from .visual import verify_png
+        verify_png(raw, (row["metadata"]["width"], row["metadata"]["height"]))
         return {"data": "data:image/png;base64," + base64.b64encode(raw).decode("ascii"),
                 "sha256": row["metadata"]["artifact_sha256"]}

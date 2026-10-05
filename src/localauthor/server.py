@@ -174,10 +174,14 @@ def make_handler(app: Application, ui_path: Path):
                 if path == "/api/conversations": return app.chat.create(body["project_id"], body.get("title", "Nova conversa"))
                 if path == "/api/project-preferences": return app.chat.save_preferences(body["project_id"], body["method"], body["wip_limit"], body["definition_of_done"])
                 if path == "/api/chat":
+                    if "image_options" in body:
+                        if body.get("mode") != "image": raise PolicyError("Parâmetros visuais exigem modo imagem.")
+                        from .foundation.visual import ImageOptions
+                        ImageOptions.parse(body["image_options"])
                     app.chat.get(body["project_id"], body["conversation_id"])
                     app.chat.validate_message(body["message"], body.get("mode", "guide"), body.get("input_format", "text"))
                     if body.get("mode") in {"model", "foundation", "image"}:
-                        return {"job": app.jobs.submit("chat", {k: body[k] for k in ("project_id", "conversation_id", "message", "mode", "input_format") if k in body})}
+                        return {"job": app.jobs.submit("chat", {k: body[k] for k in ("project_id", "conversation_id", "message", "mode", "input_format", "image_options") if k in body})}
                     return app.chat.respond(body["project_id"], body["conversation_id"], body["message"], body.get("mode", "guide"), input_format=body.get("input_format", "text"))
                 if path == "/api/consult": return app.knowledge.consult(body["query"], body.get("scope", "global"), body.get("include_global") is True)
                 if path == "/api/import":

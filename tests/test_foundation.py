@@ -31,6 +31,8 @@ def register_fixture(home, directory, kind="text"):
     directory.mkdir(parents=True, exist_ok=True)
     (directory / "config.json").write_text('{"model_type":"unit_test_double"}', encoding="utf-8")
     (directory / "model.safetensors").write_bytes(b"fixture-not-a-trained-model")
+    if kind == "image":
+        (directory / "model_index.json").write_text('{"_class_name":"StableDiffusionPipeline"}', encoding="utf-8")
     target = home / "foundation" / f"{kind}-model.json"
     register_model(directory, target, model_id="test-double", revision="fixture-v1", license="test-fixture",
                    reviewed_by="test-suite", capability=kind, context_tokens=8192)
@@ -72,7 +74,7 @@ class DummyImage:
     def __init__(self, spec):
         self.spec = spec
 
-    def generate(self, prompt, cancel=None):
+    def generate(self, prompt, cancel=None, *, options=None):
         check_cancel(cancel)
         return DummyImageArtifact()
 
@@ -179,14 +181,21 @@ class FoundationModelTests(WorkspaceCase):
     def test_image_runtime_uses_local_only_and_callback_contract(self):
         spec = self.model("image")
         class Pipeline:
+            safety_checker = object()
+            feature_extractor = object()
             def to(self, device): return self
             def __call__(self, prompt, callback_on_step_end=None): pass
         loader = Mock(); loader.from_pretrained.return_value = Pipeline()
         with patch.dict(sys.modules, {"torch": SimpleNamespace(float32="float32"),
-                                     "diffusers": SimpleNamespace(AutoPipelineForText2Image=loader)}):
+                                     "diffusers": SimpleNamespace(StableDiffusionPipeline=loader)}):
             ImageRuntime(spec)
         self.assertTrue(loader.from_pretrained.call_args.kwargs["local_files_only"])
         self.assertTrue(loader.from_pretrained.call_args.kwargs["use_safetensors"])
+        loader.from_pretrained.return_value.safety_checker = None
+        with patch.dict(sys.modules, {"torch": SimpleNamespace(float32="float32"),
+                                     "diffusers": SimpleNamespace(StableDiffusionPipeline=loader)}):
+            with self.assertRaisesRegex(PolicyError, "verificador"):
+                ImageRuntime(spec)
 
 
 class FoundationContextTests(WorkspaceCase):

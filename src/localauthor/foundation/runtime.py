@@ -6,7 +6,7 @@ import os
 import time
 
 from ..errors import PolicyError
-from .models import ModelSpec
+from .models import ModelSpec, read_object
 
 
 def check_cancel(cancel, deadline: float | None = None) -> None:
@@ -79,20 +79,30 @@ class ImageRuntime:
             raise PolicyError("Imagens exigem dispositivo cpu ou cuda explícito nesta versão.")
         try:
             import torch
-            from diffusers import AutoPipelineForText2Image
-        except ImportError as exc:
+            # Import only the homologated pipeline. AutoPipeline imports many
+            # unrelated families and may require incompatible extra tokenizers.
+            from diffusers import StableDiffusionPipeline
+        except (ImportError, RuntimeError) as exc:
             raise PolicyError("Instale as dependências opcionais de requirements-foundation.txt.") from exc
         self.torch = torch
+        if read_object(spec.directory / "model_index.json").get("_class_name") != "StableDiffusionPipeline":
+            raise PolicyError("Este perfil visual homologa somente StableDiffusionPipeline nativo.")
         try:
-            self.pipeline = AutoPipelineForText2Image.from_pretrained(
+            self.pipeline = StableDiffusionPipeline.from_pretrained(
                 str(spec.directory), local_files_only=True, use_safetensors=True,
                 torch_dtype=getattr(torch, spec.dtype)).to(spec.device)
         except (OSError, ValueError, ImportError, RuntimeError) as exc:
             raise PolicyError("Pipeline visual local incompatível; nenhum serviço externo foi utilizado.") from exc
+        if getattr(self.pipeline, "safety_checker", None) is None or getattr(self.pipeline, "feature_extractor", None) is None:
+            raise PolicyError("Este perfil visual exige verificador e extrator ativos; não desative para aceitar uma imagem.")
         if "callback_on_step_end" not in inspect.signature(self.pipeline.__call__).parameters:
             raise PolicyError("Pipeline sem callback de cancelamento; homologue uma implementação suportada.")
 
-    def generate(self, prompt: str, cancel=None):
+    def generate(self, prompt: str, cancel=None, *, options=None):
+        from .visual import ImageOptions
+        profile = ImageOptions.parse(options)
+        if options is not None and type(self.pipeline).__name__ != "StableDiffusionPipeline":
+            raise PolicyError("Parâmetros configuráveis exigem perfil StableDiffusionPipeline homologado.")
         check_cancel(cancel)
         for name in ("tokenizer", "tokenizer_2", "tokenizer_3"):
             tokenizer = getattr(self.pipeline, name, None)
@@ -107,15 +117,19 @@ class ImageRuntime:
             check_cancel(cancel, deadline)
             return kwargs
 
-        generator = self.torch.Generator(device=self.spec.device).manual_seed(31)
+        generator = self.torch.Generator(device=self.spec.device).manual_seed(profile.seed)
         with self.torch.inference_mode():
-            result = self.pipeline(prompt=prompt, width=512, height=512,
-                     num_inference_steps=20, generator=generator,
-                     callback_on_step_end=callback)
+            kwargs = dict(prompt=prompt, width=profile.width, height=profile.height,
+                          num_inference_steps=profile.steps, generator=generator, callback_on_step_end=callback)
+            if options is not None:
+                kwargs["guidance_scale"] = profile.guidance_scale
+            result = self.pipeline(**kwargs)
         check_cancel(cancel, deadline)
         flagged = getattr(result, "nsfw_content_detected", None)
-        if flagged is not None and any(flagged):
+        images = getattr(result, "images", None)
+        if (not isinstance(flagged, (list, tuple)) or not images or len(flagged) != len(images)
+                or any(type(flag) is not bool for flag in flagged)):
+            raise PolicyError("Pipeline sem resultado verificável do controle visual.")
+        if any(flagged):
             raise PolicyError("O verificador do pipeline bloqueou a saída visual.")
-        if not getattr(result, "images", None):
-            raise PolicyError("O pipeline não produziu uma imagem.")
-        return result.images[0]
+        return images[0]
