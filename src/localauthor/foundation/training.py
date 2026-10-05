@@ -83,7 +83,7 @@ def _train(experiment_path: Path, base_manifest: Path, dataset_path: Path, outpu
         raise PolicyError("Base/dataset divergem do manifesto congelado.")
     spec = ModelSpec.load(base_manifest, "text")
     spec.verify()
-    if spec.reviewed_local_code or spec.device != "cpu" or spec.dtype != "float32":
+    if spec.backend != "transformers" or spec.reviewed_local_code or spec.device != "cpu" or spec.dtype != "float32":
         raise PolicyError("Primeiro perfil de treinamento: CPU/float32 nativo, sem código de checkpoint.")
     for name, expected in experiment["tokenizer_hashes"].items():
         if name not in spec.files or spec.files[name] != expected:

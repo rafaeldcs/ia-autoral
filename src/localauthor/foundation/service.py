@@ -19,31 +19,43 @@ from .runtime import ImageRuntime, TextRuntime, check_cancel
 MAX_ARTIFACT_BYTES = 256_000_000
 
 
+def text_runtime(spec, diagnostics=None):
+    if spec.backend == "gguf-docker":
+        from .gguf_bridge import DockerGgufRuntime
+        return DockerGgufRuntime(spec, diagnostics=diagnostics)
+    return TextRuntime(spec)
+
+
 class FoundationService:
-    def __init__(self, home: Path, *, text_factory=TextRuntime, image_factory=ImageRuntime):
+    def __init__(self, home: Path, *, text_factory=None, image_factory=ImageRuntime):
         self.home = Path(home)
-        self.factories = {"text": text_factory, "image": image_factory}
+        self.factories = {"text": text_factory or (lambda spec: text_runtime(spec, self.home / "foundation/runtime")), "image": image_factory}
         self._cache = {}
         self._lock = threading.RLock()
 
     def status(self) -> dict:
         base = local_path(self.home / "foundation")
         return {"capabilities": {kind: {"registered": (base / f"{kind}-model.json").is_file(),
-                "loaded": kind in self._cache} for kind in self.factories},
+                "loaded": kind in self._cache and not getattr(self._cache[kind][2], "closed", False)} for kind in self.factories},
                 "remote_fallback": False, "weights_trained_here": False,
                 "image_understanding": False, "generated_code_execution": False}
 
     def _evict(self, kind):
-        cached = self._cache.pop(kind, None)
+        cached = self._cache.get(kind)
         if cached is not None:
             close = getattr(cached[2], "close", None)
             if callable(close): close()
+            self._cache.pop(kind, None)
+
+    def close(self):
+        with self._lock:
+            for kind in tuple(self._cache): self._evict(kind)
 
     def _engine(self, kind: str, cancel=None):
         check_cancel(cancel)
         spec = ModelSpec.load(self.home / "foundation" / f"{kind}-model.json", kind)
         cached = self._cache.get(kind)
-        if cached and cached[0].manifest_sha256 == spec.manifest_sha256:
+        if cached and not getattr(cached[2], "closed", False) and cached[0].manifest_sha256 == spec.manifest_sha256:
             if spec.signature() != cached[1]:
                 self._evict(kind)
                 raise PolicyError("Arquivos de modelo mudaram durante a sessão. Reinicie após revisão.")

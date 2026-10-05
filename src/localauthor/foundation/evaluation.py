@@ -36,6 +36,8 @@ def evaluate(model_manifest: Path, cases_path: Path, report_path: Path) -> dict:
             raise PolicyError("Oráculo precisa de expectativa congelada.")
     spec = ModelSpec.load(model_manifest, "text")
     spec.verify()
+    if spec.backend != "transformers":
+        raise PolicyError("Avaliador Safetensors não executa GGUF. Use o probe GGUF em sandbox; não é qualificação final.")
     engine = TextRuntime(spec)
     results = []
     for row in rows:
@@ -72,7 +74,7 @@ def evaluate(model_manifest: Path, cases_path: Path, report_path: Path) -> dict:
 def compare(base_manifest: Path, candidate: Path, cases: Path, output: Path) -> dict:
     """Same frozen inputs and generation budgets; no resetting criteria on failure."""
     base, new = ModelSpec.load(base_manifest, "text"), ModelSpec.load(candidate, "text")
-    for key in ("device", "dtype", "context_tokens", "output_tokens"):
+    for key in ("device", "dtype", "context_tokens", "output_tokens", "backend", "runtime_profile"):
         if getattr(base, key) != getattr(new, key):
             raise PolicyError("Comparação exige condições iguais de dispositivo, precisão e tokens.")
     if output.exists(): raise PolicyError("Use pasta nova para preservar avaliação anterior.")

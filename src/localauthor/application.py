@@ -55,3 +55,4 @@ class Application:
     def close(self):
         self.browser.close()
         self.jobs.close()
+        self.chat.foundation.close()

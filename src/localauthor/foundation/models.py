@@ -116,6 +116,8 @@ class ModelSpec:
     device: str = "cpu"
     dtype: str = "float32"
     derivation: dict = field(default_factory=dict)
+    backend: str = "transformers"
+    runtime_profile: dict = field(default_factory=dict)
 
     @classmethod
     def load(cls, manifest: Path, capability: str) -> "ModelSpec":
@@ -143,6 +145,20 @@ class ModelSpec:
             raise PolicyError("Dispositivo ou precisão não suportados.")
         if type(data.get("reviewed_local_code", False)) is not bool:
             raise PolicyError("A revisão de código local deve ser um booleano explícito.")
+        backend, runtime_profile = data.get("backend", "transformers"), data.get("runtime_profile", {})
+        if not isinstance(backend, str) or backend not in {"transformers", "gguf-docker"} or not isinstance(runtime_profile, dict):
+            raise PolicyError("Backend local inválido.")
+        if backend == "gguf-docker":
+            from .gguf_lab import valid_profile, valid_decoding
+            valid_profile(context, output, 4)
+            if (capability != "text" or device not in {"cpu", "cuda"} or data.get("reviewed_local_code", False)
+                    or set(runtime_profile) != {"image_id", "volume", "reasoning_budget"}
+                    or not re.fullmatch(r"sha256:[a-f0-9]{64}", str(runtime_profile.get("image_id", "")))
+                    or not re.fullmatch(r"localauthor-[a-z0-9-]{1,100}", str(runtime_profile.get("volume", "")))):
+                raise PolicyError("GGUF exige texto, imagem Docker imutável e volume local revisado.")
+            valid_decoding(output, runtime_profile["reasoning_budget"], False)
+        elif runtime_profile:
+            raise PolicyError("Perfil Docker não se aplica ao backend Transformers.")
         derived = data.get("derivation", {})
         if not isinstance(derived, dict) or (derived and (
                 derived.get("created_from_scratch") is not False or not derived.get("base_model")
@@ -151,7 +167,7 @@ class ModelSpec:
             raise PolicyError("Procedência de modelo derivado incompleta.")
         return cls(local_path(Path(data["directory"])), data["model_id"], data["revision"],
                    data["license"], capability, files, digest(manifest),
-                   data.get("reviewed_local_code", False), context, output, device, dtype, data.get("derivation", {}))
+                   data.get("reviewed_local_code", False), context, output, device, dtype, data.get("derivation", {}), backend, runtime_profile)
 
     def verify(self) -> tuple:
         paths = inventory(self.directory)
@@ -160,7 +176,7 @@ class ModelSpec:
             raise PolicyError("Inventário do modelo mudou; revise e registre novamente.")
         if self.derivation and read_object(self.directory / "DERIVATION.json") != self.derivation:
             raise PolicyError("Procedência diverge da derivação conservada com os pesos.")
-        if any(p.suffix.lower() == ".py" for p in paths) and (not self.reviewed_local_code or self.capability != "text"):
+        if any(p.suffix.lower() == ".py" for p in paths) and (self.backend == "gguf-docker" or not self.reviewed_local_code or self.capability != "text"):
             raise PolicyError("Código Python do checkpoint exige revisão local explícita; imagens não aceitam código customizado.")
         for name, path in actual.items():
             if path.name == "adapter_config.json":
@@ -180,7 +196,10 @@ class ModelSpec:
                         raise PolicyError("Shard de pesos fora do inventário revisado.")
             if digest(path) != self.files[name]:
                 raise PolicyError("Hash do modelo divergente: " + name)
-        if not any(p.suffix == ".safetensors" for p in paths):
+        if self.backend == "gguf-docker":
+            if len([p for p in paths if p.suffix == ".gguf"]) != 1 or any(p.suffix == ".safetensors" for p in paths):
+                raise PolicyError("GGUF exige exatamente um arquivo de pesos, sem mistura de formatos.")
+        elif not any(p.suffix == ".safetensors" for p in paths):
             raise PolicyError("Este runtime requer pesos Safetensors locais.")
         return self.signature()
 
@@ -191,6 +210,7 @@ class ModelSpec:
 
     def provenance(self) -> dict:
         return {"model_id": self.model_id, "revision": self.revision, "license": self.license,
+                "backend": self.backend, "runtime_profile": self.runtime_profile,
                 "manifest_sha256": self.manifest_sha256, "capability": self.capability,
                 "weights_modified_by_this_run": False, "derived_checkpoint": bool(self.derivation), "derivation": self.derivation,
                 "created_from_scratch": False if self.derivation else None}
@@ -200,7 +220,8 @@ def register_model(directory: Path, target: Path, *, model_id: str, revision: st
                    license: str, reviewed_by: str, capability: str,
                    reviewed_local_code: bool = False, device: str = "cpu",
                    dtype: str = "float32", context_tokens: int = 4096,
-                   output_tokens: int = 768, derivation: dict | None = None) -> None:
+                   output_tokens: int = 768, derivation: dict | None = None,
+                   backend: str = "transformers", runtime_profile: dict | None = None) -> None:
     """Operator attests origin/rights; hashes do not establish model competence."""
     directory, target = local_path(directory), local_path(target)
     if target.is_relative_to(directory):
@@ -213,6 +234,7 @@ def register_model(directory: Path, target: Path, *, model_id: str, revision: st
             "capability": capability, "reviewed_local_code": reviewed_local_code,
             "device": device, "dtype": dtype, "context_tokens": context_tokens,
             "output_tokens": output_tokens,
+            "backend": backend, "runtime_profile": runtime_profile or {},
             "derivation": derivation or {},
             "files": {p.relative_to(directory).as_posix(): digest(p) for p in paths}}
     import tempfile

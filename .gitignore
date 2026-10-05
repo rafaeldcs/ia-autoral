@@ -21,6 +21,7 @@ server.lock
 *.npz
 *.npy
 *.safetensors
+*.gguf
 *.pt
 *.pth
 *.bundle

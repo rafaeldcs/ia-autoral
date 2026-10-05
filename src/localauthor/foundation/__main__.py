@@ -30,6 +30,10 @@ def main(argv=None) -> int:
     register.add_argument("--dtype", choices=["float32", "float16", "bfloat16"], default="float32")
     register.add_argument("--context-tokens", type=int, default=4096)
     register.add_argument("--output-tokens", type=int, default=768)
+    register.add_argument("--backend", choices=["transformers", "gguf-docker"], default="transformers")
+    register.add_argument("--gguf-image-id")
+    register.add_argument("--gguf-volume")
+    register.add_argument("--reasoning-budget", type=int, default=0)
     knowledge = commands.add_parser("import-md")
     knowledge.add_argument("project_id")
     knowledge.add_argument("file", type=Path)
@@ -64,12 +68,16 @@ def main(argv=None) -> int:
         if args.command == "status":
             result = FoundationService(home).status()
         elif args.command == "register-model":
+            if args.backend == "transformers" and (args.gguf_image_id or args.gguf_volume or args.reasoning_budget):
+                raise PolicyError("Opções GGUF exigem backend gguf-docker.")
+            runtime_profile = {"image_id": args.gguf_image_id, "volume": args.gguf_volume,
+                               "reasoning_budget": args.reasoning_budget} if args.backend == "gguf-docker" else {}
             target = home / "foundation" / f"{args.kind}-model.json"
             register_model(args.directory, target, model_id=args.model_id,
                 revision=args.revision, license=args.license, reviewed_by=args.reviewed_by,
                 capability=args.kind, reviewed_local_code=args.reviewed_local_code,
                 device=args.device, dtype=args.dtype, context_tokens=args.context_tokens,
-                output_tokens=args.output_tokens)
+                output_tokens=args.output_tokens, backend=args.backend, runtime_profile=runtime_profile)
             result = {"manifest": str(target), "registered": True, "inference_tested": False}
         elif args.command == "import-md":
             from .knowledge import import_markdown

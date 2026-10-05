@@ -42,7 +42,7 @@ def export_candidate(experiment: Path, base_manifest: Path, dataset: Path, check
     output = local_path(output)
     if output.exists() or output.is_relative_to(spec.directory) or output.is_relative_to(local_path(checkpoint)):
         raise PolicyError("Exportação exige pasta nova fora da base e checkpoint.")
-    if spec.device != "cpu" or spec.dtype != "float32" or spec.reviewed_local_code:
+    if spec.backend != "transformers" or spec.device != "cpu" or spec.dtype != "float32" or spec.reviewed_local_code:
         raise PolicyError("Exportação homologada somente em CPU/f32 nativo.")
     output.mkdir(parents=True)
     import torch

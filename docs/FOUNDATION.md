@@ -104,7 +104,41 @@ dos pesos decorre da presença do Markdown no Git.
 `qa/foundation/Dockerfile.gguf` usa o arquivo oficial CPU do llama.cpp b11429,
 com SHA-256 conferido e extração limitada. `Dockerfile.cuda118-builder` prepara
 uma compilação separada CUDA 11.8 para Turing/sm75, sem alterar o driver Windows.
-Essas imagens não contêm pesos e não são o runtime ativo do aplicativo.
+Essas imagens não contêm pesos. O aplicativo só as utiliza se um operador
+registrar explicitamente o backend opcional `gguf-docker`; nunca baixa a imagem.
+
+Para usar GGUF no chat, há um backend separado de inferência por IPC no Docker
+local. Ele reutiliza o modelo entre pedidos, conta tokens com o template real,
+para a própria instância no cancelamento/encerramento e recarrega após cancelamento.
+A imagem é selecionada por SHA-256, nunca por uma tag mutável. Antes de iniciar,
+o controlador confere imagem, usuário, rede desabilitada, root somente leitura,
+capabilities, mounts somente leitura, 6 GiB de RAM, quatro CPUs e limite de PIDs.
+O worker repete os canários de isolamento e confere o hash GGUF no volume.
+Nenhuma porta de inferência é publicada; não se monta o socket Docker nem a pasta
+de dados do aplicativo. Somente mensagens limitadas atravessam o IPC.
+
+Docker Desktop com suporte GPU é infraestrutura adicional **do servidor**.
+Os computadores clientes continuam usando o LocalAuthor pela rede local.
+Falta de Docker/GPU, imagem ausente ou divergência do volume gera erro; não há
+fallback para inferência no host nem API externa. Esse backend não treina GGUF:
+o trainer/export Qwen continua restrito ao perfil Safetensors aprovado.
+
+Registro técnico em uma pasta de laboratório nova, após adquirir e revisar pesos,
+licença, imagem e volume. Substitua os valores por identidades realmente conferidas;
+não execute contra a instalação ativa para contornar promoção/aprovação:
+
+```powershell
+& $python -m localauthor.foundation --home "D:\LocalAuthor-Laboratorio" register-model text "D:\Modelos\GGUF-revisado" --model-id "ORIGEM/MODELO" --revision "REVISAO_IMUTAVEL" --license "LICENCA_REVISADA" --reviewed-by "OPERADOR" --backend gguf-docker --device cuda --context-tokens 4096 --output-tokens 1536 --reasoning-budget 512 --gguf-image-id "sha256:HASH_REAL_DE_64_HEXADECIMAIS" --gguf-volume "localauthor-volume-revisado"
+```
+
+O produto mantém uma geração por vez para não carregar três modelos na GPU de
+6 GB. Pedidos dos projetos entram na fila persistente; perfis de trabalho não
+substituem autenticação por usuário. Registro/carregamento e testes da fila não
+qualificam competência profissional. Contêineres encerrados ficam preservados.
+Antes da parada, o controlador captura um snapshot do diagnóstico já expurgado
+da chave interna em `foundation/runtime`, com limite por arquivo e quota de 512 MB.
+O snapshot não inclui necessariamente eventos posteriores à cópia. Falha de
+diagnóstico não impede a parada; não existe limpeza automática de evidências.
 
 `scripts/foundation-gguf-probe.py` executa pesos GGUF locais conferidos em sandbox
 Linux verificada, sem rede, root ou execução do código produzido. `--gpu` exige

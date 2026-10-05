@@ -367,6 +367,35 @@ class FoundationIntegrationTests(WorkspaceCase):
         self.assertIsNot(service._cache["text"][2], text)
         self.assertEqual((self.spec.directory / "model.safetensors").read_bytes(), before)
 
+    def test_closed_engine_is_reloaded_for_next_request(self):
+        self.respond()
+        old = self.app.chat.foundation._cache["text"][2]
+        old.closed = True
+        self.assertFalse(self.app.chat.foundation.status()["capabilities"]["text"]["loaded"])
+        self.respond("Novo pedido depois do cancelamento")
+        self.assertIsNot(self.app.chat.foundation._cache["text"][2], old)
+
+    def test_application_shutdown_closes_resident_engine(self):
+        from unittest.mock import Mock
+        self.respond()
+        engine = self.app.chat.foundation._cache["text"][2]; engine.close = Mock()
+        self.app.close()
+        engine.close.assert_called_once()
+        self.assertEqual(self.app.chat.foundation._cache, {})
+
+    def test_unconfirmed_shutdown_keeps_owned_engine_for_retry(self):
+        from unittest.mock import Mock
+        self.respond()
+        service = self.app.chat.foundation
+        engine = service._cache["text"][2]
+        engine.closed = True
+        engine.close = Mock(side_effect=PolicyError("fixture unconfirmed stop"))
+        with self.assertRaises(PolicyError): self.respond("Outro pedido")
+        self.assertIs(service._cache["text"][2], engine)
+        engine.close = Mock()
+        self.respond("Tentar depois da parada confirmada")
+        self.assertIsNot(service._cache["text"][2], engine)
+
     def test_image_saved_with_hash_and_project_access_check(self):
         result = self.respond("Um quadrado", "image")
         metadata = result["messages"][-1]["metadata"]

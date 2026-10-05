@@ -18,6 +18,7 @@ from .runtime import check_cancel
 
 BINARY = Path("/opt/llama-b11429/llama-server")
 MAX_RESPONSE_BYTES = 1_000_000
+MAX_DIAGNOSTIC_BYTES = 64_000_000
 
 
 def private_diagnostic(raw, key):
@@ -103,6 +104,7 @@ class GgufLabRuntime:
             self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                 shell=False)
             def record_diagnostics():
+                written = 0
                 while True:
                     raw = self.process.stdout.readline(MAX_RESPONSE_BYTES + 1)
                     if not raw: break
@@ -110,7 +112,12 @@ class GgufLabRuntime:
                     except PolicyError:
                         self.process.terminate()
                         safe = b"Diagnostic exceeded budget; owned process stopped.\n"
+                    if written + len(safe) > MAX_DIAGNOSTIC_BYTES:
+                        self.process.terminate()
+                        self.log.write(b"Total diagnostic budget reached; owned process stopped.\n"); self.log.flush()
+                        break
                     self.log.write(safe); self.log.flush()
+                    written += len(safe)
             self.reader = threading.Thread(target=record_diagnostics, daemon=True)
             self.reader.start()
             deadline = time.monotonic() + 120

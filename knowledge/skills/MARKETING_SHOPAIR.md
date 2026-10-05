@@ -25,6 +25,18 @@ Conferir linguagem, legibilidade no celular, acessibilidade e coerência entre
 anúncio, página e oferta. Usar imagens locais como rascunhos sujeitos à revisão;
 não tratar texto desenhado pelo gerador como identidade visual pronta.
 
+Na revisão editorial, conferir cada afirmação das peças, não apenas o aviso final.
+Uma hipótese não autoriza prometer economia, tempo em minutos, gratuidade,
+atualização em tempo real ou uma integração. A fonte precisa sustentar exatamente
+a afirmação. Pedir demonstração da plataforma é uma meta comercial; não comprova
+que há uma função de agendamento dentro do produto. Não confundir o público
+empresário com consumidores comprando no catálogo de uma loja.
+
+Conferir coerência entre duração do vídeo, cenas e calendário. Referências devem
+usar o identificador e as linhas realmente recebidos; escrever apenas
+`fonte:linhas` não identifica uma origem. Uma mensagem afirmando que tudo foi
+verificado não substitui a verificação das peças ou das ferramentas de coleta.
+
 Comparar taxas com seus denominadores, preservando empates e dados ausentes.
 CTR, conversão por clique, custo por clique e custo por conversão podem ser
 calculados pela ferramenta determinística da plataforma. Maior CTR não comprova
