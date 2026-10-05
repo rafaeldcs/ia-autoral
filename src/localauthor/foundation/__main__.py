@@ -57,6 +57,7 @@ def main(argv=None) -> int:
     export = commands.add_parser("export-training")
     export.add_argument("project_id")
     export.add_argument("kind", choices=["text", "code", "image"])
+    export.add_argument("--split", choices=["train", "validation"], default="train")
     args = parser.parse_args(argv)
     try:
         home = local_path(args.home)
@@ -89,7 +90,7 @@ def main(argv=None) -> int:
                 verification_note=args.verification_note, split=args.split)
             result = {"reviewed": True, "weights_modified": False}
         else:
-            rows = ExperienceStore(home).training_rows(args.project_id, args.kind)
+            rows = ExperienceStore(home).training_rows(args.project_id, args.kind, args.split)
             if not rows:
                 raise PolicyError("Não há experiências autorizadas e verificadas para exportação.")
             if args.kind == "image":

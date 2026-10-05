@@ -173,15 +173,17 @@ class ExperienceStore:
                                       "code_revision": code_revision, "training_allowed": bool(row["training_allowed"])}))
         return [item for _, item in sorted(ranked, key=lambda pair: -pair[0])[:limit]]
 
-    def training_rows(self, project_id: str, kind: str) -> list[dict]:
+    def training_rows(self, project_id: str, kind: str, split: str = "train") -> list[dict]:
         if kind not in {"text", "code", "image"}:
             raise PolicyError("Tipo de corpus inválido.")
+        if split not in {"train", "validation"}:
+            raise PolicyError("A avaliação final não é exportada para desenvolvimento.")
         with self.connect() as db:
             rows = db.execute("""SELECT * FROM experiences e WHERE project_id=? AND kind=?
                 AND accepted=1 AND training_allowed=1 AND rights_reviewed=1 AND verified=1
-                AND split='train' AND NOT EXISTS (SELECT 1 FROM experiences h
-                    WHERE h.problem_hash=e.problem_hash AND h.split IN ('validation','test'))
-                ORDER BY created_at,id""", (identifier(project_id), kind)).fetchall()
+                AND split=? AND NOT EXISTS (SELECT 1 FROM experiences h
+                    WHERE h.problem_hash=e.problem_hash AND h.split IN ('validation','test') AND h.split<>e.split)
+                ORDER BY created_at,id""", (identifier(project_id), kind, split)).fetchall()
             rows = [row for row in rows if not self._revoked(db, project_id, json.loads(row["metadata"]))]
         seen, output = set(), []
         for row in rows:
@@ -192,7 +194,7 @@ class ExperienceStore:
             context = metadata.get("generation_context")
             if not isinstance(context, list) or not context:
                 context = [{"role": "user", "content": row["prompt"]}]
-            output.append({"id": row["id"], "kind": kind, "split": "train",
+            output.append({"id": row["id"], "kind": kind, "split": split, "project_id": project_id,
                 "messages": [*context, {"role": "assistant", "content": row["response"]}],
                 "metadata": metadata, "output_hash": row["output_hash"],
                 "reviewer": row["reviewer"], "verification_note": row["verification_note"]})

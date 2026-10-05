@@ -1,7 +1,7 @@
 """Explicit, checksum-bound local model registration. No automatic downloads."""
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import hashlib
 import json
 import os
@@ -115,6 +115,7 @@ class ModelSpec:
     output_tokens: int = 768
     device: str = "cpu"
     dtype: str = "float32"
+    derivation: dict = field(default_factory=dict)
 
     @classmethod
     def load(cls, manifest: Path, capability: str) -> "ModelSpec":
@@ -142,15 +143,23 @@ class ModelSpec:
             raise PolicyError("Dispositivo ou precisão não suportados.")
         if type(data.get("reviewed_local_code", False)) is not bool:
             raise PolicyError("A revisão de código local deve ser um booleano explícito.")
+        derived = data.get("derivation", {})
+        if not isinstance(derived, dict) or (derived and (
+                derived.get("created_from_scratch") is not False or not derived.get("base_model")
+                or any(not re.fullmatch(r"[a-f0-9]{64}", str(derived.get(k, ""))) for k in
+                       ("base_manifest_sha256", "dataset_sha256", "experiment_sha256", "checkpoint_sha256")))):
+            raise PolicyError("Procedência de modelo derivado incompleta.")
         return cls(local_path(Path(data["directory"])), data["model_id"], data["revision"],
                    data["license"], capability, files, digest(manifest),
-                   data.get("reviewed_local_code", False), context, output, device, dtype)
+                   data.get("reviewed_local_code", False), context, output, device, dtype, data.get("derivation", {}))
 
     def verify(self) -> tuple:
         paths = inventory(self.directory)
         actual = {p.relative_to(self.directory).as_posix(): p for p in paths}
         if set(actual) != set(self.files):
             raise PolicyError("Inventário do modelo mudou; revise e registre novamente.")
+        if self.derivation and read_object(self.directory / "DERIVATION.json") != self.derivation:
+            raise PolicyError("Procedência diverge da derivação conservada com os pesos.")
         if any(p.suffix.lower() == ".py" for p in paths) and (not self.reviewed_local_code or self.capability != "text"):
             raise PolicyError("Código Python do checkpoint exige revisão local explícita; imagens não aceitam código customizado.")
         for name, path in actual.items():
@@ -183,14 +192,15 @@ class ModelSpec:
     def provenance(self) -> dict:
         return {"model_id": self.model_id, "revision": self.revision, "license": self.license,
                 "manifest_sha256": self.manifest_sha256, "capability": self.capability,
-                "weights_modified_by_this_run": False}
+                "weights_modified_by_this_run": False, "derived_checkpoint": bool(self.derivation), "derivation": self.derivation,
+                "created_from_scratch": False if self.derivation else None}
 
 
 def register_model(directory: Path, target: Path, *, model_id: str, revision: str,
                    license: str, reviewed_by: str, capability: str,
                    reviewed_local_code: bool = False, device: str = "cpu",
                    dtype: str = "float32", context_tokens: int = 4096,
-                   output_tokens: int = 768) -> None:
+                   output_tokens: int = 768, derivation: dict | None = None) -> None:
     """Operator attests origin/rights; hashes do not establish model competence."""
     directory, target = local_path(directory), local_path(target)
     if target.is_relative_to(directory):
@@ -203,6 +213,7 @@ def register_model(directory: Path, target: Path, *, model_id: str, revision: st
             "capability": capability, "reviewed_local_code": reviewed_local_code,
             "device": device, "dtype": dtype, "context_tokens": context_tokens,
             "output_tokens": output_tokens,
+            "derivation": derivation or {},
             "files": {p.relative_to(directory).as_posix(): digest(p) for p in paths}}
     import tempfile
     with tempfile.TemporaryDirectory() as temp:
