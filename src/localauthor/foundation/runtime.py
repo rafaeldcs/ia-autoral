@@ -46,6 +46,14 @@ class TextRuntime:
         return len(self.tokenizer.apply_chat_template(messages, tokenize=True,
                    add_generation_prompt=True, enable_thinking=False, return_dict=False))
 
+    def close(self):
+        self.model = None
+        self.tokenizer = None
+        if self.spec.device in {"cuda", "auto"} and self.torch.cuda.is_available():
+            import gc
+            gc.collect()
+            self.torch.cuda.empty_cache()
+
     def generate(self, messages: list[dict], cancel=None) -> tuple[str, bool]:
         from transformers import StoppingCriteria, StoppingCriteriaList
         check_cancel(cancel)
@@ -97,6 +105,13 @@ class ImageRuntime:
             raise PolicyError("Este perfil visual exige verificador e extrator ativos; não desative para aceitar uma imagem.")
         if "callback_on_step_end" not in inspect.signature(self.pipeline.__call__).parameters:
             raise PolicyError("Pipeline sem callback de cancelamento; homologue uma implementação suportada.")
+
+    def close(self):
+        self.pipeline = None
+        if self.spec.device == "cuda" and self.torch.cuda.is_available():
+            import gc
+            gc.collect()
+            self.torch.cuda.empty_cache()
 
     def generate(self, prompt: str, cancel=None, *, options=None):
         from .visual import ImageOptions

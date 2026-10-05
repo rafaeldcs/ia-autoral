@@ -1,0 +1,14 @@
+# Explicit acquisition/build environment, not an inference or project executor.
+# Build with --build-context llama_source=/private/acquisition/llama-b11429.
+FROM localauthor-terreiro-simulation:1 AS source
+USER root
+COPY --from=llama_source /source.tar.gz /tmp/source.tar.gz
+RUN python3 -c 'import hashlib,tarfile; from pathlib import Path; p=Path("/tmp/source.tar.gz"); assert hashlib.sha256(p.read_bytes()).hexdigest()=="6b58785f0a82898f4c3442417ff962e2d4b231b1bee5d033902ad90b27901e14"; t=tarfile.open(p); m=t.getmembers(); prefix="llama.cpp-d81235049384534c167caea52b85a694f6103d14"; assert len(m)<20000 and sum(x.size for x in m)<300000000; assert all(x.name==prefix or x.name.startswith(prefix+"/") for x in m); t.extractall("/src",filter="data"); p.unlink()'
+FROM nvidia/cuda:11.8.0-devel-ubuntu22.04@sha256:94fd755736cb58979173d491504f0b573247b1745250249415b07fefc738e41f
+# Network is used only for explicit dependency acquisition. Compile separately
+# with --network=none, non-root, memory/CPU limits and no GPU access.
+RUN apt-get update && apt-get install -y --no-install-recommends cmake build-essential ca-certificates && dpkg-query -W > /opt/build-packages.txt && rm -rf /var/lib/apt/lists/*
+COPY --from=source /src/llama.cpp-d81235049384534c167caea52b85a694f6103d14 /src/llama
+USER 10001:10001
+WORKDIR /out
+ENTRYPOINT ["cmake"]

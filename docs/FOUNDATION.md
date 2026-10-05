@@ -80,6 +80,35 @@ Para atualizar/remover uma fonte importada, pare o servidor, preserve um backup 
 
 ## Processo operacional implementado
 
+Nas orientações de cada projeto, selecione Geral, Desenvolvimento ou Marketing.
+O perfil persiste somente naquele projeto e orienta respostas do modo foundation;
+não concede ferramentas, publicação, uso de verba ou autorização para treinamento.
+Scrum/Kanban, WIP e critério de pronto entram no contexto como dados do projeto.
+Os contratos antigos de preferências continuam compatíveis. Há uma única fila de
+inferência; ao trocar texto/imagem, o serviço libera o modelo anterior antes de
+carregar outro, após verificar o candidato. Não mantém ambos residentes na RAM.
+
+### Laboratório GGUF opcional
+
+`qa/foundation/Dockerfile.gguf` usa o arquivo oficial CPU do llama.cpp b11429,
+com SHA-256 conferido e extração limitada. `Dockerfile.cuda118-builder` prepara
+uma compilação separada CUDA 11.8 para Turing/sm75, sem alterar o driver Windows.
+Essas imagens não contêm pesos e não são o runtime ativo do aplicativo.
+
+`scripts/foundation-gguf-probe.py` executa pesos GGUF locais conferidos em sandbox
+Linux verificada, sem rede, root ou execução do código produzido. `--gpu` exige
+CUDA0 e offload completo comprovado no log; não cai silenciosamente para CPU.
+Registra contexto real, truncamento, saídas originais, hashes e latência.
+Casos de captura não contam como acertos; resultados são de desenvolvimento,
+sem treinamento, promoção ou equivalência com modelos de fronteira.
+
+`scripts/foundation-code-oracle-worker.py` observa artefatos originais de C#,
+JavaScript e PostgreSQL em **outra** sandbox inspecionada, sem pesos, segredos,
+gabaritos ou mounts graváveis do host. Recebe apenas entradas via stdin.
+O controlador externo preserva e compara resultados esperados. Nunca execute
+esse worker como alternativa no Windows nem monte a pasta privada inteira.
+Compilação, saída do worker e testes com dublês não qualificam o modelo.
+
 Pedido validado → contexto limitado e isolado por projeto → inferência local → checagem de cancelamento → resultado e procedência → experiência não aprovada → gravação da conversa → revisão humana. Falha ao salvar a conversa dispara limpeza compensatória do resultado não revisado; não apaga experiências já revisadas. Uma queda abrupta entre os dois bancos pode deixar um candidato órfão, nunca autorizado para treino; requer reconciliação manual.
 
 Código gerado é texto. Para aplicar, use o fluxo existente de snapshot/proposta/diff/testes/revisão. O novo modo não tem shell, Git, acesso de escrita ao projeto nem ferramentas agentivas. Instruções dentro do código ou da documentação não podem conceder essas capacidades.

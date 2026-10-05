@@ -30,6 +30,8 @@ def main():
             settings = Settings.load(base / "data")
             app = Application(settings)
             item = app.store.add_project("Laboratório visual", str(project))
+            second_root = base / "marketing"; second_root.mkdir()
+            second = app.store.add_project("Marketing de laboratório", str(second_root))
             app.store.ingest(item["id"], "note:stock", "Estoque", "O estoque não pode ser negativo.", kind="note")
             register_fixture(settings.home, base / "text-weights")
             register_fixture(settings.home, base / "image-weights", "image")
@@ -50,6 +52,8 @@ def main():
                     page.locator("#token").fill(settings.token)
                     page.locator("#connect button").click()
                     expect(page.locator("#workspace")).to_be_visible()
+                    page.locator("#project").select_option(item["id"])
+                    expect(page.locator("#conversation")).to_have_value("")
                     assert page.locator("#token").input_value() == ""
                     assert page.evaluate("localStorage.length + sessionStorage.length") == 0
                     report["flows"].append("authenticated login, no browser credential persistence")
@@ -98,6 +102,39 @@ def main():
                     expect(page.locator("#login")).to_be_visible()
                     assert page.locator("#messages").inner_text() == ""
                     report["flows"].append("mobile layout and logout cleanup")
+                    page.goto(f"http://127.0.0.1:{server.server_port}/")
+                    page.locator("#local-token").fill(settings.token)
+                    page.locator("#connect-form button").click()
+                    expect(page.locator("#studio")).to_be_visible()
+                    page.locator("#open-menu").click()
+                    page.locator("#project-list button").filter(has_text="Marketing de laboratório").click()
+                    page.locator("#show-rules").click()
+                    expect(page.locator("#rules-dialog")).to_be_visible()
+                    page.locator("#work-profile").select_option("marketing")
+                    page.locator("#done").fill("Conferir fontes; conteúdo é uma proposta até revisão.")
+                    page.locator("#rules-form button.primary").click()
+                    expect(page.locator("#rules-dialog")).not_to_be_visible()
+                    assert app.chat.preferences(second["id"])["work_profile"] == "marketing"
+                    page.locator("#show-rules").click()
+                    expect(page.locator("#work-profile")).to_have_value("marketing")
+                    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+                    page.screenshot(path=str(reports / "work-profile-mobile.png"), full_page=True)
+                    page.locator('[data-close="rules-dialog"]').click()
+                    page.locator("#open-menu").click()
+                    page.locator("#project-list button").filter(has_text="Laboratório visual").click()
+                    page.locator("#show-rules").click()
+                    expect(page.locator("#work-profile")).to_have_value("general")
+                    page.locator("#work-profile").select_option("developer")
+                    page.locator("#rules-form button.primary").click()
+                    expect(page.locator("#rules-dialog")).not_to_be_visible()
+                    assert app.chat.preferences(item["id"])["work_profile"] == "developer"
+                    assert app.chat.preferences(second["id"])["work_profile"] == "marketing"
+                    page.reload()
+                    page.locator("#local-token").fill(settings.token)
+                    page.locator("#connect-form button").click()
+                    expect(page.locator("#studio")).to_be_visible()
+                    assert app.chat.preferences(second["id"])["work_profile"] == "marketing"
+                    report["flows"].append("project work profiles persist independently; mobile guidance dialog")
                     assert (project / "Stock.cs").read_text(encoding="utf-8") == original
                     report["flows"].append("original project file unchanged")
                     report["success"] = not report["errors"]

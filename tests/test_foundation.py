@@ -352,6 +352,21 @@ class FoundationIntegrationTests(WorkspaceCase):
         with self.assertRaises(PolicyError):
             self.respond()
 
+    def test_switching_modality_releases_other_engine_and_preserves_weights(self):
+        from unittest.mock import Mock
+        self.respond()
+        service = self.app.chat.foundation
+        text = service._cache["text"][2]
+        text.close = Mock()
+        before = (self.spec.directory / "model.safetensors").read_bytes()
+        self.respond("Quadrado de laboratório", "image")
+        text.close.assert_called_once()
+        self.assertEqual(set(service._cache), {"image"})
+        self.respond("Voltar ao texto")
+        self.assertEqual(set(service._cache), {"text"})
+        self.assertIsNot(service._cache["text"][2], text)
+        self.assertEqual((self.spec.directory / "model.safetensors").read_bytes(), before)
+
     def test_image_saved_with_hash_and_project_access_check(self):
         result = self.respond("Um quadrado", "image")
         metadata = result["messages"][-1]["metadata"]

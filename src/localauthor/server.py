@@ -172,7 +172,7 @@ def make_handler(app: Application, ui_path: Path):
                 if path == "/api/investigations": return app.chat.investigations.create(body["project_id"], body["name"], body["origin"])
                 if path == "/api/investigations/observe": return app.chat.investigations.observe(body["project_id"], body["investigation_id"], body["screen"])
                 if path == "/api/conversations": return app.chat.create(body["project_id"], body.get("title", "Nova conversa"))
-                if path == "/api/project-preferences": return app.chat.save_preferences(body["project_id"], body["method"], body["wip_limit"], body["definition_of_done"])
+                if path == "/api/project-preferences": return app.chat.save_preferences(body["project_id"], body["method"], body["wip_limit"], body["definition_of_done"], body.get("work_profile"))
                 if path == "/api/chat":
                     if "image_options" in body:
                         if body.get("mode") != "image": raise PolicyError("Parâmetros visuais exigem modo imagem.")

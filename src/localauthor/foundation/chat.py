@@ -57,10 +57,12 @@ class FoundationChatService(ChatService):
             if mode == "image":
                 response = self.foundation.create_image(project_id, message, cancel, options=image_options)
             else:
+                preferences = self.preferences(project_id)
                 found = self.knowledge.consult(message[:1000], project_id, False)
                 evidence = [{**item, "scope": project_id} for item in found["evidence"]]
                 response = self.foundation.answer(project_id, message, conversation["messages"],
-                    evidence, cancel, input_format=input_format)
+                    evidence, cancel, input_format=input_format, work_profile=preferences["work_profile"],
+                    project_guidance={k: preferences[k] for k in ("method", "wip_limit", "definition_of_done")})
             try:
                 check_cancel(cancel)
                 metadata = json.dumps({k: v for k, v in response.items() if k != "content"}, ensure_ascii=False)

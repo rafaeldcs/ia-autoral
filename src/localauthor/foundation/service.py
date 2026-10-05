@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import base64
+import gc
 import hashlib
 import io
 import os
@@ -32,33 +33,49 @@ class FoundationService:
                 "remote_fallback": False, "weights_trained_here": False,
                 "image_understanding": False, "generated_code_execution": False}
 
+    def _evict(self, kind):
+        cached = self._cache.pop(kind, None)
+        if cached is not None:
+            close = getattr(cached[2], "close", None)
+            if callable(close): close()
+
     def _engine(self, kind: str, cancel=None):
         check_cancel(cancel)
         spec = ModelSpec.load(self.home / "foundation" / f"{kind}-model.json", kind)
         cached = self._cache.get(kind)
         if cached and cached[0].manifest_sha256 == spec.manifest_sha256:
             if spec.signature() != cached[1]:
-                self._cache.pop(kind, None)
+                self._evict(kind)
                 raise PolicyError("Arquivos de modelo mudaram durante a sessão. Reinicie após revisão.")
             return cached[0], cached[2]
-        self._cache.pop(kind, None)
         signature = spec.verify()
         check_cancel(cancel)
+        # Verify the replacement before discarding a valid resident engine.
+        # One worker/one generation: only one modality resides in memory.
+        for other in tuple(self._cache):
+            self._evict(other)
+        gc.collect()
         engine = self.factories[kind](spec)
-        check_cancel(cancel)
-        if spec.signature() != signature:
-            raise PolicyError("O modelo mudou durante o carregamento.")
+        try:
+            check_cancel(cancel)
+            if spec.signature() != signature:
+                raise PolicyError("O modelo mudou durante o carregamento.")
+        except Exception:
+            close = getattr(engine, "close", None)
+            if callable(close): close()
+            raise
         self._cache[kind] = (spec, signature, engine)
         return spec, engine
 
     def answer(self, project_id: str, message: str, history: list[dict], evidence: list[dict],
-               cancel=None, *, input_format: str = "text") -> dict:
+               cancel=None, *, input_format: str = "text", work_profile: str = "general", project_guidance=None) -> dict:
         project_id = identifier(project_id)
         with self._lock:
             spec, engine = self._engine("text", cancel)
             notes = markdown_evidence(self.home / "foundation" / "knowledge" / project_id, message, project_id)
             context = build_context(message, history, [*evidence, *notes], scope=project_id,
-                       count=engine.count, context_tokens=spec.context_tokens, output_tokens=spec.output_tokens)
+                       count=engine.count, context_tokens=spec.context_tokens, output_tokens=spec.output_tokens,
+                       work_profile=work_profile, project_guidance=project_guidance)
             content, truncated = engine.generate(context.messages, cancel)
             check_cancel(cancel)
             if not isinstance(content, str) or not content.strip():
@@ -69,6 +86,7 @@ class FoundationService:
                 "history_messages_used": context.history_used,
                 "omitted_history": context.omitted_history, "omitted_evidence": context.omitted_evidence,
                 "possibly_truncated": truncated,
+                "work_profile": work_profile,
                 "notice": "Modelo local de origem registrada. Código não executado nem aplicado. "
                           "Memória não é treinamento; nenhuma experiência foi autorizada para treino automaticamente."}
             if truncated:
