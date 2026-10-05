@@ -23,6 +23,8 @@ def main():
     parser.add_argument("--context", type=int, default=2048)
     parser.add_argument("--tokens", type=int, default=192)
     parser.add_argument("--gpu", action="store_true", help="Require full CUDA0 offload; reject CPU fallback.")
+    parser.add_argument("--reasoning-budget", type=int, default=0, help="Bounded thinking tokens; zero disables thinking.")
+    parser.add_argument("--json-output", action="store_true", help="Constrain JSON syntax, never supply expected values.")
     args = parser.parse_args()
     if args.output.exists(): parser.error("Use pasta nova.")
     cases = read_object(args.cases)
@@ -42,7 +44,9 @@ def main():
     runtime = None
     results = []
     try:
-        runtime = GgufLabRuntime(args.weights, args.sha256, args.output / "engine.log", context=args.context, output=args.tokens, gpu=args.gpu)
+        runtime = GgufLabRuntime(args.weights, args.sha256, args.output / "engine.log", context=args.context,
+                                 output=args.tokens, gpu=args.gpu, reasoning_budget=args.reasoning_budget,
+                                 json_output=args.json_output)
         loaded = time.monotonic() - started
         for row in rows:
             before = time.monotonic(); answer = ""; truncated = False; error = None; passed = False
@@ -61,7 +65,8 @@ def main():
                 (Path(__file__), ROOT / "src/localauthor/foundation/gguf_lab.py", ROOT / "src/localauthor/foundation/isolation.py")},
             "real_checkpoint": True, "checkpoint_trained": False, "qualification_suite": False,
             "production_activated": False, "cases_sha256": digest(args.cases), "context_tokens": args.context,
-            "output_tokens": args.tokens, "decoding": "temperature0-seed31-thinking-disabled",
+            "output_tokens": args.tokens, "decoding": {"temperature": 0, "seed": 31,
+                "reasoning_budget": args.reasoning_budget, "json_output": args.json_output},
             "passed": sum(r["passed"] for r in results), "total": len(rows), "omitted": 0,
             "results": results, "isolation": runtime.isolation,
             "scope": "development examples; literal/json oracles; captures are not passes; no final qualification",

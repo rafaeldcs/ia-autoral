@@ -63,6 +63,7 @@ def observations(task, code, values, directory):
         (directory / "Solution.cs").write_text(code, encoding="utf-8")
         expr = "StockRules.Available(v[0],v[1])" if task == "cs-stock" else "DateRules.IsIsoDate(v)"
         typ = "int[][]" if task == "cs-stock" else "string?[]"
+        cls, method, returns, parameters = ("StockRules", "Available", "int", "typeof(int),typeof(int)") if task == "cs-stock" else ("DateRules", "IsIsoDate", "bool", "typeof(string)")
         driver = f'''using System;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -72,7 +73,10 @@ foreach(var v in input) {{
     try {{ result.Add(new {{kind="value", value={expr}}}); }}
     catch(Exception ex) {{ result.Add(new {{kind="error", error=ex.GetType().Name}}); }}
 }}
-Console.Write(JsonSerializer.Serialize(result));
+var type=typeof({cls});
+var method=type.GetMethod("{method}",new Type[]{{{parameters}}});
+var contract=type.IsPublic && type.IsAbstract && type.IsSealed && method!=null && method.IsPublic && method.IsStatic && method.ReturnType==typeof({returns});
+Console.Write(JsonSerializer.Serialize(new {{observations=result,api_contract=contract}}));
 '''
         (directory / "Program.cs").write_text(driver, encoding="utf-8")
         run(["dotnet", "build", "Probe.csproj", "-c", "Release", "--nologo", "-m:1", "-p:UseSharedCompilation=false"], directory)
@@ -108,7 +112,13 @@ def main():
     values = parse_inputs(sys.stdin.read(20001), args.task)
     with tempfile.TemporaryDirectory(prefix="foundation-code-") as temp:
         output = observations(args.task, code, values, Path(temp))
-    print(json.dumps({"task": args.task, "observations": output, "qualification_suite": False}, ensure_ascii=False))
+    report = {"task": args.task, "qualification_suite": False}
+    if args.task.startswith("cs-"):
+        if not isinstance(output, dict) or set(output) != {"observations", "api_contract"} or type(output["api_contract"]) is not bool:
+            raise PolicyError("Missing C# observations and interface contract.")
+        report.update(output)
+    else: report["observations"] = output
+    print(json.dumps(report, ensure_ascii=False))
 
 
 if __name__ == "__main__":

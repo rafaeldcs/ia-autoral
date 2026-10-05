@@ -113,12 +113,26 @@ Registra contexto real, truncamento, saídas originais, hashes e latência.
 Casos de captura não contam como acertos; resultados são de desenvolvimento,
 sem treinamento, promoção ou equivalência com modelos de fronteira.
 
+O perfil padrão desativa raciocínio. `--reasoning-budget N` habilita um orçamento
+de até 1024 tokens de raciocínio, menor que `--tokens`; a contagem usa o mesmo
+template da geração. `--json-output` restringe a sintaxe JSON sem fornecer
+respostas esperadas. Registre a mudança de perfil: ela não treina pesos e pode
+aumentar a latência. Raciocínio privado não é uma resposta nem prova de acerto.
+
 `scripts/foundation-code-oracle-worker.py` observa artefatos originais de C#,
 JavaScript e PostgreSQL em **outra** sandbox inspecionada, sem pesos, segredos,
 gabaritos ou mounts graváveis do host. Recebe apenas entradas via stdin.
 O controlador externo preserva e compara resultados esperados. Nunca execute
 esse worker como alternativa no Windows nem monte a pasta privada inteira.
 Compilação, saída do worker e testes com dublês não qualificam o modelo.
+Para C#, o worker observa também se a classe e o método têm a interface pública
+estática solicitada. Comportamento correto com interface incompatível continua
+sendo uma falha no contrato.
+
+`scripts/foundation-visual-briefs.py` captura até 20 briefings originais congelados
+em CUDA, com checker ativo, hashes, recuperação de PNG e resultados individuais.
+Use sandbox inspecionada e pesos somente leitura. As notas humanas começam vazias;
+entregar 20 imagens não aprova qualidade, direitos comerciais ou uma campanha.
 
 Pedido validado → contexto limitado e isolado por projeto → inferência local → checagem de cancelamento → resultado e procedência → experiência não aprovada → gravação da conversa → revisão humana. Falha ao salvar a conversa dispara limpeza compensatória do resultado não revisado; não apaga experiências já revisadas. Uma queda abrupta entre os dois bancos pode deixar um candidato órfão, nunca autorizado para treino; requer reconciliação manual.
 

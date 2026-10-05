@@ -43,6 +43,12 @@ def valid_profile(context, output, threads):
         raise PolicyError("Perfil GGUF CPU fora do orçamento homologável.")
 
 
+def valid_decoding(output, reasoning_budget, json_output):
+    if (type(reasoning_budget) is not int or not 0 <= reasoning_budget <= 1024
+            or reasoning_budget >= output or type(json_output) is not bool):
+        raise PolicyError("Perfil de raciocínio/JSON fora do orçamento.")
+
+
 def completion(response):
     choices = response.get("choices") if isinstance(response, dict) else None
     if not isinstance(choices, list) or len(choices) != 1:
@@ -58,8 +64,10 @@ def completion(response):
 
 
 class GgufLabRuntime:
-    def __init__(self, weights: Path, expected_sha256: str, log: Path, *, context=2048, output=192, threads=4, gpu=False):
+    def __init__(self, weights: Path, expected_sha256: str, log: Path, *, context=2048, output=192, threads=4, gpu=False,
+                 reasoning_budget=0, json_output=False):
         valid_profile(context, output, threads)
+        valid_decoding(output, reasoning_budget, json_output)
         if type(gpu) is not bool: raise PolicyError("Seleção GPU inválida.")
         self.isolation = require_isolated_process()
         self.weights = local_path(weights)
@@ -68,6 +76,8 @@ class GgufLabRuntime:
         if not BINARY.is_file():
             raise PolicyError("Runtime fixado ausente; não existe fallback nem download.")
         self.context, self.output = context, output
+        self.reasoning_budget, self.json_output = reasoning_budget, json_output
+        self.template_options = {"enable_thinking": reasoning_budget > 0}
         self.process = None
         self.key_dir = tempfile.TemporaryDirectory(prefix="localauthor-gguf-")
         self.log_path = local_path(log)
@@ -87,7 +97,8 @@ class GgufLabRuntime:
                 "--threads-batch", str(threads), "--parallel", "1", "--batch-size", "256",
                 "--ubatch-size", "128", "--gpu-layers", "99" if gpu else "0", "--host", "127.0.0.1",
                 "--port", str(port), "--offline", "--jinja", "--no-context-shift", "--no-webui",
-                "--api-key-file", str(key_file)]
+                "--api-key-file", str(key_file), "--reasoning-format", "deepseek",
+                "--reasoning-budget", str(reasoning_budget)]
             if gpu: command.extend(["--device", "CUDA0", "--split-mode", "none", "--log-verbosity", "5"])
             self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                 shell=False)
@@ -151,7 +162,7 @@ class GgufLabRuntime:
             raise PolicyError("Mensagens GGUF inválidas.")
         if len(json.dumps(messages, ensure_ascii=False).encode("utf-8")) > 128000:
             raise PolicyError("Contexto GGUF excessivo.")
-        template = self.request("/apply-template", {"messages": messages, "chat_template_kwargs": {"enable_thinking": False}})
+        template = self.request("/apply-template", {"messages": messages, "chat_template_kwargs": self.template_options})
         prompt = template.get("prompt")
         if not isinstance(prompt, str): raise PolicyError("Template GGUF ausente.")
         tokens = self.request("/tokenize", {"content": prompt, "add_special": True}).get("tokens")
@@ -163,8 +174,10 @@ class GgufLabRuntime:
         check_cancel(cancel)
         if self.count(messages) + self.output > self.context:
             raise PolicyError("Contexto GGUF excedido; nenhuma fonte truncada silenciosamente.")
-        response = self.request("/v1/chat/completions", {"messages": messages, "max_tokens": self.output,
-            "temperature": 0, "seed": 31, "stream": False, "chat_template_kwargs": {"enable_thinking": False}}, cancel=cancel)
+        payload = {"messages": messages, "max_tokens": self.output,
+            "temperature": 0, "seed": 31, "stream": False, "chat_template_kwargs": self.template_options}
+        if self.json_output: payload["response_format"] = {"type": "json_object"}
+        response = self.request("/v1/chat/completions", payload, cancel=cancel)
         check_cancel(cancel)
         return completion(response)
 

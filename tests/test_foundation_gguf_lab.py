@@ -5,7 +5,7 @@ import unittest
 from unittest.mock import patch, Mock
 
 from localauthor.errors import PolicyError
-from localauthor.foundation.gguf_lab import GgufLabRuntime, completion, valid_profile, verify_gpu_offload, private_diagnostic
+from localauthor.foundation.gguf_lab import GgufLabRuntime, completion, valid_profile, valid_decoding, verify_gpu_offload, private_diagnostic
 
 
 class GgufLabTests(unittest.TestCase):
@@ -45,7 +45,24 @@ class GgufLabTests(unittest.TestCase):
     def engine(self):
         runtime = object.__new__(GgufLabRuntime)
         runtime.context = 256; runtime.output = 32
+        runtime.template_options = {"enable_thinking": False}
+        runtime.json_output = False
         return runtime
+
+    def test_reasoning_cannot_consume_entire_answer_budget_or_be_unbounded(self):
+        valid_decoding(1536, 512, True)
+        for budget, json_mode in ((True, False), (-1, False), (1025, False), (1536, False), (0, 1)):
+            with self.subTest(budget=budget), self.assertRaises(PolicyError): valid_decoding(1536, budget, json_mode)
+
+    def test_thinking_template_count_matches_generation_and_json_contains_no_expected_values(self):
+        runtime = self.engine(); runtime.template_options = {"enable_thinking": True}; runtime.json_output = True
+        runtime.request = Mock(side_effect=[{"prompt": "fixture thinking"}, {"tokens": [1, 2]},
+            {"choices": [{"message": {"content": '{"proposal":"fixture"}', "reasoning_content": "private"}, "finish_reason": "stop"}]}])
+        result = runtime.generate([{"role": "user", "content": "fixture"}])
+        calls = runtime.request.call_args_list
+        self.assertEqual(calls[0].args[1]["chat_template_kwargs"], calls[2].args[1]["chat_template_kwargs"])
+        self.assertEqual(calls[2].args[1]["response_format"], {"type": "json_object"})
+        self.assertEqual(result, ('{"proposal":"fixture"}', False))
 
     def test_context_overflow_does_not_call_generation(self):
         runtime = self.engine(); runtime.count = Mock(return_value=225); runtime.request = Mock()
