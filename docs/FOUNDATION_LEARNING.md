@@ -10,6 +10,18 @@ Execução de treino, export e avaliação exige container Linux sem rede, usuá
 
 O primeiro trainer suporta **Qwen3 nativo, CPU/float32, LoRA em q_proj/v_proj**. Não homologa Nemotron, todas as arquiteturas, GPU ou quantização. O perfil visual suporta **StableDiffusionPipeline nativo**, com verificador habilitado, dimensões 256–768 em múltiplos de 64, seed explícita, 1–50 passos e guidance 1–15. Imagens reais continuam exigindo julgamento de qualidade.
 
+## Capacidade antes de adquirir outra base
+
+`preflight REQUISITOS.json HARDWARE.json --report NOVO.json` faz uma conferência offline dos orçamentos declarados, sem baixar ou carregar pesos. Ambos os documentos usam `schema: 1`. Requisitos contêm `model_id`, revisão Git imutável `revision`, URLs técnicas `sources`, `weights_bytes` (todos os especialistas de um MoE), `additional_weight_copies`, `additional_disk_overhead_bytes`, `required_ram_bytes` e `gpu_profiles`. Cada alternativa GPU declara `family`, `count` e `minimum_memory_bytes_each`. Não combina famílias diferentes para completar uma alternativa.
+
+Hardware contém `total_ram_bytes`, `available_ram_bytes`, `free_disk_bytes` e `gpus`, cada GPU com `family` e `memory_bytes`. Use famílias normalizadas iguais nos dois documentos e registre data, comando e proveniência da medição. Atualize RAM/VRAM livre e disco antes de executar; uma medição antiga ou VRAM total pode superestimar disponibilidade. Orçamentos de staging, cache KV, runtime, treino, export e cópias temporárias precisam ser estimados separadamente pelo operador. Zero indica somente um limite inferior declarado, não ausência comprovada de consumo.
+
+O relatório conserva hashes dos dois documentos e nunca sobrescreve evidências. Falta de disco/RAM/perfil GPU retorna `blocked` e exit 1; entrada inválida retorna exit 2. Mesmo com capacidade suficiente, retorna somente `capacity-only`, `acquisition_authorized: false` e `qualification_suite: false`. Não homologa licença, driver, arquitetura, desempenho ou inteligência. RAM e VRAM não são somadas.
+
+Na revisão `02462641f13d3af838b904f48195b9bb8a1e4ebc` do [Nemotron 3 Ultra NVFP4](https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-NVFP4/tree/02462641f13d3af838b904f48195b9bb8a1e4ebc), o inventário oficial lista 113 arquivos Safetensors somando 352.308.689.576 bytes. O [model card](https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-NVFP4/raw/02462641f13d3af838b904f48195b9bb8a1e4ebc/README.md) recomenda, entre outras alternativas, quatro B200 ou oito H100. O servidor observado em 5 de outubro tem cerca de 16 GiB de RAM, RTX 2060 de 6 GiB e 182 GB livres: não atende nem ao disco dos pesos, nem ao perfil GPU. Não foi adquirido/carregado/treinado e não houve chamada a uma API NVIDIA.
+
+O [Nemotron Nano 4B GGUF oficial](https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-4B-GGUF/tree/ba223d14e45525f7fae81db77ea8cabeb2fc6c25) tem um Q4_K_M de 2.837.072.864 bytes. É candidato a investigação de inferência local, sem equivalência ao Ultra. O runtime atual de treino Qwen3/Safetensors não suporta esse GGUF híbrido Mamba2; exige outro runtime homologado, revisão da licença e testes reais de português/código/segurança/latência antes de integração. O arquivo `LICENSE` desse repositório é vazio; conserve o texto integral da licença oficial vinculada pelo model card, sem tratar o arquivo vazio como autorização. Não há aquisição ou promoção implícita nesse diagnóstico.
+
 ## Dados e recibos
 
 O schema 1 exige fontes locais com hash, licença, estado de revogação e recibo. Cada exemplo preserva todas as mensagens, hashes de contexto/alvo, família, grupo de projeto, grupo de vazamento, modalidade e partição train/validation. A avaliação final não é entrada do trainer.

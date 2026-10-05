@@ -10,6 +10,10 @@ from ..errors import PolicyError
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
+    capacity = sub.add_parser("preflight", help="Compara requisitos auditados com hardware; não baixa ou autoriza modelos")
+    capacity.add_argument("requirements", type=Path)
+    capacity.add_argument("hardware", type=Path)
+    capacity.add_argument("--report", type=Path, required=True)
     validate = sub.add_parser("validate-data", help="Rejeita fontes sem direitos e contaminação")
     validate.add_argument("dataset", type=Path)
     converter = sub.add_parser("convert", help="JSONL revisado + curadoria de grupos/direitos para dataset; não autoriza dados")
@@ -52,7 +56,10 @@ def main(argv=None):
     rollback.add_argument("journal", type=Path)
     args = parser.parse_args(argv)
     try:
-        if args.command == "validate-data":
+        if args.command == "preflight":
+            from .capacity import preflight
+            result = preflight(args.requirements, args.hardware, args.report)
+        elif args.command == "validate-data":
             from .dataset import validate_dataset
             result = validate_dataset(args.dataset)
             result = {k: v for k, v in result.items() if k != "dataset"}
@@ -80,7 +87,7 @@ def main(argv=None):
             from .promotion import rollback
             result = rollback(args.home, args.journal)
         print(json.dumps(result, ensure_ascii=False, indent=2))
-        return 0 if result.get("status", "completed") in {"completed", "passed", "exported-not-promoted"} else 1
+        return 0 if result.get("status", "completed") in {"completed", "passed", "exported-not-promoted", "capacity-only"} else 1
     except (PolicyError, OSError, UnicodeError, ValueError) as exc:
         print(str(exc), file=sys.stderr)
         return 2
