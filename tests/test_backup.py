@@ -11,6 +11,33 @@ from tests.helpers import WorkspaceCase
 
 
 class BackupTests(WorkspaceCase):
+    def test_explicit_server_profile_preserves_exports_and_default_limits(self):
+        artifact = self.settings.home / 'exports' / 'retained.txt'
+        artifact.parent.mkdir(exist_ok=True); artifact.write_text('private export')
+        path = self.root / 'server.zip'
+        with patch.object(backup, 'MAX_BYTES', 10):
+            with self.assertRaises(PolicyError): backup.backup_home(self.settings, path)
+            result = backup.backup_home(self.settings, path, server_profile=True)
+            self.assertTrue(result['exports_included'])
+            with self.assertRaises(PolicyError): backup.restore_home(path, self.root / 'denied')
+            backup.restore_home(path, self.root / 'restored', server_profile=True)
+        self.assertEqual((self.root / 'restored/exports/retained.txt').read_text(), 'private export')
+        with self.assertRaises(PolicyError): backup.limits('unbounded')
+
+    def test_server_profile_omits_stale_nested_runtime_metadata_but_not_active_locks(self):
+        nested = self.settings.home / 'qa'; nested.mkdir()
+        (nested / 'api.token').write_text('fixture credential')
+        (nested / 'server.lock').write_text(str(os.getpid()))
+        path = self.root / 'server.zip'
+        with self.assertRaises(PolicyError): backup.backup_home(self.settings, path, server_profile=True)
+        (nested / 'server.lock').write_text('invalid pid')
+        with self.assertRaises(PolicyError): backup.backup_home(self.settings, path, server_profile=True)
+        (nested / 'server.lock').write_text('2147483647')
+        result = backup.backup_home(self.settings, path, server_profile=True)
+        self.assertEqual(sorted(result['excluded_nested_runtime_metadata']), ['qa/api.token', 'qa/server.lock'])
+        backup.restore_home(path, self.root / 'restored', server_profile=True)
+        self.assertFalse((self.root / 'restored/qa/api.token').exists())
+
     def archive(self, entries):
         path = self.root / 'crafted.zip'
         manifest = {name: sha256(data) for name, data in entries.items()}

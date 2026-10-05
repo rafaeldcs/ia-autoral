@@ -39,9 +39,11 @@ def main(argv=None) -> int:
     gen_p.add_argument("--max-tokens", type=int, default=64)
     backup_p = sub.add_parser("backup")
     backup_p.add_argument("output", type=Path)
+    backup_p.add_argument("--server-profile", action="store_true", help="Perfil limitado a 10 GB/50000 arquivos, incluindo exports; backup privado")
     restore_p = sub.add_parser("restore")
     restore_p.add_argument("archive", type=Path)
     restore_p.add_argument("destination", type=Path)
+    restore_p.add_argument("--server-profile", action="store_true", help="Aceita explicitamente backup do perfil servidor limitado")
     capture_p = sub.add_parser("capture", help="Capturas públicas pelo navegador isolado do LocalAuthor (experimental).")
     capture_p.add_argument("urls", nargs="+")
     capture_p.add_argument("--policy-report", type=Path, required=True)
@@ -51,7 +53,7 @@ def main(argv=None) -> int:
     try:
         if args.command == "restore":
             from .backup import restore_home
-            print_json(restore_home(args.archive, args.destination))
+            print_json(restore_home(args.archive, args.destination, server_profile=args.server_profile))
             return 0
         settings = Settings.load(args.home)
         if args.command == "init":
@@ -106,7 +108,7 @@ def main(argv=None) -> int:
                                  (str(exc) if isinstance(exc, RuntimeError) else "Verifique o Docker e o relatório da execução.")) from exc
         elif args.command == "backup":
             from .backup import backup_home
-            print_json(backup_home(settings, args.output))
+            print_json(backup_home(settings, args.output, server_profile=args.server_profile))
         return 0
     except (LocalAIError, OSError, ValueError, ImportError) as exc:
         print(f"Erro: {exc}", file=sys.stderr)
