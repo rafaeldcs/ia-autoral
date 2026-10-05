@@ -88,6 +88,17 @@ Os contratos antigos de preferências continuam compatíveis. Há uma única fil
 inferência; ao trocar texto/imagem, o serviço libera o modelo anterior antes de
 carregar outro, após verificar o candidato. Não mantém ambos residentes na RAM.
 
+Na tela de modelos locais, “Comparar campanhas” calcula CTR, conversão por
+clique, CPC e CPA sem carregar um modelo. Usa contagens inteiras e custos em
+centavos; compara taxas exatas antes de arredondar para exibição. Preserva empates
+e denominadores ausentes. Os números são fornecidos pelo usuário e não provam
+publicação ou gasto real. “Usar análise no pedido” preenche um rascunho, sem enviar
+automaticamente. Alterar dados/projeto ou sair descarta a comparação anterior.
+
+`knowledge/skills/MARKETING_SHOPAIR.md` orienta briefing, propostas e medição.
+Importe somente no projeto pertinente após revisar o conteúdo; nenhum aprendizado
+dos pesos decorre da presença do Markdown no Git.
+
 ### Laboratório GGUF opcional
 
 `qa/foundation/Dockerfile.gguf` usa o arquivo oficial CPU do llama.cpp b11429,

@@ -164,6 +164,10 @@ def make_handler(app: Application, ui_path: Path):
                         return {"path": q["path"], "sha256": sha256(raw), "content": raw.decode("utf-8")}
                     return app.tasks.preview(ident)
             if method == "POST":
+                if path == "/api/foundation/marketing-metrics":
+                    app.store.project(body["project_id"])
+                    from .foundation.marketing import compare_campaigns
+                    return compare_campaigns(body["campaigns"])
                 if path == "/api/browser/start":
                     return app.browser.start(body['project_id'], body['url'], body.get('allow_network'), body.get('asset_hosts'), body.get('auth_hosts'))
                 if path == "/api/browser/action":

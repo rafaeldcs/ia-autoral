@@ -57,6 +57,24 @@ def main():
                     assert page.locator("#token").input_value() == ""
                     assert page.evaluate("localStorage.length + sessionStorage.length") == 0
                     report["flows"].append("authenticated login, no browser credential persistence")
+                    page.locator("#marketing-tools summary").click()
+                    for index, impressions, clicks in ((0,3000,60),(1,1000,30)):
+                        box=page.locator("[data-campaign]").nth(index)
+                        box.locator('[data-field="impressions"]').fill(str(impressions))
+                        box.locator('[data-field="clicks"]').fill(str(clicks))
+                    page.locator("#marketing-form button").click()
+                    expect(page.locator("#marketing-result")).to_contain_text("Maior CTR: B")
+                    page.locator("#marketing-use").click()
+                    assert '"best_ctr":["B"]' in page.locator("#prompt").input_value()
+                    assert page.locator("#messages article").count()==0
+                    page.locator('[data-campaign] [data-field="conversions"]').nth(1).fill("31")
+                    expect(page.locator("#marketing-use")).not_to_be_visible()
+                    page.locator("#marketing-form button").click()
+                    expect(page.locator("#marketing-result")).to_contain_text("conversões ≤ cliques")
+                    page.locator('[data-campaign] [data-field="conversions"]').nth(1).fill("0")
+                    page.locator("#marketing-form button").click()
+                    expect(page.locator("#marketing-result")).to_contain_text("Maior CTR: B")
+                    report["flows"].append("deterministic campaign rates, invalid counts rejected, draft only, stale results discarded")
                     page.locator("#prompt").fill("Explique estoque")
                     page.locator("#send").click()
                     expect(page.locator("#messages article")).to_have_count(2, timeout=15000)

@@ -435,6 +435,17 @@ class FoundationHttpTests(WorkspaceCase):
         self.assertEqual(status, 200)
         self.assertFalse(data["remote_fallback"])
 
+    def test_marketing_metrics_require_project_auth_and_do_not_load_a_model(self):
+        from tests.test_foundation_marketing import row
+        body={"project_id":self.project["id"],"campaigns":[row(),row("B",1000,30,3,6000)]}
+        self.assertEqual(self.request("/api/foundation/marketing-metrics",body,authenticated=False)[0],401)
+        self.assertEqual(self.request("/api/foundation/marketing-metrics",{**body,"project_id":"unknown"})[0],404)
+        self.assertEqual(self.request("/api/foundation/marketing-metrics",{**body,"campaigns":[row(conversions=61)]})[0],400)
+        status,result=self.request("/api/foundation/marketing-metrics",body)
+        self.assertEqual(status,200);self.assertEqual(result["best_ctr"],["B"])
+        self.assertEqual(self.app.chat.foundation._cache,{})
+        self.assertEqual(self.app.jobs.list(),[])
+
     def test_chat_runs_through_persistent_job(self):
         conversation = self.app.chat.create(self.project["id"], "HTTP")
         status, data = self.request("/api/chat", {"project_id": self.project["id"],
