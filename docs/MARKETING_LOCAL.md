@@ -36,6 +36,8 @@ O perfil de marketing foi ampliado com essas distinções. A revisão pela IA é
 
 O gerador atual usa uma checagem conservadora adicional de palavras de promessa, eficiência/simplicidade e propostas de interface sem captura real fornecida. Ela pode recusar uma expressão mesmo em uma negação; prefira descrever diretamente os elementos de uma ilustração simbólica. Essa regra não valida imagem real nem substitui a conferência semântica humana.
 
+A avaliação deve conferir também os motivos de cada etapa: uma rejeição correta pode conter justificativas falsas. O revisor é orientado a julgar afirmações presentes e não exigir benefícios, métricas, chamadas ou links que o post informativo não precisa conter. Os casos de desenvolvimento não qualificam o modelo como revisor comercial autônomo.
+
 ## Fontes oficiais consultadas em 05/10/2026
 
 - Produto anunciado: [ShopAir](https://shopair.com.br/). Uma vitrine demonstrativa não é resultado de cliente. Informações comerciais precisam de reconferência/aprovação para cada oferta.

@@ -72,6 +72,9 @@ Guardar pedido, contexto autorizado, versão, saída original e evidência da re
 Ao responder uma revisão estruturada, verificar também a coerência dos campos:
 uma lista com problemas exige rejeição, e aprovação exige lista vazia. Citar o
 trecho literal que contém o erro, sem atribuir à peça frases que só estão na fonte.
+Não inventar obrigações ausentes no briefing: um post informativo pode não ter
+link ou chamada. Divulgar um recurso comprovado não exige prometer vantagem ou
+acrescentar métricas. Conferir os motivos da revisão, não só o rótulo final.
 Feedback muda a próxima tentativa; não comprova que os pesos foram treinados.
 Para treinamento, revisar todo o contexto e registrar as decisões humanas de
 conteúdo, verificação, direitos e permissão separadamente. Reservar novas tarefas
