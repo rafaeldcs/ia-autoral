@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "scope": "validação documental do pacote; não execução de aprendizado",
+  "md_files": 29,
+  "knowledge_files": 7,
+  "utf8_valid": true,
+  "relative_links_checked": 27,
+  "relative_links_valid": true,
+  "fences_balanced": true,
+  "original_manifest_verified": true,
+  "cleanup_executed": false,
+  "real_models_executed": false,
+  "training_executed": false,
+  "notes": [
+    "O protocolo final é novo; seis guias/templates originais foram ajustados para referenciá-lo.",
+    "Nenhum código de runtime, peso, dataset privado ou resultado de treinamento é publicado nesta alteração."
+  ]
+}
