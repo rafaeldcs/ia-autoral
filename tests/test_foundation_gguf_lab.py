@@ -5,10 +5,16 @@ import unittest
 from unittest.mock import patch, Mock
 
 from localauthor.errors import PolicyError
-from localauthor.foundation.gguf_lab import GgufLabRuntime, completion, valid_profile, verify_gpu_offload
+from localauthor.foundation.gguf_lab import GgufLabRuntime, completion, valid_profile, verify_gpu_offload, private_diagnostic
 
 
 class GgufLabTests(unittest.TestCase):
+    def test_diagnostics_redact_internal_key_before_persistence_and_are_bounded(self):
+        key="fixture-not-a-real-key"
+        safe=private_diagnostic(("Authorization: Bearer "+key+"\nCUDA0 offloaded 37/37 layers to GPU").encode(),key)
+        self.assertNotIn(key.encode(),safe)
+        self.assertIn(b"offloaded 37/37",safe)
+        with self.assertRaises(PolicyError):private_diagnostic(b"x"*1000001,key)
     def test_device_visibility_and_partial_offload_do_not_prove_gpu_inference(self):
         for log in ("CUDA0: RTX2060", "CUDA0: RTX2060 offloaded 2/37 layers to GPU", "offloaded 37/37 layers to GPU", "CUDA0 offloaded 0/0 layers to GPU"):
             with self.subTest(log=log), self.assertRaises(PolicyError): verify_gpu_offload(log)

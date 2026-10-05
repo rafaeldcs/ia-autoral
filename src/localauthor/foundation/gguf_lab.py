@@ -20,6 +20,11 @@ BINARY = Path("/opt/llama-b11429/llama-server")
 MAX_RESPONSE_BYTES = 1_000_000
 
 
+def private_diagnostic(raw, key):
+    if len(raw) > MAX_RESPONSE_BYTES: raise PolicyError("Linha de diagnóstico excede orçamento.")
+    return raw.replace(key.encode("ascii"), b"[private-api-key]")
+
+
 def verify_gpu_offload(log_text):
     """A visible device is insufficient: every requested model layer must load."""
     matches = re.findall(r"offloaded (\d+)/(\d+) layers to GPU", log_text)
@@ -68,6 +73,7 @@ class GgufLabRuntime:
         self.log_path = local_path(log)
         self.log = self.log_path.open("xb")
         self.compute = {"device": "CPU", "offloaded_layers": 0}
+        self.reader = None
         self.key = secrets.token_hex(32)
         key_file = Path(self.key_dir.name) / "api.key"
         key_file.write_text(self.key, encoding="ascii"); key_file.chmod(0o600)
@@ -82,9 +88,20 @@ class GgufLabRuntime:
                 "--ubatch-size", "128", "--gpu-layers", "99" if gpu else "0", "--host", "127.0.0.1",
                 "--port", str(port), "--offline", "--jinja", "--no-context-shift", "--no-webui",
                 "--api-key-file", str(key_file)]
-            if gpu: command.extend(["--device", "CUDA0", "--split-mode", "none"])
-            self.process = subprocess.Popen(command, stdout=self.log, stderr=subprocess.STDOUT,
+            if gpu: command.extend(["--device", "CUDA0", "--split-mode", "none", "--log-verbosity", "5"])
+            self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                 shell=False)
+            def record_diagnostics():
+                while True:
+                    raw = self.process.stdout.readline(MAX_RESPONSE_BYTES + 1)
+                    if not raw: break
+                    try: safe = private_diagnostic(raw, self.key)
+                    except PolicyError:
+                        self.process.terminate()
+                        safe = b"Diagnostic exceeded budget; owned process stopped.\n"
+                    self.log.write(safe); self.log.flush()
+            self.reader = threading.Thread(target=record_diagnostics, daemon=True)
+            self.reader.start()
             deadline = time.monotonic() + 120
             while time.monotonic() < deadline:
                 if self.process.poll() is not None:
@@ -157,5 +174,9 @@ class GgufLabRuntime:
             try: self.process.wait(timeout=5)
             except subprocess.TimeoutExpired:
                 self.process.kill(); self.process.wait(timeout=5)
+        if self.reader is not None:
+            self.reader.join(timeout=5)
+        if self.process is not None and self.process.stdout is not None:
+            self.process.stdout.close()
         self.log.close()
         self.key_dir.cleanup()
