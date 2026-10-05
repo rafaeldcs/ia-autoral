@@ -12,7 +12,10 @@ def replace_json(path: Path, data: dict):
     temporary = local_path(path.parent / (uuid.uuid4().hex + ".json"))
     try:
         write_new(temporary, data)
-        with temporary.open("rb") as stream:
+        # Windows _commit/fsync rejects a read-only descriptor (errno 9).
+        # This is our newly created temporary file, opened writable before the
+        # atomic replacement; the previous active pointer remains untouched.
+        with temporary.open("r+b") as stream:
             os.fsync(stream.fileno())
         os.replace(temporary, local_path(path))
     finally:

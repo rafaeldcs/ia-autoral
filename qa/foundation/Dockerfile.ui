@@ -1,0 +1,7 @@
+FROM localauthor-terreiro-simulation:1
+USER root
+RUN python3 -m pip install --break-system-packages --no-cache-dir playwright==1.55.0 \
+    && python3 -m playwright install --with-deps chromium
+USER 10001:10001
+ENV HOME=/tmp PYTHONDONTWRITEBYTECODE=1
+ENTRYPOINT ["python3"]
