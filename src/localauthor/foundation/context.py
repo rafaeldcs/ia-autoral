@@ -39,7 +39,7 @@ def markdown_evidence(root: Path, query: str, scope: str) -> list[dict]:
         raise PolicyError("Manifesto Markdown inválido.")
     candidates = []
     for entry in entries:
-        if not isinstance(entry, dict) or entry.get("scope") != scope:
+        if not isinstance(entry, dict) or entry.get("scope") != scope or not entry.get("active", True):
             continue
         path = child(root, entry.get("path"))
         if path.suffix.lower() != ".md":

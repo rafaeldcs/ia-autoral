@@ -44,7 +44,7 @@ class TextRuntime:
 
     def count(self, messages: list[dict]) -> int:
         return len(self.tokenizer.apply_chat_template(messages, tokenize=True,
-                   add_generation_prompt=True, enable_thinking=False))
+                   add_generation_prompt=True, enable_thinking=False, return_dict=False))
 
     def generate(self, messages: list[dict], cancel=None) -> tuple[str, bool]:
         from transformers import StoppingCriteria, StoppingCriteriaList

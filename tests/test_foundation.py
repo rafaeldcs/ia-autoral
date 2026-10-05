@@ -78,6 +78,14 @@ class DummyImage:
 
 
 class FoundationModelTests(WorkspaceCase):
+    def test_token_count_requests_ids_instead_of_counting_batch_fields(self):
+        runtime = TextRuntime.__new__(TextRuntime)
+        class Tokenizer:
+            def apply_chat_template(self, messages, **kwargs):
+                return [1] * 301 if kwargs.get("return_dict") is False else {"input_ids": [1] * 301, "attention_mask": [1] * 301}
+        runtime.tokenizer = Tokenizer()
+        self.assertEqual(runtime.count([{"role": "user", "content": "fixture"}]), 301)
+
     def model(self, kind="text"):
         return register_fixture(self.settings.home, self.root / ("weights-" + kind), kind)
 
