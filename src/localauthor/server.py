@@ -17,7 +17,8 @@ from .util import read_json, write_json, sha256
 
 MAX_BODY = 2_500_000
 STATIC = {"/": "chat.html", "/advanced": "index.html", "/app.js": "app.js", "/styles.css": "styles.css", "/chat.js": "chat.js", "/chat.css": "chat.css",
-          "/foundation": "foundation.html", "/foundation.js": "foundation.js", "/foundation.css": "foundation.css"}
+          "/foundation": "foundation.html", "/foundation.js": "foundation.js", "/foundation.css": "foundation.css",
+          "/marketing": "marketing.html", "/marketing.js": "marketing.js", "/marketing.css": "marketing.css"}
 
 
 def make_handler(app: Application, ui_path: Path):
@@ -121,6 +122,11 @@ def make_handler(app: Application, ui_path: Path):
 
         def _route(self, method, path, q, body):
             if method == "GET":
+                if path == '/api/marketing/campaigns': return app.marketing.list(q['project_id'])
+                if path == '/api/marketing/campaign': return app.marketing.get(q['project_id'],q['id'])
+                if path == '/api/marketing/export': return app.marketing.export(q['project_id'],q['id'])
+                if path == '/api/marketing/channels': return app.marketing_channels.list(q['project_id'])
+                if path == '/api/marketing/deliveries': return app.marketing_channels.deliveries(q['project_id'])
                 if path == "/api/browser/sessions": return app.browser.list(q['project_id'])
                 if path == "/api/browser/session": return app.browser.get(q['project_id'], q['id'])
                 if path == "/api/browser/image": return app.browser.image(q['project_id'], q['id'], int(q['frame']))
@@ -164,6 +170,22 @@ def make_handler(app: Application, ui_path: Path):
                         return {"path": q["path"], "sha256": sha256(raw), "content": raw.decode("utf-8")}
                     return app.tasks.preview(ident)
             if method == "POST":
+                if path == '/api/marketing/campaigns': return app.marketing.create(body['project_id'],body['brief'])
+                if path == '/api/marketing/choice': return app.marketing.choose(body['project_id'],body['id'],body['digest'],body['choice'],body.get('source_id'))
+                if path == '/api/marketing/approve': return app.marketing.approve(body['project_id'],body['id'],body['digest'],body.get('reviewed'))
+                if path == '/api/marketing/connect': return app.marketing_channels.connect(body['project_id'],body['channel'],body['account'],body['api_version'],body['token'])
+                if path == '/api/marketing/disconnect': return app.marketing_channels.disconnect(body['project_id'],body['channel'])
+                if path == '/api/marketing/preview': return app.marketing_channels.preview(body['project_id'],body['id'],body['piece_id'],body.get('media_url'))
+                if path == '/api/marketing/publish': return app.marketing_channels.publish(body['project_id'],body['id'],body['piece_id'],body['payload_hash'],body.get('authorized'),body.get('media_url'))
+                if path in {'/api/marketing/research','/api/marketing/generate','/api/marketing/plan'}:
+                    expected={'project_id','id','digest'}
+                    if path.endswith('research'):expected.add('plan')
+                    if path.endswith('plan'):expected.add('candidates')
+                    if set(body)!=expected:raise PolicyError('Envie somente os campos necessários à etapa de marketing; credenciais não pertencem à fila.')
+                    current=app.marketing.get(body['project_id'],body['id'])
+                    if current['digest']!=body['digest']:raise ConflictError('A campanha mudou. Recarregue antes de continuar.')
+                    if path.endswith('generate') and not current['choice']:raise PolicyError('Escolha original ou adaptação antes de gerar.')
+                    return {'job':app.jobs.submit('marketing-'+path.rsplit('/',1)[-1],body)}
                 if path == "/api/foundation/marketing-metrics":
                     app.store.project(body["project_id"])
                     from .foundation.marketing import compare_campaigns

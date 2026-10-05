@@ -35,8 +35,9 @@ class FoundationService:
 
     def status(self) -> dict:
         base = local_path(self.home / "foundation")
+        cache = self._cache.copy()
         return {"capabilities": {kind: {"registered": (base / f"{kind}-model.json").is_file(),
-                "loaded": kind in self._cache and not getattr(self._cache[kind][2], "closed", False)} for kind in self.factories},
+                "loaded": kind in cache and not getattr(cache[kind][2], "closed", False)} for kind in self.factories},
                 "remote_fallback": False, "weights_trained_here": False,
                 "image_understanding": False, "generated_code_execution": False}
 

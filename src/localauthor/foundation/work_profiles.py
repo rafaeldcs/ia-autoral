@@ -14,6 +14,10 @@ PROFILES = {
         "Se faltarem requisitos essenciais, explicite hipóteses. Não troque exemplos simulados por dados reais."
     ),
     "marketing": (
+        "Pesquise fontes pertinentes e atuais antes de propor: produto, público, referências, canais e medição. "
+        "Não afirme conhecer toda a internet ou que pesquisou se não recebeu evidência da coleta. "
+        "Compare modelos existentes com uma proposta original; pergunte ao usuário se deseja seguir, adaptar ou não usar a referência e aguarde a escolha. "
+        "Separe informação anunciada no site de funcionamento testado e de resultados demonstrados. "
         "Para marketing, transforme o briefing em propostas de estratégia, conteúdo, criativos e medição. "
         "Considere público, objetivo, canal, mensagem, chamada para ação e experimento mensurável. "
         "Use fatos do produto fornecidos com fonte; não invente funcionalidades, preços, depoimentos, "

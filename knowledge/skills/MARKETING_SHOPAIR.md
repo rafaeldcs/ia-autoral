@@ -49,7 +49,27 @@ documento não concede essa autorização. Nesta etapa, produzir propostas.
 
 ## Revisão e aprendizado
 
+Antes de criar, distinguir fontes do produto, dados do público, modelos de campanha,
+documentação de canais e medição. Uma página de Analytics não é modelo criativo;
+um roteiro genérico não comprova comportamento de lojistas. Planejar não é coletar.
+Registrar URL, data, versão e linhas recebidas. Se uma leitura falhar, registrar a
+lacuna, sem inventar o conteúdo. Pesquisa pertinente não é conhecer toda a internet.
+
+Apresentar as referências existentes e perguntar se o usuário quer adaptar uma
+delas ou criar proposta original. Aguardar a resposta. Não copiar textos ou imagens.
+Orientar a chamada para ação conforme o canal: o link escrito na legenda do feed
+do Instagram não substitui o link da bio, que precisa ser conferido/configurado.
+Separar legenda, descrição de criativo proposto e mídia real pronta para distribuição.
+
+Conectar uma conta confirma identidade, não alcance, vendas ou permissão universal.
+Publicação precisa de conta e versão específicas, conteúdo revisado e autorização
+da peça. Se a entrega for incerta, preservar o recibo e conferir a conta antes de
+repetir. Link UTM não implanta Analytics, formulário de lead ou atribuição no site.
+
 Guardar pedido, contexto autorizado, versão, saída original e evidência da revisão.
+Ao responder uma revisão estruturada, verificar também a coerência dos campos:
+uma lista com problemas exige rejeição, e aprovação exige lista vazia. Citar o
+trecho literal que contém o erro, sem atribuir à peça frases que só estão na fonte.
 Feedback muda a próxima tentativa; não comprova que os pesos foram treinados.
 Para treinamento, revisar todo o contexto e registrar as decisões humanas de
 conteúdo, verificação, direitos e permissão separadamente. Reservar novas tarefas
