@@ -1,0 +1,11 @@
+# Optional inference libraries. No weights are downloaded by this file.
+# Initial supported API range, NOT a GPU/checkpoint qualification or a lockfile.
+# Resolve on the target machine, review the exact environment and record pip freeze.
+# Install the appropriate PyTorch CPU/CUDA distribution for that machine first.
+torch>=2.6,<3
+transformers>=5.3,<6
+diffusers>=0.35,<1
+accelerate>=1.0,<2
+safetensors>=0.6,<1
+Pillow>=11,<13
+sentencepiece>=0.2,<1

@@ -10,7 +10,7 @@ from .runner import SandboxRunner
 from .jobs import JobQueue
 from .safety import PathPolicy
 from .errors import PolicyError
-from .chat import ChatService
+from .foundation.chat import FoundationChatService as ChatService
 from .browser_workspace import BrowserWorkspace
 
 

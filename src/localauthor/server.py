@@ -16,7 +16,8 @@ from .safety import PathPolicy
 from .util import read_json, write_json, sha256
 
 MAX_BODY = 2_500_000
-STATIC = {"/": "chat.html", "/advanced": "index.html", "/app.js": "app.js", "/styles.css": "styles.css", "/chat.js": "chat.js", "/chat.css": "chat.css"}
+STATIC = {"/": "chat.html", "/advanced": "index.html", "/app.js": "app.js", "/styles.css": "styles.css", "/chat.js": "chat.js", "/chat.css": "chat.css",
+          "/foundation": "foundation.html", "/foundation.js": "foundation.js", "/foundation.css": "foundation.css"}
 
 
 def make_handler(app: Application, ui_path: Path):
@@ -125,6 +126,10 @@ def make_handler(app: Application, ui_path: Path):
                 if path == "/api/browser/image": return app.browser.image(q['project_id'], q['id'], int(q['frame']))
                 if path == "/api/health":
                     return {"status": "ok", "version": "0.1.0", "mode": "platform_and_experimental_cpu_model", "offline": app.settings.offline, "model_qualified": False, "gpu_backend": False, "stats": app.store.stats(), "allowed_domains": app.settings.allowed_domains, "runner_enabled": bool(app.settings.docker_image)}
+                if path == "/api/foundation/status": return app.chat.foundation.status()
+                if path == "/api/foundation/image":
+                    app.store.project(q["project_id"])
+                    return app.chat.foundation.image(q["project_id"], q["id"])
                 if path == "/api/diagnostics": return diagnose(app.settings.home)
                 if path == "/api/projects": return app.store.projects()
                 if path == "/api/investigations": return app.chat.investigations.list(q["project_id"])
@@ -171,7 +176,7 @@ def make_handler(app: Application, ui_path: Path):
                 if path == "/api/chat":
                     app.chat.get(body["project_id"], body["conversation_id"])
                     app.chat.validate_message(body["message"], body.get("mode", "guide"), body.get("input_format", "text"))
-                    if body.get("mode") == "model":
+                    if body.get("mode") in {"model", "foundation", "image"}:
                         return {"job": app.jobs.submit("chat", {k: body[k] for k in ("project_id", "conversation_id", "message", "mode", "input_format") if k in body})}
                     return app.chat.respond(body["project_id"], body["conversation_id"], body["message"], body.get("mode", "guide"), input_format=body.get("input_format", "text"))
                 if path == "/api/consult": return app.knowledge.consult(body["query"], body.get("scope", "global"), body.get("include_global") is True)
@@ -242,6 +247,7 @@ def serve(app: Application, ui_path: Path):
         app.start()
         print(f"LocalAuthor: http://127.0.0.1:{server.server_port}", flush=True)
         print(f"Token em {app.settings.home / 'api.token'} (ou use o comando token).", flush=True)
+        print(f"Texto e imagens com modelos locais: http://127.0.0.1:{server.server_port}/foundation", flush=True)
         print("Modo: plataforma local + laboratório CPU; modelo programador não qualificado.", flush=True)
         try:
             server.serve_forever(poll_interval=0.25)
