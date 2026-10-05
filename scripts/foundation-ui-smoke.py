@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Browser integration with explicit doubles, NEVER a real-model benchmark."""
 import json
+import argparse
 from pathlib import Path
 import re
 import shutil
@@ -17,7 +18,7 @@ from localauthor.server import create_server
 from tests.test_foundation import DummyText, DummyImage, register_fixture
 
 
-def main():
+def main(browser_channel=None):
     from playwright.sync_api import sync_playwright, expect
     report = {"success": False, "model_inference": "test doubles only", "flows": [], "errors": []}
     reports = ROOT / "reports"
@@ -41,7 +42,8 @@ def main():
             thread = threading.Thread(target=server.serve_forever, daemon=True); thread.start()
             try:
                 with sync_playwright() as playwright:
-                    browser = playwright.chromium.launch(headless=True, executable_path=shutil.which("chromium") or None)
+                    browser = playwright.chromium.launch(headless=True, channel=browser_channel,
+                        executable_path=None if browser_channel else shutil.which("chromium") or None)
                     page = browser.new_page(viewport={"width": 1440, "height": 1000})
                     page.on("pageerror", lambda error: report["errors"].append(str(error)))
                     page.goto(f"http://127.0.0.1:{server.server_port}/foundation")
@@ -114,7 +116,7 @@ def main():
                     assert page.locator("#prompt").input_value() == "aguardar cancelamento"
                     report["flows"].append("cooperative job cancellation without saving a response")
                     page.set_viewport_size({"width": 390, "height": 844})
-                    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+                    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), "Foundation mobile horizontal overflow"
                     page.screenshot(path=str(reports / "foundation-mobile.png"), full_page=True)
                     page.locator("#logout").click()
                     expect(page.locator("#login")).to_be_visible()
@@ -135,7 +137,7 @@ def main():
                     assert app.chat.preferences(second["id"])["work_profile"] == "marketing"
                     page.locator("#show-rules").click()
                     expect(page.locator("#work-profile")).to_have_value("marketing")
-                    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+                    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), "Chat project guidance mobile horizontal overflow"
                     page.screenshot(path=str(reports / "work-profile-mobile.png"), full_page=True)
                     page.locator('[data-close="rules-dialog"]').click()
                     page.locator("#open-menu").click()
@@ -168,4 +170,7 @@ def main():
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--browser-channel',choices=['chrome','msedge'])
+    args=parser.parse_args()
+    raise SystemExit(main(args.browser_channel))

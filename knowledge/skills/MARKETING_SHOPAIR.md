@@ -31,6 +31,8 @@ atualização em tempo real ou uma integração. A fonte precisa sustentar exata
 a afirmação. Pedir demonstração da plataforma é uma meta comercial; não comprova
 que há uma função de agendamento dentro do produto. Não confundir o público
 empresário com consumidores comprando no catálogo de uma loja.
+Eficiência e simplicidade do software também precisam de comprovação. Sem captura
+real revisada, propor ilustração simbólica, evitando inventar telas do produto.
 
 Conferir coerência entre duração do vídeo, cenas e calendário. Referências devem
 usar o identificador e as linhas realmente recebidos; escrever apenas

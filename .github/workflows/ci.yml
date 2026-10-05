@@ -83,3 +83,4 @@ jobs:
             reports/foundation-ui-smoke.json
             reports/foundation-desktop.png
             reports/foundation-mobile.png
+            reports/work-profile-mobile.png

@@ -185,6 +185,8 @@ def make_handler(app: Application, ui_path: Path):
                     current=app.marketing.get(body['project_id'],body['id'])
                     if current['digest']!=body['digest']:raise ConflictError('A campanha mudou. Recarregue antes de continuar.')
                     if path.endswith('generate') and not current['choice']:raise PolicyError('Escolha original ou adaptação antes de gerar.')
+                    if path.endswith('research'):app.marketing.validate_sources(body['plan'])
+                    if path.endswith('plan'):app.marketing.validate_sources(body['candidates'])
                     return {'job':app.jobs.submit('marketing-'+path.rsplit('/',1)[-1],body)}
                 if path == "/api/foundation/marketing-metrics":
                     app.store.project(body["project_id"])

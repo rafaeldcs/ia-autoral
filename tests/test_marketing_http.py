@@ -44,3 +44,11 @@ class MarketingHttpTests(WorkspaceCase):
             status,result=self.request('/api/marketing/'+endpoint,{**body,**extra})
             self.assertEqual(status,400);self.assertNotIn(body['token'],json.dumps(result))
         self.assertFalse(self.app.jobs.list())
+    def test_credentials_in_a_source_url_are_rejected_before_job_persistence(self):
+        brief={'brand':'Marca','audience':'Lojistas','objective':'Demonstração','destination':'https://example.com/','channels':['facebook']}
+        _,c=self.request('/api/marketing/campaigns',{'project_id':self.project['id'],'brief':brief})
+        source={'role':'product','url':'https://synthetic-user:synthetic-private@example.com/'}
+        for endpoint,key in [('plan','candidates'),('research','plan')]:
+            status,result=self.request('/api/marketing/'+endpoint,{'project_id':self.project['id'],'id':c['id'],'digest':c['digest'],key:[source]})
+            self.assertEqual(status,400);self.assertNotIn('synthetic-private',json.dumps(result))
+        self.assertFalse(self.app.jobs.list())

@@ -122,6 +122,12 @@ class MarketingWorkflowTests(unittest.TestCase):
     def test_unsupported_claim_in_creative_description_is_also_rejected(self):
         self.model.responses=[json.dumps({'caption':'Conheça a marca.','alt_text':'Proposta: estoque em tempo real.','fact_indices':[1]})]*3
         c=self.generated();self.assertEqual(c['stage'],'rejected')
+    def test_illustration_cannot_invent_a_product_screen_without_screenshot_evidence(self):
+        self.model.responses=[json.dumps({'caption':'Conheça catálogo e estoque.','alt_text':'Proposta: tablet exibindo dashboard da plataforma.','fact_indices':[1]})]*3
+        c=self.generated();self.assertEqual(c['stage'],'rejected');self.assertIsNone(c['approval'])
+    def test_unverified_efficiency_is_blocked_even_with_a_real_resource_citation(self):
+        self.model.responses=[json.dumps({'caption':'Centralize catálogo e estoque com eficiência.','alt_text':'Proposta: ícones.','fact_indices':[1]})]*3
+        c=self.generated();self.assertEqual(c['stage'],'rejected');self.assertFalse(c['draft']['checks_passed'])
     def test_citation_is_resolved_from_exact_received_source_without_rewriting_caption(self):
         c=self.generated();asset=c['draft']['assets'][0]
         self.assertEqual(asset['caption'],'Conheça catálogo e estoque. Solicite demonstração.')
@@ -147,13 +153,32 @@ class MarketingWorkflowTests(unittest.TestCase):
         prompts=[]
         def reviewer(project,prompt,*args,**kwargs):
             prompts.append(prompt)
-            return {'content':json.dumps(replies.pop(0)),'experience_id':str(len(prompts)),'possibly_truncated':False}
+            return {'content':json.dumps(replies.pop(0) if replies else {'supported':True,'problems':[]}),
+                    'experience_id':str(len(prompts)),'possibly_truncated':False}
         self.model.answer=reviewer
         result=self.service.review_candidate(self.project,{'brief':self.brief},
             {'channel':'facebook','caption':'Conheça catálogo.','alt_text':'Proposta: ícones.','claims':[]})
-        self.assertFalse(result['supported']);self.assertEqual(len(result['attempts']),2)
+        self.assertFalse(result['supported']);self.assertEqual(len(result['phases']),3)
+        self.assertEqual(len(result['phases'][0]['attempts']),2)
         self.assertIn('contradiz',result['attempts'][0]['error']);self.assertIn('contradiz',prompts[1])
         self.assertEqual(result['attempts'][0]['experience_id'],'1')
+    def test_critic_only_receives_and_quotes_the_field_for_its_phase(self):
+        prompts=[]
+        def reviewer(project,prompt,*args,**kwargs):
+            prompts.append(prompt)
+            if 'Etapa creative.' in prompt:
+                response={'supported':False,'problems':[{'phrase':'Conheça catálogo.','reason':'Citou um campo que esta etapa não recebeu.'}]}
+            else:response={'supported':True,'problems':[]}
+            return {'content':json.dumps(response),'possibly_truncated':False}
+        self.model.answer=reviewer
+        with self.assertRaises(PolicyError):
+            self.service.review_candidate(self.project,{'brief':self.brief},
+                {'channel':'facebook','caption':'Conheça catálogo.','alt_text':'Proposta: ícones.','claims':[]})
+        payloads=[json.loads(p.split(' Dados: ',1)[1].split('. Retorne somente JSON',1)[0]) for p in prompts]
+        self.assertEqual(set(payloads[0]),{'brand','caption','facts'})
+        self.assertEqual(set(payloads[1]),{'brand','caption','channel'})
+        self.assertEqual(set(payloads[2]),{'brand','alt_text'})
+        self.assertNotIn('caption',payloads[3]);self.assertIn('campo não recebido',prompts[3])
     def test_good_draft_needs_human_review_and_events_are_not_claimed_installed(self):
         c=self.generated();self.assertEqual(c['stage'],'review');self.assertTrue(c['draft']['human_review_required'])
         self.assertEqual(c['draft']['measurement']['implementation'],'pending');self.assertEqual(c['draft']['budget_spent_cents'],0)

@@ -32,7 +32,9 @@ UTM separa canal, campanha e peça, preserva parâmetros comerciais e não deve 
 
 Para uma avaliação de marketing aceitável, congele antes da geração: público, objetivo, fontes, oferta, formatos e rubrica. Avalie factualidade, mensagem, adequação ao canal, originalidade, clareza/acessibilidade e medição. Preserve saídas completas e casos negativos (fonte contraditória, referência não escolhida, oferta desconhecida, injeção na fonte, token vencido, conta errada, entrega incerta e fonte revogada). Meça resultados comerciais somente após conexão, campanha aprovada e coleta real. Não declare “melhor possível” a partir de testes conhecidos.
 
-O perfil de marketing foi ampliado com essas distinções. Isso muda instruções/contexto e processo de trabalho; não significa que os pesos aprenderam permanentemente. Treinar exige curadoria e autorização completas, separadas da consulta e da aprovação de uma campanha.
+O perfil de marketing foi ampliado com essas distinções. A revisão pela IA é separada em fatos/resultados, canal e criativo; cada etapa preserva sua resposta e só a aprovação das três permite seguir à revisão humana. Isso muda instruções/contexto e processo de trabalho; não significa que os pesos aprenderam permanentemente. Treinar exige curadoria e autorização completas, separadas da consulta e da aprovação de uma campanha.
+
+O gerador atual usa uma checagem conservadora adicional de palavras de promessa, eficiência/simplicidade e propostas de interface sem captura real fornecida. Ela pode recusar uma expressão mesmo em uma negação; prefira descrever diretamente os elementos de uma ilustração simbólica. Essa regra não valida imagem real nem substitui a conferência semântica humana.
 
 ## Fontes oficiais consultadas em 05/10/2026
 
