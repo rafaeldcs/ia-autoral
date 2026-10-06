@@ -1,0 +1,32 @@
+{
+  "photos": [
+    {
+      "id": "planning",
+      "prompt": "Top view of empty paper notepad, pencil, and mug on a wooden desk.",
+      "purpose": "Visualize a clean workspace for planning tasks.",
+      "alt": "Foto conceitual gerada de planejamento"
+    },
+    {
+      "id": "workstation",
+      "prompt": "Empty office desk and chair with a plant and natural light from a window.",
+      "purpose": "Showcase a minimalist and serene workspace environment.",
+      "alt": "Foto conceitual gerada de estação de trabalho"
+    },
+    {
+      "id": "abstract",
+      "prompt": "Geometric arrangement of violet and blue paper cubes on a white surface.",
+      "purpose": "Create a conceptual and elegant abstract composition.",
+      "alt": "Cubos de papel violeta e azul em composição geométrica sobre superfície branca."
+    }
+  ],
+  "art_direction": {
+    "palette": [
+      "#6B4EFF",
+      "#101325",
+      "#FFFFFF"
+    ],
+    "typography": "Fonte elegante, layout limpo, sem marcas ou logos.",
+    "layout": "Headline, imagem central e convite à demo com espaço livre.",
+    "cta": "Explore o conceito e descubra como ele pode apoiar seu planejamento."
+  }
+}

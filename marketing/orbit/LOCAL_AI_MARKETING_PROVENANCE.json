@@ -1,0 +1,397 @@
+{
+  "schema": 1,
+  "product": "Orbit",
+  "stage": "HML / experimental",
+  "text_author": "LocalAuthor",
+  "text_model": "Qwen/Qwen3-8B-GGUF",
+  "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+  "weights_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+  "text_license": "Apache-2.0",
+  "reasoning": "0 for initial drafts; 512/1024 for corrections",
+  "image_sources": [
+    {
+      "id": "planning",
+      "sha256": "81a22c4f506f965859d1329b106a4d05e7ba55f8553014037f907d793151071d",
+      "seed": 410,
+      "steps": 20,
+      "width": 512,
+      "height": 512,
+      "origin": "LocalAuthor FoundationService/ImageRuntime",
+      "model": {
+        "model_id": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+        "revision": "451f4fe16113bff5a5d2269ed5ad43b0592e9a14",
+        "license": "CreativeML-OpenRAIL-M",
+        "backend": "transformers",
+        "runtime_profile": {},
+        "manifest_sha256": "720dccb322bde70dba1792a4fcc7d9d341b7f4d5f14f832c41f4ff3713e50382",
+        "capability": "image",
+        "weights_modified_by_this_run": false,
+        "derived_checkpoint": false,
+        "derivation": {},
+        "created_from_scratch": null
+      },
+      "review": "Concept draft accepted by supervisor; not real office/client photography"
+    },
+    {
+      "id": "workstation",
+      "sha256": "2cb472938d35f45274ba82a0da5d6522f99ccb29be321cdd4d068b3dd19f366e",
+      "seed": 411,
+      "steps": 20,
+      "width": 512,
+      "height": 512,
+      "origin": "LocalAuthor FoundationService/ImageRuntime",
+      "model": {
+        "model_id": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+        "revision": "451f4fe16113bff5a5d2269ed5ad43b0592e9a14",
+        "license": "CreativeML-OpenRAIL-M",
+        "backend": "transformers",
+        "runtime_profile": {},
+        "manifest_sha256": "720dccb322bde70dba1792a4fcc7d9d341b7f4d5f14f832c41f4ff3713e50382",
+        "capability": "image",
+        "weights_modified_by_this_run": false,
+        "derived_checkpoint": false,
+        "derivation": {},
+        "created_from_scratch": null
+      },
+      "review": "Concept draft accepted by supervisor; not real office/client photography"
+    },
+    {
+      "id": "abstract",
+      "sha256": "7d7b1aba335594c6549c02529ed785d761e33d3210ee18b5b5f3738591c821b9",
+      "seed": 412,
+      "steps": 20,
+      "width": 512,
+      "height": 512,
+      "origin": "LocalAuthor FoundationService/ImageRuntime",
+      "model": {
+        "model_id": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+        "revision": "451f4fe16113bff5a5d2269ed5ad43b0592e9a14",
+        "license": "CreativeML-OpenRAIL-M",
+        "backend": "transformers",
+        "runtime_profile": {},
+        "manifest_sha256": "720dccb322bde70dba1792a4fcc7d9d341b7f4d5f14f832c41f4ff3713e50382",
+        "capability": "image",
+        "weights_modified_by_this_run": false,
+        "derived_checkpoint": false,
+        "derivation": {},
+        "created_from_scratch": null
+      },
+      "review": "Concept draft accepted by supervisor; not real office/client photography"
+    },
+    {
+      "id": "product",
+      "sha256": "7ce5caded8fa8c4c140f9a594c4a22e2baab5e0758b2d811284e097d98bc8064",
+      "origin": "Reviewer QA screenshot",
+      "data": "synthetic",
+      "student_capture": false
+    }
+  ],
+  "student_source_fragments": [
+    {
+      "request": "24",
+      "task": "ESTRATEGIA_COMERCIAL.md",
+      "content_sha256": "4cab6abd881a7eccf3e8e2b96d8a79800c46f87d643ba1aae535c6d3a20fd7c1"
+    },
+    {
+      "request": "23",
+      "task": "PESQUISA_E_DIRECAO.md",
+      "content_sha256": "d9b6cd825c4993b7c9e96e6b56e38f0744334de73e8bd49efd6cdb57ae9e2e07"
+    },
+    {
+      "request": "38",
+      "task": "research-edits.json",
+      "content_sha256": "0510cdc8fdff5c49bfd702cd7a22d8979ad82bd90b5c65dd73cdb3a16b9767cd"
+    },
+    {
+      "request": "31",
+      "task": "ORBIT_MARKETING_RESPONSAVEL.md",
+      "content_sha256": "ce4d44c3f9bb9150068f727bc564419328e58c87cc1f6ac8c94f1bcb9ddafce8"
+    },
+    {
+      "request": "45",
+      "task": "lesson-edits.json",
+      "content_sha256": "5b19b466ab49955eee1177cc6f13fe3ad0871b0453a999102503cd43f0c7e379"
+    },
+    {
+      "request": "41",
+      "task": "copy-01.json",
+      "content_sha256": "32dc0dcf8c4675c21f87ca32282a9bdcf53264f4cda4674c14130a34e61e0dbe"
+    },
+    {
+      "request": "42",
+      "task": "copy-04.json",
+      "content_sha256": "d5e0d21a6d1436493b47da8403d3a5a9203c36959290dececd6d1aa636709950"
+    },
+    {
+      "request": "43",
+      "task": "copy-07.json",
+      "content_sha256": "da48ba5aec53152a13465f367b02d43247b1014107dcdaa9d2301e4fa0849ccd"
+    },
+    {
+      "request": "44",
+      "task": "copy-10.json",
+      "content_sha256": "561f7f7f4732dc1b8792584aebf5afaa5f245286baae82a2ecbd79400d65d5b5"
+    },
+    {
+      "request": "27",
+      "task": "posts-01-final.json",
+      "content_sha256": "49b5076f4f7cadfbecc315b61342b69d9869d7f8d80a1a4ae9810a78499fe191"
+    },
+    {
+      "request": "28",
+      "task": "posts-04-final.json",
+      "content_sha256": "cdbbc1df26fe9fa1f251afbde8c6890943fa14f4475303695f729f2d99f9b447"
+    },
+    {
+      "request": "29",
+      "task": "posts-07-final.json",
+      "content_sha256": "542352ffcf328ca9e93b675755eda8fe30d7b945540b2fe43fcef6dbf6fa6177"
+    },
+    {
+      "request": "30",
+      "task": "posts-10-final.json",
+      "content_sha256": "afb40d226757f3805677019df02b33df611b0718b9048ac224921c2970b17430"
+    },
+    {
+      "request": "12",
+      "task": "posts-01-reviewed.json",
+      "content_sha256": "5cf9136e5367fe07f1eaff8d9b80e34b58550216896c8e952801c972edd22232"
+    },
+    {
+      "request": "25",
+      "task": "carrossel.json",
+      "content_sha256": "83d3aa81550d609bbbabb88c296774810c14d3c98bd956823f7c50300687fcb2"
+    },
+    {
+      "request": "40",
+      "task": "carousel-edits.json",
+      "content_sha256": "c8f84613c30dc8b95d15cd4f3874aadde28a5cc3b9a2018a7591fa8ab6f27167"
+    },
+    {
+      "request": "22",
+      "task": "template.html",
+      "content_sha256": "3089e9e2c11dedcc2f0ff6cabfaabd0b655b2570e56e2b51e0bc5cc850a92378"
+    },
+    {
+      "request": "32",
+      "task": "CALENDARIO_E_MEDICAO.md",
+      "content_sha256": "aec4005f088bf6c9fc70e198aa417a4cf384fb48645212a9269972ddfe900651"
+    },
+    {
+      "request": "46",
+      "task": "calendar-edits.json",
+      "content_sha256": "482629181d27ce29b2a10c1546ca7250639f07a7b0ce5df3f9929090caffaccb"
+    },
+    {
+      "request": "20",
+      "task": "LANDING.json",
+      "content_sha256": "b0e98d3253d230371b0948301567a9c2d30aae9e0d6c3eefd937b55799ee9deb"
+    },
+    {
+      "request": "34",
+      "task": "landing-edits.json",
+      "content_sha256": "6a75261b0bf22ab41752fb207abbb1b3cfb1cfd41ba0d3efb143642397953ac9"
+    },
+    {
+      "request": "39",
+      "task": "sales-demo.json",
+      "content_sha256": "064cb01ca8c2bc070523a7ee8a7e71a684858ed5eb38cdfb13371721b8a370b2"
+    },
+    {
+      "request": "50",
+      "task": "sales-reel-approved.json",
+      "content_sha256": "106f502ac72a3c41cbbfee8b256f829ea5671c11b0adc27ae15f05cb1255f880"
+    },
+    {
+      "request": "53",
+      "task": "task-demo-final.json",
+      "content_sha256": "8e30cc3d6504b1b66db89121e1f6b8f828ba18951be8fc921a6d217bbf27d1dd"
+    },
+    {
+      "request": "33",
+      "task": "REELS.json",
+      "content_sha256": "7768ebef995446ec9c492e022b632f983d587a836b4844122e1b1e9e6f5c69a7"
+    },
+    {
+      "request": "51",
+      "task": "reel-scenes-approved.json",
+      "content_sha256": "5d33210c98c3e0bd81e223404a5d4475cf76abb353b08de5b5fd9068266680fe"
+    },
+    {
+      "request": "35",
+      "task": "FOTOS_E_ARTES.json",
+      "content_sha256": "8a177610488e56cc0374f0a65d8c8373745824262e92a5db4809a1a3eb33dc8c"
+    },
+    {
+      "request": "37",
+      "task": "template-layout-edits.json",
+      "content_sha256": "e83f91ed8d18d3e372a912d1e30268088c4be0d134d31cb02297e2b870d68561"
+    },
+    {
+      "request": "55",
+      "task": "template-function-verified.js",
+      "content_sha256": "59564eaa546fe0469fa04dacf61595dd43d5425703554ce0ce2e7e14e8f44fba"
+    },
+    {
+      "request": "52",
+      "task": "default-call-final.js",
+      "content_sha256": "2a7abd7e79f13a2c07cece454cf1554d80ace181134b20ff5703bbf5f3d0675a"
+    },
+    {
+      "request": "11",
+      "task": "index.html",
+      "content_sha256": "0d6973ab9bfa9b93147a3e279cba1ae719e2d4113e8181fb6aa47cbbaf53c031"
+    },
+    {
+      "request": "47",
+      "task": "gallery-final-edits.json",
+      "content_sha256": "2fda2a0a708deb137dd4cc039385d840a57a0615acc413d4e5aeeb9a8200036c"
+    },
+    {
+      "request": "49",
+      "task": "gallery-footer-approved.json",
+      "content_sha256": "664c5993274df872769520bdf25e3d837273e1492ff62df1e755ffeb862092eb"
+    },
+    {
+      "request": "56",
+      "task": "footer-contrast-edit.json",
+      "content_sha256": "ac3c8100f7e73a542de90fabacbd26a8b1b28977442725a926e9b0e36edd8d90"
+    },
+    {
+      "request": "57",
+      "task": "notice-contrast-edit.json",
+      "content_sha256": "c1c4ac8a98d6837483d5627f66bd0009e89b6fb799a187a99bc2f86284982162"
+    }
+  ],
+  "editorial_selection": [
+    "Selected factual fields from multiple local drafts, bound preexisting CTA/alt/channel strings; normalized integer dates and JSON/Markdown serialization",
+    "Research 38: accepted future-tense first sentence, rejected fabricated citation tail",
+    "Calendar 46: accepted rows only; placeholder edits rejected",
+    "Template 37: accepted indices 0,1,2,4,5,7,8; duplicate/broad/ineffective edits rejected",
+    "Gallery 47: accepted indices 0,1,2,3,4,6,8; broad closing-div changes rejected; closing main from 49",
+    "Landing 34: accepted indices 0,2,3; unsupported CTA rejected, reused student CTA",
+    "Reels and sales: rejected invented dependency/history/native-Git-progress screens; accepted focused corrections 50/51",
+    "Template 55: replaced superseded initialization with corrected function; default call 52. Rejected escaped regex and undefined variable in earlier drafts",
+    "Gallery 49: selected replacement through opening footer and links; premature closing footer excluded. Color property matching excludes background-color",
+    "Sales 50: accepted follow-up email and Git terminal shot; rejected task dependency statement, used 53",
+    "Reels 51: rejected dependency overlay; reused its factual task-detail overlay from Scrum scene. Shot labels are operator references, not filmed evidence.",
+    "Editorial fragments are not blanket approval of the full original responses",
+    "Canonical LF serialization and trailing-whitespace removal for Git; original student strings preserved privately.",
+    "Contrast: selector extension from 56, white notice/footer text from 57; review identified insufficient footer/notice contrast. Original gallery and renders retained privately.",
+    "p08: selected existing sprint detail headline from 33 and report narration from 51 to distinguish the second sprint artwork."
+  ],
+  "supervisor_role": "Facts, contracts, source URL discovery, selective review/application, operators, QA; no external creative AI",
+  "research": {
+    "collector": "LocalAuthor ResearchService",
+    "student_input": "Reviewer summaries, not autonomous browsing",
+    "verified_sources": [
+      "https://business.linkedin.com/advertise/resources/marketing-terms/video-ads",
+      "https://support.google.com/analytics/answer/10917952",
+      "https://www.atlassian.com/software/jira",
+      "https://linear.app/"
+    ],
+    "unverified_sources": [
+      "https://www.facebook.com/business/ads-guide/update/image",
+      "https://www.linkedin.com/help/lms/answer/a420488"
+    ],
+    "collection_receipts": [
+      {
+        "role": "channel",
+        "url": "https://business.linkedin.com/advertise/resources/marketing-terms/video-ads",
+        "collected": true,
+        "sha256": "2c11c3d8d5e8f6e32388fa8cf60727aeb2fbfd80332479f5dc1dc1f1a3ce9fef",
+        "title": "https://business.linkedin.com/advertise/resources/marketing-terms/video-ads",
+        "checked_at": "2026-10-06T19:50:51.207954+00:00"
+      },
+      {
+        "role": "channel",
+        "url": "https://www.linkedin.com/help/lms/answer/a420488",
+        "collected": false,
+        "error": "Coleta nÃ£o autorizada por robots.txt ou regras nÃ£o verificÃ¡veis."
+      },
+      {
+        "role": "measurement",
+        "url": "https://support.google.com/analytics/answer/10917952",
+        "collected": true,
+        "sha256": "d556177d42bb6e75d50d89a3b66c6d971cdc51272d7c609f8a32474fd4b4d405",
+        "title": "https://support.google.com/analytics/answer/10917952",
+        "checked_at": "2026-10-06T19:50:53.471132+00:00"
+      },
+      {
+        "role": "channel",
+        "url": "https://www.facebook.com/business/ads-guide/update/image",
+        "collected": false,
+        "error": "Coleta nÃ£o autorizada por robots.txt ou regras nÃ£o verificÃ¡veis."
+      },
+      {
+        "role": "competitor",
+        "url": "https://www.atlassian.com/software/jira",
+        "collected": true,
+        "sha256": "788e586b450c2299aaaf3cf1b0af8f43813d6e67909abec07da49cfad6a046e6",
+        "title": "https://www.atlassian.com/software/jira",
+        "checked_at": "2026-10-06T19:50:55.557682+00:00"
+      },
+      {
+        "role": "competitor",
+        "url": "https://linear.app/",
+        "collected": true,
+        "sha256": "76ca24bb2ac5dd248f5d5cfbf40d1b016621c81595ec74506c954992b01b7f0d",
+        "title": "https://linear.app/",
+        "checked_at": "2026-10-06T19:50:56.742745+00:00"
+      }
+    ]
+  },
+  "rejected_attempts": "Original drafts, failed operators, model errors and rejected SD images preserved privately; not all attempts passed",
+  "photo_review": "Three regenerated concepts accepted as drafts; no people/real client results. Workstation is a concept, not a literal fulfilment of every prompt detail. SD safety checker kept enabled. Native resolution 512x512.",
+  "formats": "Chosen 1080x1350 feed / 1080x1920 story; not verified Meta acceptance",
+  "training_allowed": false,
+  "weights_modified": false,
+  "autonomous_marketing_qualified": false,
+  "commercial_results_verified": false,
+  "social_published": false,
+  "ad_spend": 0,
+  "commercial_pending": [
+    "Price, pilot scope/duration/support",
+    "Contact and landing destination",
+    "Capture/consent/analytics",
+    "Audience/style confirmation",
+    "Production commercial blockers"
+  ],
+  "validation": {
+    "platform_tests_run": 418,
+    "passed": 415,
+    "skipped": 3,
+    "skips": "Windows symlink privileges unavailable; existing runner flag used",
+    "environment": "PYTHONUTF8=1 matching CI; initial cp1252 run failed one encoding fixture and was retained privately",
+    "visual_review": {
+      "art_exports": 19,
+      "png_and_jpeg": true,
+      "gallery_widths": [
+        390,
+        1280
+      ],
+      "issues": [],
+      "checks": [
+        "Image loaded",
+        "1080x1350 feed and 1080x1920 story bounds",
+        "No element outside artwork",
+        "No gallery overflow/broken images at tested widths",
+        "Repeated story calls and return to feed",
+        "Five invalid path/format inputs rejected before mutations",
+        "Literal text insertion and mandatory origin/HML notices",
+        "Gallery links and notice contrast at least 4.5:1",
+        "Gallery file links resolve locally"
+      ],
+      "pixel_review": "Supervisor inspected sample feed/product/concept and mobile gallery; not LocalAuthor vision or sales efficacy"
+    }
+  },
+  "consultation": {
+    "identity": "ORBIT_MARKETING_RESPONSAVEL",
+    "sha256": "65eb54ba2c6065123b36ebdd13c2418e22845a1622b04605bed93eef741c6391",
+    "version": 2,
+    "retrieval_verified": true,
+    "backup_crc_verified": true,
+    "server_health": "ok",
+    "training_allowed": false
+  }
+}

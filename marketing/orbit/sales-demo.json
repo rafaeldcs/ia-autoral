@@ -1,0 +1,53 @@
+{
+  "demo_minutes": [
+    {
+      "minute": 1,
+      "action": "confirmar necessidade/abrir projeto",
+      "spoken": "Confirme a necessidade do projeto e abra o ambiente de trabalho."
+    },
+    {
+      "minute": 2,
+      "action": "ver backlog",
+      "spoken": "Visualize o backlog de tarefas e prioridades do projeto."
+    },
+    {
+      "minute": 3,
+      "action": "ver tarefas",
+      "spoken": "Durante a demonstração do Orbit, é possível visualizar o título da tarefa, seu status e a pessoa responsável."
+    },
+    {
+      "minute": 4,
+      "action": "ver quadro Kanban",
+      "spoken": "Visualize o quadro Kanban com colunas de status e fluxo de trabalho."
+    },
+    {
+      "minute": 5,
+      "action": "ver sprint",
+      "spoken": "Acesse o plano do sprint e suas metas de entrega."
+    },
+    {
+      "minute": 6,
+      "action": "abrir código e entregas/arquivos",
+      "spoken": "Abra o repositório de código e verifique as entregas e arquivos."
+    },
+    {
+      "minute": 7,
+      "action": "ver histórico Git",
+      "spoken": "Explore o histórico de commits e alterações do código."
+    },
+    {
+      "minute": 8,
+      "action": "combinar próximo passo",
+      "spoken": "Combine o próximo passo com base nas observações do projeto."
+    }
+  ],
+  "followup_email": "Agradecemos pelo seu tempo durante a demonstração. Gostaríamos de saber qual workflow você gostaria de avaliar? Propomos um escopo piloto para testar a solução. Por favor, confirme a conveniência para seguir com essa etapa.",
+  "proposal": {
+    "scope": "Definição de escopo a combinar",
+    "price": "Preço a definir",
+    "duration": "Duração a definir",
+    "support": "Suporte a definir",
+    "acceptance": "Critério de aceite a combinar",
+    "limitations": "Limites: SSH/LFS/PR/editor online/ACLindependente ausentes, HML experimental"
+  }
+}

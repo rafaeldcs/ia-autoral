@@ -1,0 +1,36 @@
+{
+  "posts": [
+    {
+      "id": "c01",
+      "headline": "Como organizar projetos?",
+      "subtitle": "Estruturação de projetos no Orbit: prioridades e tarefas",
+      "cta": "Conheça o Orbit",
+      "visual": "product",
+      "alt": "Captura QA do Orbit com dados fictícios"
+    },
+    {
+      "id": "c02",
+      "headline": "Tarefas e sprints",
+      "subtitle": "Gestão de tarefas e sprints no Orbit: metas e progresso",
+      "cta": "Conheça o Orbit",
+      "visual": "product",
+      "alt": "Captura QA do Orbit com dados fictícios"
+    },
+    {
+      "id": "c03",
+      "headline": "Git nativo HTTPS",
+      "subtitle": "Orbit suporta clonagem, pull/push HTTPS: repositórios privados",
+      "cta": "Conheça o Orbit",
+      "visual": "product",
+      "alt": "Captura QA do Orbit com dados fictícios"
+    },
+    {
+      "id": "c04",
+      "headline": "Demonstração Acompanhada",
+      "subtitle": "Conheça o Orbit em uma demonstração",
+      "cta": "Conheça o Orbit",
+      "visual": "product",
+      "alt": "Captura QA do Orbit com dados fictícios"
+    }
+  ]
+}

@@ -1,0 +1,373 @@
+{
+  "cases": [
+    {
+      "id": "p01",
+      "format": "feed",
+      "width": 1080,
+      "height": 1350,
+      "scrollW": 1080,
+      "scrollH": 1350,
+      "visible": true,
+      "overflow": []
+    },
+    {
+      "id": "p02",
+      "format": "feed",
+      "width": 1080,
+      "height": 1350,
+      "scrollW": 1080,
+      "scrollH": 1350,
+      "visible": true,
+      "overflow": []
+    },
+    {
+      "id": "p03",
+      "format": "feed",
+      "width": 1080,
+      "height": 1350,
+      "scrollW": 1080,
+      "scrollH": 1350,
+      "visible": true,
+      "overflow": []
+    },
+    {
+      "id": "p04",
+      "format": "feed",
+      "width": 1080,
+      "height": 1350,
+      "scrollW": 1080,
+      "scrollH": 1350,
+      "visible": true,
+      "overflow": []
+    },
+    {
+      "id": "p05",
+      "format": "feed",
+      "width": 1080,
+      "height": 1350,
+      "scrollW": 1080,
+      "scrollH": 1350,
+      "visible": true,
+      "overflow": []
+    },
+    {
+      "id": "p06",
+      "format": "feed",
+      "width": 1080,
+      "height": 1350,
+      "scrollW": 1080,
+      "scrollH": 1350,
+      "visible": true,
+      "overflow": []
+    },
+    {
+      "id": "p07",
+      "format": "feed",
+      "width": 1080,
+      "height": 1350,
+      "scrollW": 1080,
+      "scrollH": 1350,
+      "visible": true,
+      "overflow": []
+    },
+    {
+      "id": "p08",
+      "format": "feed",
+      "width": 1080,
+      "height": 1350,
+      "scrollW": 1080,
+      "scrollH": 1350,
+      "visible": true,
+      "overflow": []
+    },
+    {
+      "id": "p09",
+      "format": "feed",
+      "width": 1080,
+      "height": 1350,
+      "scrollW": 1080,
+      "scrollH": 1350,
+      "visible": true,
+      "overflow": []
+    },
+    {
+      "id": "p10",
+      "format": "feed",
+      "width": 1080,
+      "height": 1350,
+      "scrollW": 1080,
+      "scrollH": 1350,
+      "visible": true,
+      "overflow": []
+    },
+    {
+      "id": "p11",
+      "format": "feed",
+      "width": 1080,
+      "height": 1350,
+      "scrollW": 1080,
+      "scrollH": 1350,
+      "visible": true,
+      "overflow": []
+    },
+    {
+      "id": "p12",
+      "format": "feed",
+      "width": 1080,
+      "height": 1350,
+      "scrollW": 1080,
+      "scrollH": 1350,
+      "visible": true,
+      "overflow": []
+    },
+    {
+      "id": "p01",
+      "format": "story",
+      "width": 1080,
+      "height": 1920,
+      "scrollW": 1080,
+      "scrollH": 1920,
+      "visible": true,
+      "overflow": []
+    },
+    {
+      "id": "p02",
+      "format": "story",
+      "width": 1080,
+      "height": 1920,
+      "scrollW": 1080,
+      "scrollH": 1920,
+      "visible": true,
+      "overflow": []
+    },
+    {
+      "id": "p03",
+      "format": "story",
+      "width": 1080,
+      "height": 1920,
+      "scrollW": 1080,
+      "scrollH": 1920,
+      "visible": true,
+      "overflow": []
+    },
+    {
+      "id": "c01",
+      "format": "feed",
+      "width": 1080,
+      "height": 1350,
+      "scrollW": 1080,
+      "scrollH": 1350,
+      "visible": true,
+      "overflow": []
+    },
+    {
+      "id": "c02",
+      "format": "feed",
+      "width": 1080,
+      "height": 1350,
+      "scrollW": 1080,
+      "scrollH": 1350,
+      "visible": true,
+      "overflow": []
+    },
+    {
+      "id": "c03",
+      "format": "feed",
+      "width": 1080,
+      "height": 1350,
+      "scrollW": 1080,
+      "scrollH": 1350,
+      "visible": true,
+      "overflow": []
+    },
+    {
+      "id": "c04",
+      "format": "feed",
+      "width": 1080,
+      "height": 1350,
+      "scrollW": 1080,
+      "scrollH": 1350,
+      "visible": true,
+      "overflow": []
+    },
+    {
+      "negative_and_repeat_checks": {
+        "repeated_story": true,
+        "feed_restored": true,
+        "invalid_rejected": 5,
+        "no_invalid_mutation": true,
+        "literal_text": true,
+        "notices_preserved": true
+      }
+    },
+    {
+      "gallery": true,
+      "width": 390,
+      "scroll": 390,
+      "broken": [],
+      "contrasts": [
+        {
+          "label": "Proposta para demonstração e piloto · condições comerciais a definir",
+          "ratio": 5.049393122824065
+        },
+        {
+          "label": "Estratégia Comercial",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Pesquisa e Direção",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Calendário e Medição",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Vendas e Landing",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "README",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Arte 01",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Arte 02",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Arte 03",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Arte 04",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Arte 05",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Arte 06",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "posts-01.json",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "posts-07.json",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "carrossel.json",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "FOTOS_E_ARTES.json",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "template.html",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Exports",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Template",
+          "ratio": 13.052444568114351
+        }
+      ]
+    },
+    {
+      "gallery": true,
+      "width": 1280,
+      "scroll": 1280,
+      "broken": [],
+      "contrasts": [
+        {
+          "label": "Proposta para demonstração e piloto · condições comerciais a definir",
+          "ratio": 5.049393122824065
+        },
+        {
+          "label": "Estratégia Comercial",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Pesquisa e Direção",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Calendário e Medição",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Vendas e Landing",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "README",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Arte 01",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Arte 02",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Arte 03",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Arte 04",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Arte 05",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Arte 06",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "posts-01.json",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "posts-07.json",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "carrossel.json",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "FOTOS_E_ARTES.json",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "template.html",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Exports",
+          "ratio": 13.052444568114351
+        },
+        {
+          "label": "Template",
+          "ratio": 13.052444568114351
+        }
+      ]
+    }
+  ],
+  "issues": []
+}

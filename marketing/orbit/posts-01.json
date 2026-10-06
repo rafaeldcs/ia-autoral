@@ -1,0 +1,70 @@
+{
+  "posts": [
+    {
+      "id": "p01",
+      "headline": "Tarefas e Backlog",
+      "subtitle": "Gerencie tarefas e backlog de forma centralizada",
+      "caption": "HML oferece um espaço para organizar tarefas e backlog. Contato a configurar. Como você organiza suas tarefas diariamente?",
+      "day": 2,
+      "channel": "linkedin",
+      "cta": "Conheça o Orbit",
+      "visual": "product",
+      "alt": "Captura QA do Orbit com dados fictícios"
+    },
+    {
+      "id": "p02",
+      "headline": "Sprints Scrum",
+      "subtitle": "Planeje e execute sprints com metodologia Scrum",
+      "caption": "HML suporta relatórios e papéis globais. Bio a configurar. Quais são os desafios ao planejar sprints?",
+      "day": 4,
+      "channel": "instagram",
+      "cta": "Conheça o Orbit",
+      "visual": "planning",
+      "alt": "Foto conceitual gerada de planejamento"
+    },
+    {
+      "id": "p03",
+      "headline": "Git Privado HTTPS",
+      "subtitle": "Controle arquivos e branches com Git privado por projeto",
+      "caption": "HML permite histórico e vínculo opcional tarefa-commit. Contato a configurar. Como você gerencia o histórico de commits?",
+      "day": 6,
+      "channel": "facebook",
+      "cta": "Conheça o Orbit",
+      "visual": "workstation",
+      "alt": "Foto conceitual gerada de estação de trabalho"
+    },
+    {
+      "id": "p04",
+      "headline": "Quadro Kanban para gestão de tarefas",
+      "subtitle": "Gerencie tarefas e backlog de forma centralizada",
+      "caption": "HML oferece quadro Kanban para acompanhar progresso. Contato a configurar.",
+      "day": 8,
+      "channel": "linkedin",
+      "cta": "Conheça o Orbit",
+      "visual": "product",
+      "alt": "Captura QA do Orbit com dados fictícios"
+    },
+    {
+      "id": "p05",
+      "headline": "Arquivos do repositório centralizados",
+      "subtitle": "Visualize mudanças e histórico de commits",
+      "caption": "HML permite armazenar arquivos com histórico vinculado. Bio a configurar.",
+      "day": 10,
+      "channel": "instagram",
+      "cta": "Conheça o Orbit",
+      "visual": "planning",
+      "alt": "Foto conceitual gerada de planejamento"
+    },
+    {
+      "id": "p06",
+      "headline": "Histórico Git com vinculação a tarefas",
+      "subtitle": "Rastreie mudanças e relacione com commits",
+      "caption": "HML mostra histórico Git com links para tarefas. Contato a configurar.",
+      "day": 12,
+      "channel": "facebook",
+      "cta": "Conheça o Orbit",
+      "visual": "workstation",
+      "alt": "Foto conceitual gerada de estação de trabalho"
+    }
+  ]
+}
