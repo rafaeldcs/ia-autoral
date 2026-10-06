@@ -9,7 +9,6 @@ import { HostedCommits } from './hosted-commits';
 
 import { HostedEntry } from './hosted-source';
 
-
 type Data = {
   exists: boolean;
   head?: string;
@@ -34,14 +33,15 @@ export function HostedRepositoryPanel({
   const [data, setData] = useState<Data>({ exists: false });
   const [url, setUrl] = useState<string>('');
   const [busy, setBusy] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<string>(''); const [loaded, setLoaded] = useState<boolean>(false);
+  const [section, setSection] = useState<'files' | 'history' | 'access'>('files');
 
   const load = async () => {
     setBusy(true);
     setError('');
     try {
       const result = await api<Data>(`/projects/${project}/repository`);
-      setData(result);
+      setData(result); setLoaded(true);
       setUrl(result.clonePath ? window.location.origin + result.clonePath : '');
     } catch (e) {
       setError((e as Error).message);
@@ -51,6 +51,9 @@ export function HostedRepositoryPanel({
   };
 
   useEffect(() => {
+    setSection('files');
+    setLoaded(false);
+    setData({ exists: false });
     load();
   }, [project]);
 
@@ -67,33 +70,66 @@ export function HostedRepositoryPanel({
     }
   };
 
-
-
   return (
     <div className="hosted-repository list-panel">
       <h3>Repositório do Orbit</h3>
-      <p>Código privado hospedado no próprio Orbit. Admins/gestores criam; colaboradores enviam; leitores consultam. GitHub continua abaixo.</p>
+      <p>Código privado hospedado no próprio Orbit. Admins/gestores criam; colaboradores enviam; leitores consultam.</p>
       <button onClick={load} disabled={busy}>
         Atualizar repositório hospedado
       </button>
       {error && <p role="alert">{error}</p>}
-      {!data.exists ? (
-        <button onClick={create} disabled={busy} style={{ display: account.role === 'admin' || account.role === 'manager' ? 'inline-block' : 'none' }}>
-          Criar repositório
-        </button>
+      {busy ? <span role="status">Carregando repositório…</span> : loaded && (!data.exists ? (
+<>
+  <p>Este projeto ainda não possui um repositório.</p>
+  {(account.role === 'admin' || account.role === 'manager') && (
+    <button onClick={create} disabled={busy}>
+      Criar repositório
+    </button>
+  )}
+</>
+
       ) : (
         <>
-          <textarea aria-label="URL para clone" value={url} readOnly />
-          <p>git clone {url}</p>
-          <p>Branch: {data.branch}</p>
-          <p>Head: {data.head || 'Faça o primeiro commit e use git push origin main.'}</p>
-          <p>Branches: {data.branches?.join(', ')}</p>
-          <p>Limite de 20 MiB por push.</p>
-          <HostedSource project={project} initial={data.entries || []} />
-          <HostedCommits commits={data.commits || []} issues={issues} onOpen={onOpen} />
-          <HostedToken project={project} account={account} />
+          <p className="git-summary">Branch: {data.branch} · Commit: {data.head ? <span title={data.head}>{data.head.slice(0,8)}</span> : 'Primeiro commit pendente'}</p>
+          <details className="git-settings">
+            <summary>Clonar repositório</summary>
+            <textarea aria-label="URL para clone" value={url} readOnly />
+            <p>git clone {url}</p>
+            <p>Branch: {data.branch}</p>
+            <p>Head: {data.head || 'Faça o primeiro commit e use git push origin main.'}</p>
+            <p>Branches: {data.branches?.join(', ')}</p>
+            <p>Limite de 20 MiB por push.</p>
+          </details>
+          <nav className="git-area-nav" aria-label="Conteúdo do repositório">
+            <button
+              type="button"
+              aria-pressed={section === 'files'}
+              onClick={() => setSection('files')}
+            >
+              Arquivos
+            </button>
+            <button
+              type="button"
+              aria-pressed={section === 'history'}
+              onClick={() => setSection('history')}
+            >
+              Histórico
+            </button>
+            <button
+              type="button"
+              aria-pressed={section === 'access'}
+              onClick={() => setSection('access')}
+            >
+              Acesso Git
+            </button>
+          </nav>
+          {section === 'files' && (data.entries?.length ? <HostedSource project={project} initial={data.entries} /> : <p>Nenhum arquivo encontrado. Faça o primeiro commit para começar.</p>)}
+          {section === 'history' && (
+            data.commits?.length ? <HostedCommits commits={data.commits || []} issues={issues} onOpen={onOpen} /> : <p>Nenhum commit ainda. Faça o primeiro envio de código.</p>
+          )}
+          {section === 'access' && <section aria-label="Acesso Git">Crie um token pessoal para clonar e enviar código neste projeto.<HostedToken project={project} account={account} /></section>}
         </>
-      )}
+      ))}
     </div>
   );
 }

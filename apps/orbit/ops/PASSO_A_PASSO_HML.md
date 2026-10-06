@@ -6,7 +6,8 @@ Abra https://orbit.hml-app.shopair.com.br. A conta Orbit é independente da cont
 ShopAir. A conta inicial é provisionada antes de abrir a rota pública; depois,
 o endpoint de primeiro administrador é desabilitado. Crie a equipe na aplicação.
 
-Administrador configura GitHub/branch na aba Código e entregas. Token protegido
+Administrador configura GitHub/branch em Código e entregas → GitHub e publicação →
+Configurar conexão GitHub. Token protegido
 no banco; vazio preserva o salvo e Remover token limpa a credencial. Não apague
 as chaves de Data Protection: perder essas chaves torna tokens guardados ilegíveis.
 
@@ -17,10 +18,13 @@ revise, teste no sandbox, faça commit e push. Push na branch de trabalho dispar
 
 ## Hospedagem Git
 
-Código e entregas possui Repositório do Orbit, além da conexão GitHub. Crie como
-administrador/gestor, copie URL HTTPS, gere token pessoal e use no cliente Git com
+Código e entregas abre a área Repositório; GitHub e publicação é uma área separada.
+Crie como administrador/gestor, abra Clonar repositório para copiar URL HTTPS,
+gere token pessoal em Acesso Git e use no cliente Git com
 seu e-mail. O token GitHub não autentica na hospedagem própria. Faça o primeiro
 commit e `git push origin main`; os demais desenvolvedores usam clone/pull/push.
+Arquivos, Histórico e Acesso Git são opções exclusivas. Ao sair de Acesso Git,
+o token mostrado é descartado da tela; sua revogação é feita na lista de tokens.
 
 Diretórios bare ficam em `data/repos/hosted/UUID.git`, no volume persistente de
 512 MiB. Não remova essa pasta nas atualizações. `/git/*` é encaminhado pelo gateway

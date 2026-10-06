@@ -6,7 +6,7 @@ import {GitHistory} from './git-history';
 import {HostedRepositoryPanel} from './hosted-repository';
 import type { GitState } from './git-types';
 
-export function GitPanel({ project, account, issues, onOpen }: { project: string; account: Account; issues: { id: string; key: string }[]; onOpen: (id: string) => void }) {
+function GithubPanel({ project, account, issues, onOpen }: { project: string; account: Account; issues: { id: string; key: string }[]; onOpen: (id: string) => void }) {
   const [data, setData] = useState<GitState>({ repository: null, jobs: [] });
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -80,31 +80,29 @@ const pending = data.jobs.some(j => j.status === 'queued' || j.status === 'runni
 
 return (
   <section className="list-panel" style={{display: 'grid', gap: '1rem', padding: '1rem', overflowWrap: 'anywhere'}}>
-    <h2>Código e entregas.</h2>
-    <HostedRepositoryPanel
-      project={project}
-      account={account}
-      issues={issues}
-      onOpen={onOpen}
-      key={project}
-    />
     <h3>Conexão com GitHub</h3>
+    {(!loaded && !error) ? <p role="status">Carregando...</p> : null}
+    {error ? <button type="button" onClick={() => void load()}><span>Tentar novamente</span></button> : null}
+
     {account.role === 'admin' && loaded && (
-      <GitConfig
-        key={project + (repo?.url || '')}
-        project={project}
-        repository={repo}
-        onSaved={() => void load()}
-      />
+      <details className="git-settings">
+        <summary>Configurar conexão GitHub</summary>
+        <GitConfig
+          key={project + (repo?.url || '')}
+          project={project}
+          repository={repo}
+          onSaved={() => void load()}
+        />
+      </details>
     )}
     {repo ? (
       <>
         <a href={repo.url.replace(/\.git$/, '')} target="_blank" rel="noopener noreferrer">
           {repo.url.replace(/\.git$/, '').split('/').pop()}
         </a>
-        <span> - {repo?.branch} / {repo?.head}</span>
+        <span title={repo?.head}>{repo?.branch} / {repo?.head?.slice(0,8)}</span>
         {canManage && (
-          <>
+          <div className="git-actions">
             <button
               className="button secondary"
               onClick={() => executeAction('pull')}
@@ -126,11 +124,11 @@ return (
             >
               Publicar homologação
             </button>
-          </>
+        </div>
         )}
       </>
     ) : (
-      <p>Configure um repositório para acompanhar entregas.</p>
+      <p>{loaded ? 'Configure um repositório para acompanhar entregas.' : ''}</p>
     )}
     {confirmAction && canManage && (
       <section role="alert">
@@ -158,3 +156,47 @@ return (
 );
 
 }
+
+export const GitPanel = ({ project, account, issues, onOpen }: { project: string; account: Account; issues: { id: string; key: string }[]; onOpen: (id: string) => void }) => {
+  const [area, setArea] = useState<'repository' | 'github'>('repository');
+  return (
+    <section className="git-workspace list-panel">
+      <h2>Código e entregas</h2>
+      <p>Gerencie seu código e entregas aqui</p>
+      <nav className="git-area-nav" aria-label="Áreas de código">
+        <button
+          type="button"
+          aria-pressed={area === 'repository'}
+          onClick={() => setArea('repository')}
+        >
+          Repositório
+        </button>
+        <button
+          type="button"
+          aria-pressed={area === 'github'}
+          onClick={() => setArea('github')}
+        >
+          GitHub e publicação
+        </button>
+      </nav>
+      {area === 'repository' && (
+        <HostedRepositoryPanel
+          project={project}
+          account={account}
+          issues={issues}
+          onOpen={onOpen}
+          key={project}
+        />
+      )}
+      {area === 'github' && (
+        <GithubPanel
+          project={project}
+          account={account}
+          issues={issues}
+          onOpen={onOpen}
+          key={project}
+        />
+      )}
+    </section>
+  );
+};

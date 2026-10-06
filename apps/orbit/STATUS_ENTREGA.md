@@ -25,6 +25,34 @@ volume Git de 512 MiB, rota HTTPS própria, banco e chaves persistentes.
 
 ## Hospedagem Git própria — autoria e aceite
 
+### Evolução da interface — 06/10/2026
+
+O LocalAuthor substituiu a composição que empilhava hospedagem própria e GitHub.
+Código e entregas abre Repositório; GitHub e publicação tem uma área separada.
+Arquivos, Histórico e Acesso Git são opções exclusivas. Clone e configuração
+GitHub ficam recolhidos. O código útil e os dados existentes foram preservados.
+
+O aceite executado inclui navegação por teclado, GET inicial retido para testar
+carregamento, configuração recolhida, troca de projeto, descarte do segredo ao
+sair da área de acesso, recuperação de erro HTTP e ausência de overflow de página
+nas áreas móveis. Navegador nos quatro papéis, 96 testes .NET, 21 cenários de API,
+11 verificações de infraestrutura e builds Release/Next.js passaram no sandbox.
+Os prints são do avaliador, com dados sintéticos. A suíte Windows aprovou 415
+testes; três verificações de symlink exigem privilégio indisponível nesse ambiente.
+
+Respostas incompletas foram rejeitadas: botões sem ação, navegação duplicada,
+remoção indevida de Criar repositório, CSS que impedia clique e textos sem
+contraste. O modelo recebeu o diagnóstico e produziu as correções. A revisão
+visual também corrigiu metadados concatenados e margens acumuladas. Originais,
+hashes e escolhas de trechos ficam preservados em registros privados; a autoria
+sanitizada está em `LOCAL_AI_UX_PROVENANCE.json`.
+
+A lição `knowledge/skills/EVOLUIR_INTERFACE_SEM_ACUMULAR.md` foi registrada como
+consulta versionada no projeto de aprendizado Orbit do servidor LocalAuthor,
+com backup e conferência de hash. Seu exemplo de marketing é hipotético.
+Orientação e consulta persistente não são fine-tuning nem prova de autonomia.
+O resultado da publicação continua condicionado ao CI e SHA de saúde.
+
 Resultado do laboratório em 06/10/2026: **96 testes unitários, 21 cenários de
 API (12 de hospedagem nativa), 11 verificações da infraestrutura, navegador nos
 quatro papéis e tela de 390 px aprovados**. .NET Release e Next.js/TypeScript

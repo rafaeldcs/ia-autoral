@@ -6,15 +6,17 @@ Git privado por projeto e também pode associar GitHub para pull, push e publica
 
 ## Repositório do próprio Orbit
 
-Abra Código e entregas e use **Criar repositório neste projeto** como administrador
-ou gestor. Copie a URL para clone e crie seu token pessoal; colaboradores podem
+Abra Código e entregas → **Repositório** e use **Criar repositório** como administrador
+ou gestor. Abra **Clonar repositório** para copiar a URL e **Acesso Git** para criar
+seu token pessoal; colaboradores podem
 marcar Permitir push, leitores só podem gerar acesso de leitura. No Git, use seu
 e-mail Orbit como usuário e o token como senha. Não coloque o token na URL.
 
 Clone, faça commits localmente e envie para `main`. O Orbit guarda o histórico no
 servidor, exibe arquivos/branches/commits e relaciona as chaves às tarefas. Token
-expira em 30 dias e pode ser revogado na mesma tela. O token do Orbit é independente
-do token GitHub da seção abaixo. Todos os usuários ativos do workspace podem ler;
+expira em 30 dias e pode ser revogado em Acesso Git. **Arquivos**, **Histórico** e
+**Acesso Git** mostram uma área por vez. O token do Orbit é independente
+do token configurado em **GitHub e publicação**. Todos os usuários ativos do workspace podem ler;
 não há ACL de membros independente por projeto nesta versão.
 
 Limites: 20 MiB por requisição/push, 32 MiB por resposta Git, 512 MiB compartilhados
@@ -37,7 +39,8 @@ Veja `LOCAL_AI_PROVENANCE.json` e `STATUS_ENTREGA.md`; não houve alteração de
 1. Abra https://orbit.hml-app.shopair.com.br e entre na conta da equipe.
 2. Crie projeto e tarefas. Escolha Scrum/Kanban em Configurar método.
 3. Inclua a chave da tarefa no assunto do commit: `ORB-1 Corrige autenticação`.
-4. Como administrador, abra Código e entregas, configure URL HTTPS terminada em
+4. Como administrador, abra Código e entregas → **GitHub e publicação** →
+   **Configurar conexão GitHub**, configure URL HTTPS terminada em
    `.git`, branch e token GitHub opcional. Token vazio preserva o salvo; a opção
    Remover token apaga a credencial. Data Protection protege o token no banco.
 5. Administradores/gestores podem Atualizar código, Enviar commits e Publicar

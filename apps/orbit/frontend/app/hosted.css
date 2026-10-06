@@ -1,77 +1,113 @@
+.git-workspace {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.git-workspace .git-area-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.git-workspace .git-area-nav button {
+  border: 1px solid var(--line);
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+}
+.git-workspace .git-area-nav button[aria-pressed="true"] {
+  background-color: var(--purple-soft);
+  color: var(--purple);
+}
+.git-workspace .git-area-nav button:hover,
+.git-workspace .git-area-nav button:focus-visible {
+  outline: 2px solid var(--purple);
+}
+.git-workspace .git-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.git-workspace .git-settings {
+  border: 1px solid var(--line);
+  padding: 0.75rem;
+  border-radius: 8px;
+}
+.git-workspace .git-settings summary {
+  cursor: pointer;
+  padding: 0.5rem;
+  font-weight: bold;
+}
+.git-workspace .git-summary {
+  white-space: pre-wrap;
+  color: var(--muted);
+  margin: 0.5rem;
+}
 .hosted-repository {
+  display: grid;
+  gap: 1rem;
   min-width: 0;
   max-width: 100%;
   padding: 1rem;
-  border: 1px solid #dfe1eb;
-  border-radius: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.hosted-repository button {
+  border: 1px solid var(--line);
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  justify-self: start;
+}
+.hosted-repository button:disabled {
+  opacity: 0.5;
+}
+.hosted-repository button:focus-visible {
+  outline: 2px solid var(--purple);
+}
+.hosted-repository .hosted-file-list {
+  display: grid;
+}
+.hosted-repository .hosted-file-list button {
+  width: 100%;
+  text-align: left;
+  background-color: white;
+  color: var(--ink);
+  border-bottom: 1px solid var(--line);
+}
+.hosted-repository .hosted-token form {
   display: grid;
   gap: 1rem;
 }
-.hosted-repository * {
-  box-sizing: border-box;
+.hosted-repository .hosted-token form label {
+  display: flex;
+  gap: 0.5rem;
 }
-.hosted-repository textarea {
+.hosted-repository textarea,
+.hosted-repository input[type="text"],
+.hosted-repository input[type="password"] {
   width: 100%;
-  min-height: 4em;
-  resize: vertical;
-}
-.hosted-repository input[type="text"], .hosted-repository input[type="password"] {
-  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   padding: 0.5rem;
+  border: 1px solid var(--line);
 }
 .hosted-repository input[type="checkbox"] {
   width: auto;
 }
-.hosted-repository label {
-  display: flex;
-  gap: 0.5rem;
-}
-.hosted-repository .hosted-token form { display: grid; gap: 1rem;
-  grid-gap: 0.6rem;
-}
-.hosted-repository button {
-  visibility: visible;
-  border: 1px solid;
-  padding: 0.5rem;
-  border-radius: 8px;
-  background-color: #6658d9;
-  color: white;
-}
-.hosted-repository button:hover {
-  background-color: #5a4fcf;
-}
-.hosted-repository button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-.hosted-repository .hosted-file-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-.hosted-repository .hosted-token-item, .hosted-repository .hosted-commit {
-  border: 1px solid;
-  padding: 0.5rem;
-  overflow-wrap: anywhere;
-}
-.hosted-repository pre, .hosted-repository code {
-  white-space: pre-wrap;
-  word-break: break-word;
-  max-width: 100%;
-  background-color: #f8f8fc;
-  color: #202239;
-  font-family: monospace;
-}
-.hosted-repository h3, .hosted-repository h4 {
-  margin: 0;
-}
-@media (max-width: 390px) {
-  .hosted-repository {
-    overflow-wrap: anywhere;
-  }
-}
-
-.hosted-repository .hosted-token-item > div {
+.hosted-repository .hosted-token-item,
+.hosted-repository .hosted-commit {
   display: grid;
   gap: 0.25rem;
+  border: 1px solid var(--line);
+  padding: 0.75rem;
+  border-radius: 6px;
 }
+.hosted-repository pre,
+.hosted-repository code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+
+.git-workspace h2, .git-workspace h3, .git-workspace h4, .git-workspace p { margin: 0; line-height: 1.5; }
