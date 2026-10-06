@@ -23,11 +23,12 @@ public static class Accounts
     private static async Task Session(Store db,HttpContext c,Guid id) {
         var token=Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
         await db.Execute("INSERT INTO sessions(hash,user_id,expires_at) VALUES($1,$2,now()+interval '8 hours')",Hash(token),id);
-        c.Response.Cookies.Append("orbit_session",token,new CookieOptions{HttpOnly=true,SameSite=SameSiteMode.Strict,Secure=false,Path="/",MaxAge=TimeSpan.FromHours(8)});
+        c.Response.Cookies.Append("orbit_session",token,new CookieOptions{HttpOnly=true,SameSite=SameSiteMode.Strict,Secure=Environment.GetEnvironmentVariable("ORBIT_PUBLIC_ORIGIN") is not null,Path="/",MaxAge=TimeSpan.FromHours(8)});
     }
     public static void Map(WebApplication app) {
         app.MapGet("/api/auth/status",async(Store db)=>Results.Ok(new{setup=!(await db.Query("SELECT EXISTS(SELECT 1 FROM users)::text")).GetValue<bool>()}));
         app.MapPost("/api/auth/setup",async(UserInput input,Store db,HttpContext c)=>{
+if(!DeliverySetup.SetupAllowed())return Results.Json(new{error="Configuração inicial reservada ao administrador do servidor."},statusCode:403);
             input=input with{Role="admin"};var error=Validate(input);if(error is not null)return Results.BadRequest(new{error});
             var id=Guid.NewGuid();
             var result=await db.Query("""

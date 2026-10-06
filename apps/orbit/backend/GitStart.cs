@@ -18,7 +18,9 @@ public sealed partial class GitProcess {
             "-c", "credential.helper="
         };
         foreach (var arg in fixedArgs) info.ArgumentList.Add(arg);
-        foreach (var arg in args) info.ArgumentList.Add(arg);
+        info.ArgumentList.Add("-c");
+info.ArgumentList.Add("http.followRedirects=false");
+foreach (var arg in args) info.ArgumentList.Add(arg);
         info.Environment.Clear();
         info.Environment["PATH"] = "/usr/bin:/bin";
         info.Environment["HOME"] = "/tmp/orbit-git";

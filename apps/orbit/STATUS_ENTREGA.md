@@ -2,10 +2,15 @@
 
 ## Estado da entrega
 
-Implementação em andamento. O núcleo inicial de validação e execução Git passou
-em 60 testes reais no Linux (40 novos casos de Git e 20 casos anteriores de fluxo).
-Isso **não** comprova pull/push autenticado, interface integrada ou deploy completo.
-O servidor ShopAir ainda não foi alterado por esta entrega.
+Implementação integrada e validada no laboratório Linux: 73 testes unitários,
+9 cenários de API com PostgreSQL, retomada após reinício, bloqueio de setup,
+5 testes da política de pacotes e navegador real nos quatro papéis, desktop e
+celular. Compilações .NET Release e Next.js/TypeScript aprovadas.
+Esta revisão aguarda primeiro workflow e entrega real em HML; esses testes
+**não** comprovam push autenticado ou deploy completo.
+
+Infraestrutura isolada preparada em HML: configuração privada, chave CI restrita
+e volume Git de 512 MiB. A rota pública ainda não foi ativada.
 
 O Orbit original foi preservado em `apps/orbit`, no repositório `ia-autoral`,
 para manter o histórico sem alterar a pasta original do experimento.
@@ -13,10 +18,11 @@ para manter o histórico sem alterar a pasta original do experimento.
 ## Autoria e verificação
 
 O código original de setembro foi escrito majoritariamente pelo Codex. Os novos
-arquivos `GitPolicy`, `GitUrlPolicy`, `GitBranchPolicy`, `GitProcess`, `GitStart` e
-`GitReadOutput` foram escritos pelo modelo local Qwen3-8B Q4_K_M, com revisão do
-Codex. Um método emitido sem classe foi reunido com o cabeçalho de classe de outra
-resposta da própria IA. Os testes e os controles do laboratório são do Codex.
+módulos de Git, fila, entrega, proxy e interface foram propostos pelo Qwen3-8B
+local, com revisão do Codex. Métodos/cabeçalhos de respostas locais foram montados
+quando o arquivo completo falhou. Testes, controladores e infraestrutura são do
+Codex. Hashes UTF-8/LF e tentativas estão em `LOCAL_AI_PROVENANCE.json`; respostas
+originais permanecem privadas. Não houve treino de pesos ou qualificação universal.
 
 As primeiras propostas falharam em compilação, APIs, permissões e regras de Git.
 Foram preservadas em evidências privadas e não publicadas como implementação.

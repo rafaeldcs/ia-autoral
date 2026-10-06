@@ -23,6 +23,12 @@
     <Compile Include="../../backend/GitProcess.cs" Link="GitProcess.cs" />
     <Compile Include="../../backend/GitStart.cs" Link="GitStart.cs" />
     <Compile Include="../../backend/GitReadOutput.cs" Link="GitReadOutput.cs" />
+    <Compile Include="../../backend/GitInit.cs" Link="GitInit.cs" />
+    <Compile Include="../../backend/GitClone.cs" Link="GitClone.cs" />
+    <Compile Include="../../backend/GitCommits.cs" Link="GitCommits.cs" />
+    <Compile Include="../../backend/GitCheckout.cs" Link="GitCheckout.cs" />
+    <Compile Include="../../backend/GitHubDelivery.cs" Link="GitHubDelivery.cs" />
+    <Compile Include="../../backend/GitDeliveryWatch.cs" Link="GitDeliveryWatch.cs" />
   </ItemGroup>
 
 </Project>

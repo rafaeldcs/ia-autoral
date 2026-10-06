@@ -50,6 +50,7 @@ public sealed class Store(NpgsqlDataSource source)
             """);
         await Upgrade.Run(this);
         await Workflow.Upgrade(this);
+        await GitSchema.Upgrade(this);
         var count = await Query("SELECT count(*)::text FROM projects");
         if (count!.GetValue<int>() != 0) return;
         var project = Guid.Parse("af1042ec-b2e7-4430-a310-825c355603f1");

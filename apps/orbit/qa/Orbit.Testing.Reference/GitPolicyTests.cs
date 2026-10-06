@@ -55,6 +55,7 @@ public sealed class GitPolicyTests
         Assert.Equal("--format=a b",info.ArgumentList.Last());
         Assert.Contains("core.hooksPath=/dev/null",info.ArgumentList);
         Assert.Contains("protocol.file.allow=never",info.ArgumentList);
+        Assert.Contains("http.followRedirects=false",info.ArgumentList);
         Assert.False(info.Environment.ContainsKey("ORBIT_TEST_PRIVATE"));
         Assert.DoesNotContain(info.ArgumentList,x=>x.Contains("synthetic-token"));
         Assert.Equal("Authorization: Basic "+Convert.ToBase64String(Encoding.UTF8.GetBytes("x-access-token:synthetic-token")),info.Environment["GIT_CONFIG_VALUE_0"]);

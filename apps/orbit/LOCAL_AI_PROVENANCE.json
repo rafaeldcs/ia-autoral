@@ -6,68 +6,1001 @@
   "context_tokens": 4096,
   "output_tokens": 2048,
   "reasoning_budget": 1024,
-  "product_authorship": "Local model; original baseline Codex; tests and controllers Codex",
+  "product_authorship": "Local model new product modules; original baseline Codex; mechanical assembly/review, tests and infrastructure Codex",
   "complete_delivery": false,
   "files": [
     {
-      "file": "backend/GitPolicy.cs",
-      "output_sha256": "5cc7ff3d759896732f2fee0244ac0ebb8424c1c77cf7471bb263e2507d49afd8",
-      "source_attempts": [
-        "001.json",
-        "007.json"
-      ],
-      "assembly": "unchanged AI file",
-      "review": "Reviewed; Linux real suite passed 60/60"
-    },
-    {
-      "file": "backend/GitUrlPolicy.cs",
-      "output_sha256": "16d2b007d7f98d9ed9a8d28803d95d760ae18e5daecc3d617c2b0639baac45e9",
-      "source_attempts": [
-        "005.json"
-      ],
-      "assembly": "unchanged AI file",
-      "review": "Reviewed; Linux real suite passed 60/60"
+      "file": "backend/DeliverySetup.cs",
+      "sha256_utf8_lf": "fc5d42499f13e7a7406487125a2a2817a7f9c797fd232657ab237eeb861b38ff",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
     },
     {
       "file": "backend/GitBranchPolicy.cs",
-      "output_sha256": "99ce2d3948bd45ea91abfdcac64905105963e5ab99e0b86bc811218f4fa1cf63",
-      "source_attempts": [
-        "006.json",
-        "010.json",
-        "010a.json",
-        "010b.json"
-      ],
-      "assembly": "unchanged AI file",
-      "review": "Reviewed; Linux real suite passed 60/60"
+      "sha256_utf8_lf": "99ce2d3948bd45ea91abfdcac64905105963e5ab99e0b86bc811218f4fa1cf63",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "backend/GitCheckout.cs",
+      "sha256_utf8_lf": "b4747a4211ecca4edf657a9c664a870ccaed041f1e7ce0fad9183a27b133ab63",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "backend/GitClone.cs",
+      "sha256_utf8_lf": "86f78bf8c40a51e2d56e5f5cd3b757cc1c950cb424afcd2d9aba2f5b1a407f65",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "backend/GitCommits.cs",
+      "sha256_utf8_lf": "4113f4bffbe6a60f9602f4d0b5bd48757713dd068ca12c2ee98db7624d742120",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "backend/GitConfigure.cs",
+      "sha256_utf8_lf": "84d010645cf0a7f88497f41059c6520ed6e2a5b98ad6bf345e200019e7f6b6c2",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "backend/GitConfigValidation.cs",
+      "sha256_utf8_lf": "0558e0194adfc0226dff5761b8e0e11d4a456fd70dced3754de421647233d672",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "backend/GitDeliveryWatch.cs",
+      "sha256_utf8_lf": "5e54079bdb13e9be74b427e1639c00644d4b06f20c2f232c3835b0bf08db4a5f",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "backend/GitExecuteJob.cs",
+      "sha256_utf8_lf": "204c4c186edc5435d54a8fb16af1fd0732298c7a6eb027e60b34543dfac7f324",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "backend/GitHubDelivery.cs",
+      "sha256_utf8_lf": "bc4d4a48981017ac65cd050d2d802911ad2079bfa5cccd22f0c270f6e11e43c3",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "backend/GitInit.cs",
+      "sha256_utf8_lf": "2ab8973eccae6cc472df97259215157e0db6f4453fae75c2c03c611f90b19402",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "backend/GitPerform.cs",
+      "sha256_utf8_lf": "193d0189e958bad18b9e3b986e1074913b1285348852f5ed4c0cadd958af7916",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "backend/GitPolicy.cs",
+      "sha256_utf8_lf": "5cc7ff3d759896732f2fee0244ac0ebb8424c1c77cf7471bb263e2507d49afd8",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
     },
     {
       "file": "backend/GitProcess.cs",
-      "output_sha256": "5b767934aae466ef76101d5190addeec636355bc93fb5f5435c4fcadf2d169ec",
-      "source_attempts": [
-        "004.json"
-      ],
-      "assembly": "unchanged AI file",
-      "review": "Reviewed; Linux real suite passed 60/60"
+      "sha256_utf8_lf": "5b767934aae466ef76101d5190addeec636355bc93fb5f5435c4fcadf2d169ec",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
     },
     {
-      "file": "backend/GitStart.cs",
-      "output_sha256": "c0492259a91f5dc6bb92c1b61a2ad940cb878e66a73f81c7185e7d5d7bef39d3",
-      "source_attempts": [
-        "002.json",
-        "009.json"
-      ],
-      "assembly": "unchanged AI file",
-      "review": "Reviewed; Linux real suite passed 60/60"
+      "file": "backend/GitQueue.cs",
+      "sha256_utf8_lf": "0c745aea86e420521dad01b30491a42e7232521cb1d9c192045128264ff14bfb",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "backend/GitRead.cs",
+      "sha256_utf8_lf": "e4f5ad8a9227c92ea4c5eeb5c57278536df2f4a7f19fa6196a0face7bd623e81",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
     },
     {
       "file": "backend/GitReadOutput.cs",
-      "output_sha256": "16c135fba7451352092601dd48382a5f339e96939ac65b0258d73b8c4d0bf382",
-      "source_attempts": [
-        "003.json",
-        "008.json"
-      ],
-      "assembly": "AI class header plus AI method",
-      "review": "Reviewed; Linux real suite passed 60/60"
+      "sha256_utf8_lf": "16c135fba7451352092601dd48382a5f339e96939ac65b0258d73b8c4d0bf382",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "backend/GitSaveConfiguration.cs",
+      "sha256_utf8_lf": "df7af38bdaf4310875461022c985bbc0ba34377a9a1994706230c5006cad20a6",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "backend/GitSchema.cs",
+      "sha256_utf8_lf": "97c3a2f80a30506b5ab8ddb8a2b2f5565b8238d8157690383d98359ad9fe6b6e",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "backend/GitStart.cs",
+      "sha256_utf8_lf": "44e09c5bca8e71f5a5abb1ac1dde9f8f40c691357a2a5b26108592a10fcf616c",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "backend/GitUrlPolicy.cs",
+      "sha256_utf8_lf": "16d2b007d7f98d9ed9a8d28803d95d760ae18e5daecc3d617c2b0639baac45e9",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "backend/GitWorker.cs",
+      "sha256_utf8_lf": "9130bf391caa46338ab04d8a8b9d79f48c9843e43b021a7a77c993e1666428ba",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "frontend/app/git-config.tsx",
+      "sha256_utf8_lf": "cea9fbe4f43b4866a20c91b606922300ce9cb938c1b5f7e30867d43d110b1f04",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "frontend/app/git-history.tsx",
+      "sha256_utf8_lf": "ab76d1c5b425b7889874300279f4a99bc8ee93aaf1bb389a95e4713ca5f2e2cc",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "frontend/app/git-types.ts",
+      "sha256_utf8_lf": "0c568d16fb544b47c466d573c6a3429bc0308c3040e39c631007386fe8ceee34",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "frontend/app/git.tsx",
+      "sha256_utf8_lf": "e85c727e5f68eb758f19833d5b966a7acfe9b07770038eee53148da6f3b5658c",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "frontend/app/proxy-api.ts",
+      "sha256_utf8_lf": "b38d12dc208b36b39bfbf6112d430b4f0653439fe2a8f9b723c80f1f529377c7",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "frontend/app/proxy-body.ts",
+      "sha256_utf8_lf": "5bddee3e386fbda44708f95a1becfe75a6d3035f10654ff316a63aff97f2b4f6",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "frontend/app/proxy-origins.ts",
+      "sha256_utf8_lf": "c6e54dda0cdcf89d9ccebc1d88c2e1ea9fd451f29356d221d381ba6156902a92",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    },
+    {
+      "file": "frontend/app/proxy-policy.ts",
+      "sha256_utf8_lf": "b96431132265d2abe4b07b1715107ec5a62dda5d1e894d8ac004bfb9ac696300",
+      "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
+      "status": "Linux build, 73 unit cases and API/browser acceptance passed"
+    }
+  ],
+  "reviewed_integration": [
+    "Store schema upgrade",
+    "DI and hosted worker",
+    "API mapping/bind/health",
+    "HTTPS session cookies and setup guard",
+    "page Git navigation and task drawer wiring",
+    "Next standalone/proxy",
+    "Portuguese labels and CSS"
+  ],
+  "qualification": "These task-specific checks do not establish general autonomous programming capability or training of model weights.",
+  "validation": {
+    "unit_passed": 73,
+    "unit_skips": 0,
+    "api_scenarios": 9,
+    "startup_recovery": true,
+    "setup_disabled": true,
+    "browser_roles": [
+      "admin",
+      "manager",
+      "member",
+      "viewer"
+    ],
+    "desktop_mobile": true,
+    "archive_policy_tests": 5,
+    "build_sandbox": "non-root Linux Docker, network none, source/read-only root, caps dropped, no-new-privileges, bounded CPU/memory/pids",
+    "actual_hml_delivery": "pending GitHub workflow"
+  },
+  "preserved_attempts": [
+    {
+      "phase": "orbit-git-hml-20261005-v1",
+      "attempt": "001.json",
+      "file": "backend/GitPolicy.cs",
+      "output_sha256": "e80087ce3432ef64de304c824c347da709924aa2d2857f3d24e6a2fbdd0243c6",
+      "truncated": false
+    },
+    {
+      "phase": "orbit-git-hml-20261005-v1",
+      "attempt": "002.json",
+      "file": "backend/GitSchema.cs",
+      "output_sha256": "f26c90bf2f60abeea4723cb29d7d94fef439259b848a4fbbee25f91c776c6133",
+      "truncated": false
+    },
+    {
+      "phase": "orbit-git-hml-20261005-v1",
+      "attempt": "003.json",
+      "file": "backend/GitProcess.cs",
+      "output_sha256": "6d969af91a022d86375fcf609f585fc66652549bbfda3d51d3f3244643b2f4ed",
+      "truncated": false
+    },
+    {
+      "phase": "orbit-git-hml-20261005-v1",
+      "attempt": "004.json",
+      "file": "backend/GitCheckout.cs",
+      "output_sha256": "674728eb4effca240d79e052a6c40a01ade7dfea9696cd941cb5f696a75aae5d",
+      "truncated": false
+    },
+    {
+      "phase": "orbit-git-hml-20261005-v1",
+      "attempt": "005.json",
+      "file": "backend/GitEndpoints.cs",
+      "output_sha256": "cd7a57697a2526a33219fae80c44f9b03f581ed2ad567d1a7b0dd1ba2d444072",
+      "truncated": false
+    },
+    {
+      "phase": "orbit-git-hml-20261005-v1",
+      "attempt": "006.json",
+      "file": "backend/GitWorker.cs",
+      "output_sha256": "f5023377a8a58867da4cf5e285907077c4ae2c174102f2d57bae1c2fd560b77b",
+      "truncated": false
+    },
+    {
+      "phase": "orbit-git-hml-20261005-v1",
+      "attempt": "007.json",
+      "file": "backend/GitHubDelivery.cs",
+      "output_sha256": "17c214d4273ebcd4a4af866c1121e2cb5831e4ecfcfbbe0e9abf36230d08cea7",
+      "truncated": false
+    },
+    {
+      "phase": "orbit-git-hml-20261005-v1",
+      "attempt": "008.json",
+      "file": "backend/GitPolicy.cs",
+      "output_sha256": "5b90052c2aa92eab2bba433efc9d2d9bbb0eea778f1e22640171e3bd8fa7ac6a",
+      "truncated": false
+    },
+    {
+      "phase": "orbit-git-hml-20261005-v1",
+      "attempt": "009.json",
+      "file": "backend/GitProcess.cs",
+      "output_sha256": "9de7e117e90b9f51b9db6bcecac8b0661558b95a73b3a94418d774d8418b4d7b",
+      "truncated": false
+    },
+    {
+      "phase": "orbit-git-hml-20261005-v1",
+      "attempt": "010.json",
+      "file": "backend/GitCheckout.cs",
+      "output_sha256": "4f46409ab6babd414e07737457202750a31075655a39016ea50a3cf5f00ec574",
+      "truncated": false
+    },
+    {
+      "phase": "orbit-git-hml-20261005-v1",
+      "attempt": "011.json",
+      "file": "backend/GitRead.cs",
+      "output_sha256": "e4f5ad8a9227c92ea4c5eeb5c57278536df2f4a7f19fa6196a0face7bd623e81",
+      "truncated": false
+    },
+    {
+      "phase": "orbit-git-hml-20261005-v1",
+      "attempt": "012.json",
+      "file": "backend/GitConfigure.cs",
+      "output_sha256": "4e7b765972da5a45ce04c9c518f06822d5d128c4ff628b17da9e4a9cc12f1a1e",
+      "truncated": false
+    },
+    {
+      "phase": "orbit-git-hml-20261005-v1",
+      "attempt": "013.json",
+      "file": "backend/GitQueue.cs",
+      "output_sha256": "2b18af29595d13841ecdcefa107f85cbe338a8e7f7f9da94b155191cda42ac93",
+      "truncated": false
+    },
+    {
+      "phase": "orbit-git-hml-20261005-v1",
+      "attempt": "014.json",
+      "file": "backend/GitWorker.cs",
+      "output_sha256": "f402703f1cf54cb6b7e95a837b524250c0f96261cb90ff4a1f718ae85bd20835",
+      "truncated": false
+    },
+    {
+      "phase": "orbit-git-hml-20261005-v1",
+      "attempt": "015.json",
+      "file": "backend/GitPerform.cs",
+      "output_sha256": "12632189d504a7b1f807f3fdafda46746994a3e93f5580d8fd74660575e409ce",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "001.json",
+      "file": "backend/GitPolicy.cs",
+      "output_sha256": "a45389a20621c4c87e9e937b695652e26d9d3712a69faceca7b401f505c6a709",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "002.json",
+      "file": "backend/GitStart.cs",
+      "output_sha256": "92fb9987e416b30fe5390936ed8a0383e66d37d3325879d0345a0690c6843295",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "002a.json",
+      "file": "backend/GitSchema.cs",
+      "output_sha256": "6fb7d66ee532368f4561f28d66a4191ae85c3ccc9cc36c8c36474eb8cf83cf9e",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "002b.json",
+      "file": "schema-patch.json",
+      "output_sha256": "a1004b0af67689f3b6cb77bfe18c04d8bc225ff09a6a42c141a41dd2e919c106",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "002c.json",
+      "file": "schema-patch.json",
+      "output_sha256": "984ee74552cc759769e75f953e5cb36d66b58f7fb5f4f2f395c522d6d999e874",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "003.json",
+      "file": "backend/GitReadOutput.cs",
+      "output_sha256": "e4d530dfbf6c139de1325da168830a41154cf514545fad56e42e63437a1cca83",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "004.json",
+      "file": "backend/GitProcess.cs",
+      "output_sha256": "5b767934aae466ef76101d5190addeec636355bc93fb5f5435c4fcadf2d169ec",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "005.json",
+      "file": "backend/GitUrlPolicy.cs",
+      "output_sha256": "16d2b007d7f98d9ed9a8d28803d95d760ae18e5daecc3d617c2b0639baac45e9",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "006.json",
+      "file": "backend/GitBranchPolicy.cs",
+      "output_sha256": "ae00d3883897fdaa191aa4c9aeaccb22f68f13b837a9e33ab2eb6d67739a31f7",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "007.json",
+      "file": "backend/GitPolicy.cs",
+      "output_sha256": "5cc7ff3d759896732f2fee0244ac0ebb8424c1c77cf7471bb263e2507d49afd8",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "008.json",
+      "file": "backend/GitReadOutput.cs",
+      "output_sha256": "d9989917de256a4e6aeda2ce3baf033aa9af93e0d922a86791f1820ac0aead5b",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "009.json",
+      "file": "backend/GitStart.cs",
+      "output_sha256": "c0492259a91f5dc6bb92c1b61a2ad940cb878e66a73f81c7185e7d5d7bef39d3",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "009a.json",
+      "file": "git-redirect-patch.json",
+      "output_sha256": "d3546ce12a05c9f3e209c310069caf4730cbaea70f9c6401ccad92f1b885d1f4",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "009b.json",
+      "file": "git-redirect-patch.json",
+      "output_sha256": "6011884d1ae291cdbdc94ad79d469b035668a1a539ff12570eb3c4a16cb9c46e",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "010.json",
+      "file": "backend/GitBranchPolicy.cs",
+      "output_sha256": "32f341c2ff6629dc9b2d0426a864b13970d7711c14930108811cec9de71d2eb2",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "010a.json",
+      "file": "backend/GitBranchPolicy.cs",
+      "output_sha256": "43b439857f5cab1fe89b53b1413c94c97800eb1ea870b278774c48d7e4f0a065",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "010b.json",
+      "file": "backend/GitBranchPolicy.cs",
+      "output_sha256": "99ce2d3948bd45ea91abfdcac64905105963e5ab99e0b86bc811218f4fa1cf63",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "011.json",
+      "file": "backend/GitClone.cs",
+      "output_sha256": "2ece43414d3afc91dfc6bf36a8b52649659e187c2d16843bd0d202a9c9ab81a5",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "011a.json",
+      "file": "backend/GitInit.cs",
+      "output_sha256": "2ab8973eccae6cc472df97259215157e0db6f4453fae75c2c03c611f90b19402",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "011b.json",
+      "file": "backend/GitClone.cs",
+      "output_sha256": "aa2bc3e76f6c7ee275823981e3552e3f82fea0bdd9598346e8f9129747e68f12",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "011c.json",
+      "file": "clone-patches.json",
+      "output_sha256": "bf2ddd40d4c2ea2ce44cfe1157616650cf04e5bb07f17e500f02657ec75eb223",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "012.json",
+      "file": "backend/GitCommits.cs",
+      "output_sha256": "4113f4bffbe6a60f9602f4d0b5bd48757713dd068ca12c2ee98db7624d742120",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "013.json",
+      "file": "backend/GitCheckout.cs",
+      "output_sha256": "42dab6465389b6a2c26f50c1895085f1f0898d1c0358a665efa8ecb0902f67ee",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "013a.json",
+      "file": "backend/GitCheckout.cs",
+      "output_sha256": "cff8aac3473a38beab25d20e82e664e8134bafe52ff461c06afd9a681df17926",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "014.json",
+      "file": "backend/GitConfigValidation.cs",
+      "output_sha256": "0558e0194adfc0226dff5761b8e0e11d4a456fd70dced3754de421647233d672",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "015.json",
+      "file": "backend/GitConfigure.cs",
+      "output_sha256": "82caa4c4213cf28a0d473f5fa1cc698a964cd333adcaabbf6f4a0e4d162712e5",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "015a.json",
+      "file": "configure-patches.json",
+      "output_sha256": "e09011ee0888e33a97d968779f9f6e50f4298ffac19eb2e9332ad0fd5eee6810",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "015b.json",
+      "file": "configure-await-patch.json",
+      "output_sha256": "d5f937e8fe2f02837c7d31f73e76f9d51207a4796a6965f5e441ff1205c1d538",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "016.json",
+      "file": "backend/GitSaveConfiguration.cs",
+      "output_sha256": "df7af38bdaf4310875461022c985bbc0ba34377a9a1994706230c5006cad20a6",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "017.json",
+      "file": "backend/GitQueue.cs",
+      "output_sha256": "0c745aea86e420521dad01b30491a42e7232521cb1d9c192045128264ff14bfb",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "018.json",
+      "file": "backend/GitWorker.cs",
+      "output_sha256": "fdc98b1257e823ea70913b125a7f9ad0a8fac1c0e89fb14d383e59cf0718e8b9",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "018a.json",
+      "file": "worker-resume-patches.json",
+      "output_sha256": "f0d490bc9dff5c15456271eb362f994c72650416bfc91d6c9a3dfce4450022a7",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "019.json",
+      "file": "backend/GitPerform.cs",
+      "output_sha256": "0b787efb25459c09efd1654833893dd5de693bb79f9c4ea4cc2b6e9a81da3403",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "019a.json",
+      "file": "backend/GitPerform.cs",
+      "output_sha256": "e0e5118a6938a02b5289c0e9ba7a749adbebace75161d97f50c6be70f236e98d",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "020.json",
+      "file": "backend/GitExecuteJob.cs",
+      "output_sha256": "84f45843666d978ffac3ecdb0241d9b1d737c18aca2fcb87991c565122091683",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "020a.json",
+      "file": "worker-patches.json",
+      "output_sha256": "b43389884e1d5d6b2927721aa1ed472eccbecdbceb52bc18bfcd4f021554987f",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "020b.json",
+      "file": "backend/GitExecuteJob.cs",
+      "output_sha256": "e1cf6cbda66ab2cd6a895f3e2dad9369fe856bb9a479ac313cd9629c47874762",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "021.json",
+      "file": "backend/GitHubDelivery.cs",
+      "output_sha256": "7791cbbec651d7467246d1d575581bb7a05e142efdb051a2b6778fa3fbb9f3a7",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "021a.json",
+      "file": "delivery-client-patches.json",
+      "output_sha256": "baaa29233ec016f8c46d67cd2f34d9958b9d1c007864bc5c0fb04a53683140d8",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "021b.json",
+      "file": "delivery-client-patches.json",
+      "output_sha256": "90122c5598dff8256b6686dbf8664bab833060b472ade03f92351798b8b8b568",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "021c.json",
+      "file": "delivery-resume-patches.json",
+      "output_sha256": "28f6dba9cb94017e727a6b1dd074c64c94f31f0a711328744169d8029e47db12",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "022.json",
+      "file": "backend/GitDeliveryWatch.cs",
+      "output_sha256": "82036c4522f7be446d5e6ed90740487cf3fe62b50cb5724ff84fef80e65ee373",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "022a.json",
+      "file": "delivery-watch-patches.json",
+      "output_sha256": "0532bb0d58d8ee54bdf798d882f7de4299c13cf3f40024559a6553df1bc8f6f7",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "022b.json",
+      "file": "delivery-watch-patches.json",
+      "output_sha256": "a8626af9f808e0a0b657872ca00c5c3aac21b2ba19acf058901d9fa21017201b",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "023.json",
+      "file": "frontend/app/git-types.ts",
+      "output_sha256": "0c568d16fb544b47c466d573c6a3429bc0308c3040e39c631007386fe8ceee34",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "024.json",
+      "file": "frontend/app/git-config.tsx",
+      "output_sha256": "1f6b099bfae07b8c50fed5bc7deb4b36223c5850ee06d13188ac543e5eb961f2",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "024a.json",
+      "file": "frontend/app/git-submit.txt",
+      "output_sha256": "3a3e29fe98deeee37a478474cf0ba23818cf1c44a8db278074d2f959286041f7",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "024b.json",
+      "file": "frontend/app/git-config-render.txt",
+      "output_sha256": "1ec23eb1f3f760c7b59516f37ceadf59fd9cd7dd47139e7ef6dd37b7714e4ffe",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "025.json",
+      "file": "frontend/app/git-history.tsx",
+      "output_sha256": "53f978324bda09fafb23371ab6e9675aab9e9f9e779b30064f7018c6e280d7a2",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "026.json",
+      "file": "frontend/app/git.tsx",
+      "output_sha256": "d7800b2df3e630f410ae077f1b14382bb4bc84ec4ddbbaf7a14390210802b954",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "026a.json",
+      "file": "frontend/app/git-load.txt",
+      "output_sha256": "b76e64fb423e9c85aa36948e0d3e31798fee88b3f38bdb111d1732c804d20a63",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "026b.json",
+      "file": "frontend/app/git-panel-render.txt",
+      "output_sha256": "02525ffbd8e568ae305f7fb6a65ac3978e73835bdc521a74e939082ec39a4b73",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "026c.json",
+      "file": "frontend-import-patches.json",
+      "output_sha256": "ad02af9c514c64875d92f3961d900d89c4b4c8e0a167a0024742a8de1fb5a790",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "027.json",
+      "file": "frontend/app/proxy-policy.ts",
+      "output_sha256": "429b401bc1fd16d3d95a41e0c6427f8282c7a652f24c3f88e0cc1fe7703ae97b",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "027a.json",
+      "file": "frontend/app/proxy-origins.ts",
+      "output_sha256": "c6e54dda0cdcf89d9ccebc1d88c2e1ea9fd451f29356d221d381ba6156902a92",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "027b.json",
+      "file": "frontend/app/proxy-policy.ts",
+      "output_sha256": "ec1a1d9c8e717ce0c82b85a0d30e0076c4d76c6dfb4d3dfa3ef136182bdbbbb6",
+      "truncated": true
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "027c.json",
+      "file": "frontend/app/proxy-api.ts",
+      "output_sha256": "2a74dcf6c44a88e06a0ba561ab510f685c7003fd844361dc584a74256d1df456",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "028.json",
+      "file": "frontend/app/proxy-body.ts",
+      "output_sha256": "f62571b6fee12b346e0869d9a9d7f2fbaf619c98181a2a770f934c0761e14b83",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "028a.json",
+      "file": "proxy-timeout-patch.json",
+      "output_sha256": "c489b1f16808437d07011c05b0236b258fcb8a220cbc3cd5681de95707ca3066",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "029.json",
+      "file": "frontend/app/api/[...path]/route.ts",
+      "output_sha256": "ea0e7f602d587773f8e24dcfa7cda79044a183e1af0088ccc541fc95a9100887",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "029a.json",
+      "file": "proxy-token-patch.json",
+      "output_sha256": "39850011cd67828a0885f39ce064b1613e5eb9cbc00b998c50e59c5d6822c57c",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "030.json",
+      "file": "frontend/next.config.mjs",
+      "output_sha256": "2a0bbf4c05ca03cccce181da4576465c5592fcc1e9ecb5f7b606f4717513baa0",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "031.json",
+      "file": "integration-patches.json",
+      "output_sha256": "5216b7853b12630e15e98e6e69baf654e8ff42636b758f1db4a7df64700445eb",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "032.json",
+      "file": "frontend-patches.json",
+      "output_sha256": "6b5b7cba3f57cd02cbb924cc1dfffc3a9b0fe6d27d7060f4b9cbc9247e14baf4",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "032a.json",
+      "file": "frontend-patches.json",
+      "output_sha256": "33065ea7045f693bf9d514be7cf9fd4e5887281fd68cee289d5a71620d25bb3e",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "033.json",
+      "file": "backend/DeliverySetup.cs",
+      "output_sha256": "4180883a70e084b4de45aa0eb6a0c5f5bd2d9278e554c24dac7cec0edb90d7d6",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "033a.json",
+      "file": "setup-patches.json",
+      "output_sha256": "a7d9cf31e02050241a0d69e64d644ece1f50414e08d3e05d7b393e8983aac4a4",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "034.json",
+      "file": "delivery-patches.json",
+      "output_sha256": "17d6ba3ccf9d47cf003f3bc54a33300b109be3131697210beef4e7752d4e1235",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "034a.json",
+      "file": "startup-service-patch.json",
+      "output_sha256": "33595c4b4fd863fcbf87b58db3399ce4d24590b35cd5f5b7db9bed266928d537",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "034b.json",
+      "file": "startup-bind-patch.json",
+      "output_sha256": "7ee61744528dc11bf8b4e333926342a747935f7b7769c69e3214f377984b14c5",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "034c.json",
+      "file": "startup-auth-patch.json",
+      "output_sha256": "79d3faae4a240762e08bafcc7cd4bf06b2d1f5d3da5821aa339158698f000e59",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "035.json",
+      "file": "hosted-patches.json",
+      "output_sha256": "9bc937111e14ba8ddaf13df4615d38d3ade0425be689852c0703e5f4cad60eeb",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "035a.json",
+      "file": "hosted-label-patches.json",
+      "output_sha256": "9107dd1372308d566ebcbaf68e71fd11d302fe4d3c5af3c0e457d6f958142304",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "035b.json",
+      "file": "health-patch.json",
+      "output_sha256": "eee35dcc5bd618e0725a199bb19ab9826426e4b4415d3aa59aff6de21198f0f4",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "036.json",
+      "file": "resume-job-patches.json",
+      "output_sha256": "ffae9687a86317ece3a7dec04e918bf1442d12cab58036b8f4b2bd707c8fb057",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "037.json",
+      "file": "resume-perform-patch.json",
+      "output_sha256": "c3180b717dd8930930b4612c51b478bd8539b92f70a7a910e3d4f795e3f9345d",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "038.json",
+      "file": "delivery-cancellation-patch.json",
+      "output_sha256": "b25ef4dcafc916222415db8dd22ece7bd004e2655bd4731f4c73631c64c4a5c6",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "039.json",
+      "file": "frontend/app/proxy-policy.ts",
+      "output_sha256": "0c5d9a907c8a6b159d357947d06646658a614a48b93f0a02c4aeb4e78fb85bda",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "040.json",
+      "file": "panel-render-patches.json",
+      "output_sha256": "0c6f37ac85aa312b4f653fe096684959160f6a816798b680d1431940e2a75d46",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "041.json",
+      "file": "config-render-patches.json",
+      "output_sha256": "db05cbb36272beb96ba8181e2f435303b9aaa0afaed00bda340d5bb857e95b46",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "042.json",
+      "file": "page-git-patch.json",
+      "output_sha256": "dd0da787afb2819d24e66fdf29559b03f54251b00dd5d485aa059185728eb775",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "043.json",
+      "file": "bind-fix-patch.json",
+      "output_sha256": "9437acf662eafacc0ff79a59777f31ba4475c27e9977e9e28441c8adb3c39d7a",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "044.json",
+      "file": "panel-pending.txt",
+      "output_sha256": "406891a95d2383c4d590ab054d9ea6faa976a70a85d1a6d2d3f33f0692fd2840",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "045.json",
+      "file": "health-syntax-patch.json",
+      "output_sha256": "8c151076ddf8c28094248ac80566a752e110bb2d954fe8dcf27e98f42c3caa6b",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "046.json",
+      "file": "experiment-spread-patch.json",
+      "output_sha256": "60738743e79344599704b89a8b15e93d552eae97feec95030fb7165f6025d203",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "047.json",
+      "file": "resume-before-checkout.txt",
+      "output_sha256": "1fb6316b3e0eebfa98fb29246bed820b570ed65a1c814011e04ddf8c7c24845e",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "048.json",
+      "file": "resume-delivery.txt",
+      "output_sha256": "2393accce4e428f1da2822f76cf247a7aa518579d7da4766a6acfd2174f7cacb",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "049.json",
+      "file": "resume-catch.txt",
+      "output_sha256": "10678d6a6a3a9b8fb403a84041bec18fc93826a29d67e50bf2889e5a10dd47b6",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "050.json",
+      "file": "proxy-imports.txt",
+      "output_sha256": "8849b23ff037c08848626827ad02809a804707813f4f919a3848936e908fabb4",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "051.json",
+      "file": "proxy-host-null-patch.json",
+      "output_sha256": "c6ef143ed13a90f624535b299e526c4daa603639405d9f4f9910aa39421fe957",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "052.json",
+      "file": "bind-line.txt",
+      "output_sha256": "dc2081844aa834fb576fcbf964a4fa1b9ea1cd334c579e32c679efa0b39b26d1",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "053.json",
+      "file": "proxy-narrowing-patch.json",
+      "output_sha256": "5b02cebcce4f913609ae8bf00fcbbcb3fc9e675c2ed2cce78f94792de173e467",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "054.json",
+      "file": "frontend/app/proxy-api.ts",
+      "output_sha256": "514b7a32d540b632697cf4ee0f2214e4c4b496831a3e3e82a7a020974048c71a",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "055.json",
+      "file": "utf8-clone-patch.json",
+      "output_sha256": "45be82e794dbccb32b4aace02e43cb5a6ca56a5a562eae3bf4c08215d658b89e",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "056.json",
+      "file": "frontend/app/git.css",
+      "output_sha256": "c7e5f63b7c6cb5a5e800cfbba98614498728795b8b248c176fceb98c1e49046c",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "057.json",
+      "file": "git-labels.json",
+      "output_sha256": "a796a2673b762ffc981443462b29d2383395540408925f16ca10120b59883a97",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "058.json",
+      "file": "checkbox.css",
+      "output_sha256": "9f5fc9b84b3923a6d17c8a64b32ef13a8fe9b23282c2de43f01dbb8d02c02719",
+      "truncated": false
     }
   ]
 }

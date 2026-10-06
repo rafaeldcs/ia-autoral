@@ -12,10 +12,11 @@ var proxyToken=runtime["proxyToken"]!.GetValue<string>();
 var builder=WebApplication.CreateBuilder(args);
 var apiPort = Environment.GetEnvironmentVariable("ORBIT_API_PORT") ?? "5088";
 if (!int.TryParse(apiPort, out var port) || port is < 1024 or > 65535) throw new InvalidOperationException("Invalid Orbit port.");
-builder.WebHost.UseUrls($"http://127.0.0.1:{port}");
+builder.WebHost.UseUrls($"http://{DeliverySetup.Bind()}:{port}");
 builder.WebHost.ConfigureKestrel(options=>options.Limits.MaxRequestBodySize=100_000);
 builder.Services.AddSingleton(NpgsqlDataSource.Create(runtime["connectionString"]!.GetValue<string>()));
 builder.Services.AddSingleton<Store>();
+DeliverySetup.Services(builder);
 builder.Services.AddRateLimiter(o=>{o.AddFixedWindowLimiter("login",p=>{p.PermitLimit=15;p.Window=TimeSpan.FromMinutes(1);p.QueueLimit=0;});o.OnRejected=async(c,t)=>{c.HttpContext.Response.StatusCode=429;await c.HttpContext.Response.WriteAsJsonAsync(new{error="Muitas tentativas. Aguarde um minuto."},t);};});
 var app=builder.Build();
 app.UseRouting();app.UseRateLimiter();
@@ -47,9 +48,10 @@ app.Use(async(context,next)=>{
 });
 await app.Services.GetRequiredService<Store>().Initialize();
 Accounts.Map(app);Planning.Map(app);Workflow.Map(app);
+GitEndpoints.Map(app);
 
 app.MapGet("/api/health",async(Store db)=>{
-    try { await db.Query("SELECT 1::text"); return Results.Ok(new{status="ok",database="PostgreSQL",mode="local-experimental"}); }
+    try { await db.Query("SELECT 1::text"); return Results.Ok(new{status="ok",database="PostgreSQL",mode=Environment.GetEnvironmentVariable("ORBIT_PUBLIC_ORIGIN") is null?"local-experimental":"homologacao",revision=Environment.GetEnvironmentVariable("ORBIT_RELEASE_SHA")??"local-development"}); }
     catch(NpgsqlException) { return Results.Json(new{error="PostgreSQL indisponível."},statusCode:503); }
 });
 app.MapGet("/api/projects",async(Store db)=>Results.Json(await db.Query("""

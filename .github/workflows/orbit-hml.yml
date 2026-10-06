@@ -1,0 +1,57 @@
+name: Orbit HML
+run-name: Orbit HML ${{ github.sha }}
+on:
+  push:
+    branches: [codex/local-learning-execution]
+    paths: ['apps/orbit/**', '.github/workflows/orbit-hml.yml']
+  pull_request:
+    paths: ['apps/orbit/**', '.github/workflows/orbit-hml.yml']
+permissions:
+  contents: read
+concurrency:
+  group: orbit-hml-${{ github.event_name }}
+  cancel-in-progress: false
+jobs:
+  validate-build-deliver:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare trusted dependencies (no project execution)
+        run: docker build -f apps/orbit/ops/qa.Dockerfile -t orbit-ci-qa apps/orbit
+      - name: Verify isolation, build, unit and functional tests
+        run: python3 apps/orbit/ops/build_verified.py --image orbit-ci-qa --sha "$GITHUB_SHA"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orbit-validation-${{ github.sha }}
+          path: |
+            apps/orbit/artifacts/*.json
+            apps/orbit/artifacts/*.trx
+            apps/orbit/artifacts/*.png
+            apps/orbit/artifacts/*build.log
+            apps/orbit/artifacts/unit.log
+            apps/orbit/artifacts/functional.log
+      - name: Package validated runtime files
+        if: github.event_name == 'push'
+        run: |
+          docker build -f apps/orbit/ops/api.Dockerfile --label "org.opencontainers.image.revision=$GITHUB_SHA" -t "orbit-hml-api:$GITHUB_SHA" apps/orbit
+          docker build -f apps/orbit/ops/web.Dockerfile --label "org.opencontainers.image.revision=$GITHUB_SHA" -t "orbit-hml-web:$GITHUB_SHA" apps/orbit
+          docker save "orbit-hml-api:$GITHUB_SHA" -o /tmp/api.tar
+          docker save "orbit-hml-web:$GITHUB_SHA" -o /tmp/web.tar
+          tar -C /tmp -czf /tmp/orbit-release.tgz api.tar web.tar
+      - name: Deliver only Orbit to HML, with health check and rollback
+        if: github.event_name == 'push'
+        env:
+          ORBIT_DEPLOY_KEY: ${{ secrets.ORBIT_HML_DEPLOY_KEY }}
+          ORBIT_KNOWN_HOSTS: ${{ secrets.ORBIT_HML_KNOWN_HOSTS }}
+        run: |
+          test -n "$ORBIT_DEPLOY_KEY"
+          test -n "$ORBIT_KNOWN_HOSTS"
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$ORBIT_DEPLOY_KEY" > ~/.ssh/orbit_hml
+          printf '%s\n' "$ORBIT_KNOWN_HOSTS" > ~/.ssh/orbit_known_hosts
+          chmod 600 ~/.ssh/orbit_hml ~/.ssh/orbit_known_hosts
+          ssh -i ~/.ssh/orbit_hml -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=~/.ssh/orbit_known_hosts root@srv1685107.hstgr.cloud "deploy $GITHUB_SHA" < /tmp/orbit-release.tgz
+          rm -f ~/.ssh/orbit_hml

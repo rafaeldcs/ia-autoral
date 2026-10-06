@@ -14,3 +14,28 @@
 .table-scroll table{min-width:600px}.table-scroll th,.table-scroll td{white-space:nowrap}
 
 .simulation-notice{background:#fff8df;border:1px solid #dfbf56;border-radius:9px;padding:14px 18px;color:#614d16;line-height:1.6;font-size:13px;margin-bottom:20px}
+
+/* Local-AI Git interface styles, reviewed. */
+.list-panel .space-y-6 { margin-block: 1.5rem; }
+.list-panel .space-y-6 > * { margin-block-end: 1.5rem; }
+.list-panel .space-y-2 { margin-block: 0.5rem; }
+.list-panel .space-y-2 > * { margin-block-end: 0.5rem; }
+.list-panel .space-y-3 { margin-block: 1rem; }
+.list-panel .space-y-3 > * { margin-block-end: 1rem; }
+.list-panel .flex { display: flex; flex-wrap: wrap; gap: 1rem; border: 1px solid #e9ebf1; padding: 0.5rem; border-radius: 0.5rem; }
+.list-panel .flex-1 { flex: 1; min-width: 180px; }
+.list-panel h2, .list-panel h3 { font-size: 1rem; }
+.list-panel a { color: #5144a0; text-decoration: underline; }
+.list-panel .text-gray-500 { color: #626c80; }
+.list-panel .field { display: flex; flex-direction: column; }
+.list-panel .field input { padding: 0.5rem; border: 1px solid #adb5c5; border-radius: 0.5rem; }
+.list-panel .field input::placeholder { color: #626c80; }
+@media (max-width: 600px) {
+  .list-panel .flex { flex-direction: column; align-items: flex-start; }
+  .list-panel .field input { min-width: 0; max-width: 100%; }
+}
+.list-panel .container { overflow-wrap: anywhere; }
+.list-panel .flex input { min-width: 0; max-width: 100%; }
+
+.list-panel .field:has(input[type="checkbox"]) {display:flex;flex-direction:row;align-items:center;gap:8px;}
+.list-panel .field input[type="checkbox"] {width:18px;height:18px;flex:none;}

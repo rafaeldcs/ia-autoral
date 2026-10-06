@@ -1,26 +1,53 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { allowedRequest, apiBase } from '../../proxy-policy';
+import { boundedBody } from '../../proxy-body';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-async function handle(request: NextRequest, context: {params: Promise<{path: string[]}>}) {
-  const origin = request.headers.get('origin');
-  const host = request.headers.get('host');
-  const port = process.env.ORBIT_WEB_PORT || '3100';
-  const apiPort = process.env.ORBIT_API_PORT || '5088';
-  if (!/^\d{4,5}$/.test(port) || !/^\d{4,5}$/.test(apiPort)) throw Error('Invalid local port');
-  const hosts = [`127.0.0.1:${port}`, `localhost:${port}`];
-  if (!hosts.includes(host || '') || (origin && !hosts.map(h=>`http://${h}`).includes(origin)) || ['cross-site','same-site'].includes(request.headers.get('sec-fetch-site') || '')) return NextResponse.json({error:'Origem não autorizada.'},{status:403});
-  const segments = (await context.params).path;
-  if (segments.some(s=>!/^[-a-zA-Z0-9]+$/.test(s))) return NextResponse.json({error:'Caminho inválido.'},{status:400});
+
+async function handle(request: NextRequest, context: { params: Promise<{ path: string[] }> }) {
+  if (!allowedRequest(request)) return new NextResponse(JSON.stringify({ error: 'Acesso negado' }), { status: 403 });
+  const params = await context.params;
+  const segments = params.path;
+  if (segments.some(seg => !/^[a-zA-Z0-9-]+$/.test(seg))) return new NextResponse(JSON.stringify({ error: 'Caminho inválido' }), { status: 400 });
+
   try {
     const proxyToken = process.env.ORBIT_PROXY_TOKEN;
-    if (!proxyToken) throw Error('Local server configuration missing.');
-    const body = request.method === 'GET' ? undefined : await request.text();
-    if (body && Buffer.byteLength(body)>100000) return NextResponse.json({error:'Solicitação muito grande.'},{status:413});
-    const response = await fetch(`http://127.0.0.1:${apiPort}/api/${segments.join('/')}`, {method:request.method,headers:{'Content-Type':'application/json','X-Orbit-Token':proxyToken,'Cookie':request.headers.get('cookie')||''},body,cache:'no-store',signal:AbortSignal.timeout(12000)});
+    if (!proxyToken) throw new Error('Token ausente');
+    const body = await boundedBody(request);
+    const response = await fetch(apiBase() + '/api/' + segments.join('/'), {
+      method: request.method,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Orbit-Token': proxyToken,
+        'Cookie': request.headers.get('cookie') || ''
+      },
+      body,
+      cache: 'no-store',
+      signal: AbortSignal.timeout(12000),
+      redirect: 'error'
+    });
     const text = await response.text();
-    const headers:Record<string,string>={'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'};
-    const cookie=response.headers.get('set-cookie');if(cookie)headers['Set-Cookie']=cookie;
-    return new NextResponse(text,{status:response.status,headers});
-  } catch {return NextResponse.json({error:'O serviço local está indisponível. Inicie o Orbit e tente novamente.'},{status:503})}
+    if (Buffer.byteLength(text, 'utf8') > 1000000) throw new Error('Corpo muito grande');
+
+    const headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+    headers.append('Cache-Control', 'no-store');
+    headers.append('X-Content-Type-Options', 'nosniff');
+
+    for (const cookie of response.headers.getSetCookie() || []) {
+      headers.append('Set-Cookie', cookie);
+    }
+
+    return new NextResponse(text, { status: response.status, headers });
+  } catch (e) {
+    if (e instanceof Error && e.message === 'BODY_TOO_LARGE') {
+      return new NextResponse(JSON.stringify({ error: 'Corpo muito grande' }), { status: 413 });
+    }
+    return new NextResponse(JSON.stringify({ error: 'Erro interno' }), { status: 503 });
+  }
 }
-export const GET=handle; export const POST=handle; export const PUT=handle;
+
+export const GET = handle;
+export const POST = handle;
+export const PUT = handle;
