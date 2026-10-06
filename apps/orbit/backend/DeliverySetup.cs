@@ -15,6 +15,7 @@ public static class DeliverySetup
         builder.Services.AddSingleton<GitProcess>();
         builder.Services.AddSingleton<GitCheckout>();
         builder.Services.AddSingleton<GitHubDelivery>();
+        builder.Services.AddSingleton<HostedRepository>();
         builder.Services.AddHostedService<GitWorker>();
     }
 

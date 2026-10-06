@@ -1,0 +1,1101 @@
+{
+  "model_id": "Qwen/Qwen3-8B-GGUF",
+  "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+  "weights_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+  "schema": 1,
+  "feature": "Native private Git hosting in Orbit",
+  "baseline_sha": "d1d703f23434681f7971a5d316f68be501065b7c",
+  "weights_modified": false,
+  "local_inference_only": true,
+  "context_tokens": 4096,
+  "output_tokens": 2048,
+  "authorship": "LocalAuthor Qwen3-8B exact responses, exact reviewed model patches and one exact additive CSS fragment. Existing baseline retains its prior authorship. Codex specifications, intensive review, tests, operator infrastructure and documentation.",
+  "reviewer_repaired_draft": "preserved privately and excluded from publication",
+  "application": "No reviewer-written repair of product logic. Every accepted contribution has its original response hash. Some valid edits were selected from otherwise rejected proposals.",
+  "autonomous_programmer_qualified": false,
+  "qualification_scope": "Supervised implementation of native Git hosting for this .NET/Next.js project, not universal programming capability.",
+  "qualification": {
+    "status": "passed verified Linux laboratory",
+    "dotnet_units": 96,
+    "original_api_workflows": 9,
+    "native_git_scenarios": 12,
+    "deployment_policy_checks": 11,
+    "browser_roles": [
+      {
+        "role": "admin",
+        "passed": true
+      },
+      {
+        "role": "manager",
+        "passed": true
+      },
+      {
+        "role": "member",
+        "passed": true
+      },
+      {
+        "role": "viewer",
+        "passed": true
+      }
+    ],
+    "mobile_width": 390,
+    "release_builds": [
+      ".NET Release",
+      "Next.js production/TypeScript"
+    ],
+    "real_git_clients": true,
+    "cancelled_upload_releases_gate": true,
+    "clone_source_preview_escapes_html": true
+  },
+  "knowledge": {
+    "identity": "ORBIT_HOSPEDAGEM_GIT",
+    "sha256": "33cbf18ea3916062a9f72f26f14fbce102a9c8af0537dd408b7e136c04a5a681",
+    "version": 1,
+    "training_allowed": false,
+    "backup_crc_verified": true
+  },
+  "files": [
+    {
+      "file": "backend/HostedSchema.cs",
+      "sha256_utf8_lf": "90cd19a5f499eaa7565ff2fb199daa1d737bcb86002d0788a54bae4565a0c3f7",
+      "local_author_attempts": [
+        {
+          "id": 2,
+          "run": "initial",
+          "response_sha256": "90cd19a5f499eaa7565ff2fb199daa1d737bcb86002d0788a54bae4565a0c3f7"
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedHttpStart.cs",
+      "sha256_utf8_lf": "41e706983e103317f546dbde34ffe9d47ba3d5327057aa24d3067f69be9092b0",
+      "local_author_attempts": [
+        {
+          "id": 20,
+          "run": "initial",
+          "response_sha256": "41e706983e103317f546dbde34ffe9d47ba3d5327057aa24d3067f69be9092b0"
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedPolicy.cs",
+      "sha256_utf8_lf": "c5a489a17c6aa6a4de358c281ca75fde42c3b1863f30892588f7cbd797090b61",
+      "local_author_attempts": [
+        {
+          "id": 19,
+          "run": "author-v3",
+          "response_sha256": "c99fb7354965eb9efa4af3e78c7c8734c7ffa906b23adfb74a420c4d415d0967"
+        },
+        {
+          "id": 47,
+          "run": "author-v4",
+          "response_sha256": "7342cf5990604c390ca84a69e9d0d56022c9558eb6e69531e4a2fa7d869d6294",
+          "reviewed_edit_indices": [
+            0,
+            1,
+            2
+          ]
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/GitProcess.cs",
+      "sha256_utf8_lf": "630f12e825e8e2d4e8a5ecb8e96e4bbfd71a314d47d6e5097d7f52cefe6526e6",
+      "local_author_attempts": [
+        {
+          "id": 46,
+          "run": "author-v4",
+          "response_sha256": "630f12e825e8e2d4e8a5ecb8e96e4bbfd71a314d47d6e5097d7f52cefe6526e6"
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedTree.cs",
+      "sha256_utf8_lf": "72ae213b208cbd2ce48a111cb8c5c9e0a21aa25efe5a08358af745d62e7ba3cd",
+      "local_author_attempts": [
+        {
+          "id": 22,
+          "run": "author-v3",
+          "response_sha256": "c57d78bb06274e0224dbde0291664b7bbd5ddeaa9286eb7e1777d4547e8263b8"
+        },
+        {
+          "id": 51,
+          "run": "author-v4",
+          "response_sha256": "3f4a70e5e446f99e57b825c16ce62a7ab37d9db9f2a339b03f7978d070f8e9da",
+          "reviewed_edit_indices": [
+            0
+          ]
+        },
+        {
+          "id": 77,
+          "run": "author-v4",
+          "response_sha256": "1bcf71be00e87572c2c8097eb2e30d36886ef3a7c0c3570f734baa6ea0f3c052",
+          "reviewed_edit_indices": [
+            0
+          ]
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedExistence.cs",
+      "sha256_utf8_lf": "006bed88dab8c3a34a669a7c882b03d882f7d6f766e67b6965d01f9cdebef5b2",
+      "local_author_attempts": [
+        {
+          "id": 57,
+          "run": "author-v4",
+          "response_sha256": "aa612dd1a052a0246ec79077f57ec0fdbb90e317b4cebd6b09df98d2a82ca2f1"
+        }
+      ],
+      "formatting": {
+        "operation": "remove end-of-line spaces/tabs and extra blank EOF lines only",
+        "before_sha256_utf8_lf": "aa612dd1a052a0246ec79077f57ec0fdbb90e317b4cebd6b09df98d2a82ca2f1",
+        "logic_modified": false
+      },
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedBranches.cs",
+      "sha256_utf8_lf": "9223f60fb0161bafac975703c10bc7a01ceb2db0dbafade2be3388adcc5d6581",
+      "local_author_attempts": [
+        {
+          "id": 60,
+          "run": "author-v4",
+          "response_sha256": "9223f60fb0161bafac975703c10bc7a01ceb2db0dbafade2be3388adcc5d6581"
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedCommits.cs",
+      "sha256_utf8_lf": "a7761ddfb31ca4da39a179c2f8d3f445077bc7b0e6077a2b5fba2df2fed2b7a9",
+      "local_author_attempts": [
+        {
+          "id": 54,
+          "run": "author-v4",
+          "response_sha256": "f496c0c1fcc1cb120b6e7fe548d007f32ce2864a360c9ea4edb679f1a9ce4c22"
+        },
+        {
+          "id": 59,
+          "run": "author-v4",
+          "response_sha256": "e927d881142902d42d24897c9f73c881ad14c6327f9ca3a7af1659b427f990ea",
+          "reviewed_edit_indices": [
+            0
+          ]
+        },
+        {
+          "id": 68,
+          "run": "author-v4",
+          "response_sha256": "b045694d4c77622fb1cb9d1bcf6cef63fbaf774bb491a4b0606dc32f40caf92d",
+          "reviewed_edit_indices": [
+            0
+          ]
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedView.cs",
+      "sha256_utf8_lf": "7db45958c8c717586ad3298e47b0c661f1b684deaf7411d482781d218a68b70e",
+      "local_author_attempts": [
+        {
+          "id": 55,
+          "run": "author-v4",
+          "response_sha256": "a0bc6d0ad22b3858b74050c6a9892190d79c5641bddd71a06025c22ea330c185"
+        },
+        {
+          "id": 61,
+          "run": "author-v4",
+          "response_sha256": "d4ab5c4ce15fdaa7c0f9f4eb891a59f9a43fbc7d88d68112f693d4844d6b0f8d",
+          "reviewed_edit_indices": [
+            0,
+            1,
+            2
+          ]
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedVerifyObject.cs",
+      "sha256_utf8_lf": "df2b3ab7bd98002b534c850eaa6799d212dbd1b7259757573d65d3f54f738191",
+      "local_author_attempts": [
+        {
+          "id": 62,
+          "run": "author-v4",
+          "response_sha256": "df2b3ab7bd98002b534c850eaa6799d212dbd1b7259757573d65d3f54f738191"
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedRepository.cs",
+      "sha256_utf8_lf": "0bf8f9690d0e776b71e641be1eea13c3016a9dfbe77332e19b3145481eb3b962",
+      "local_author_attempts": [
+        {
+          "id": 58,
+          "run": "author-v4",
+          "response_sha256": "91f07668bdcf13aec8f988c5e6c433bcb6599b93a18407dda2cea80431359962"
+        },
+        {
+          "id": 65,
+          "run": "author-v4",
+          "response_sha256": "2fe579e843d93238c5239693289fb0b27d19e2093d1ceb00e65f7bed3e5f2c82",
+          "reviewed_edit_indices": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ]
+        }
+      ],
+      "formatting": {
+        "operation": "remove end-of-line spaces/tabs and extra blank EOF lines only",
+        "before_sha256_utf8_lf": "e50e2226dab00ae292bb0b73a4eb0a829624cc388b3a9a8f7139466a6abe74ea",
+        "logic_modified": false
+      },
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedBlob.cs",
+      "sha256_utf8_lf": "267a01bfbb574b0568ad2aefa4b006e9c28c47c35e93121b35c57d169475b78b",
+      "local_author_attempts": [
+        {
+          "id": 63,
+          "run": "author-v4",
+          "response_sha256": "7e2229414c15b0bb496a7812dd6ce232e285172b88646f4945e8582184b7fd05"
+        },
+        {
+          "id": 66,
+          "run": "author-v4",
+          "response_sha256": "2dcec34c3f423995dd00d8320a4b9d839573f8b00848bcfb09a70c40e6c486fb",
+          "reviewed_edit_indices": [
+            0
+          ]
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedObject.cs",
+      "sha256_utf8_lf": "c3fc739b744d66799b143d6282a24cb0b4b4c4dd871f3b7450719ea56378d695",
+      "local_author_attempts": [
+        {
+          "id": 64,
+          "run": "author-v4",
+          "response_sha256": "fa6254ad9fe6493b0063dd770d1b76d360725ccec796284e57df1e1353984329"
+        }
+      ],
+      "formatting": {
+        "operation": "remove end-of-line spaces/tabs and extra blank EOF lines only",
+        "before_sha256_utf8_lf": "fa6254ad9fe6493b0063dd770d1b76d360725ccec796284e57df1e1353984329",
+        "logic_modified": false
+      },
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedTokenCount.cs",
+      "sha256_utf8_lf": "d7ae6449868e5f321856e0a90170364d947fbcfc39006fbbab588d9f4fa3aaee",
+      "local_author_attempts": [
+        {
+          "id": 79,
+          "run": "author-v4",
+          "response_sha256": "d7ae6449868e5f321856e0a90170364d947fbcfc39006fbbab588d9f4fa3aaee"
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedTokens.cs",
+      "sha256_utf8_lf": "143ef4b5717cf4217adecf9671068ac71bf8b16bb97e8092d313078507c8cd91",
+      "local_author_attempts": [
+        {
+          "id": 72,
+          "run": "author-v4",
+          "response_sha256": "5f51c5d8a68aa691baff3ee9389a9c4dceac6d8c8421fcd8efd5aa461ca7ee50"
+        },
+        {
+          "id": 80,
+          "run": "author-v4",
+          "response_sha256": "f976b5084cc992bc5455d2375107f11b42efdb2e562c970ab184bf7bcfdf7f4a",
+          "reviewed_edit_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        {
+          "id": 92,
+          "run": "author-v4",
+          "response_sha256": "60ed53692636b80696325256319aeabe6b50c8e89d4997070d62b541dff23715",
+          "reviewed_edit_indices": [
+            0
+          ]
+        }
+      ],
+      "formatting": {
+        "operation": "remove end-of-line spaces/tabs and extra blank EOF lines only",
+        "before_sha256_utf8_lf": "7fa164a7e0ef3a5b152d84c9705e26cbcaebc404b82941d91186c9a22ebf92a0",
+        "logic_modified": false
+      },
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedTokenRevoke.cs",
+      "sha256_utf8_lf": "3730775e8a93ca6124d129f445f0b3ef5b4437aae30cf71487e0ef407227ea58",
+      "local_author_attempts": [
+        {
+          "id": 91,
+          "run": "author-v4",
+          "response_sha256": "3730775e8a93ca6124d129f445f0b3ef5b4437aae30cf71487e0ef407227ea58"
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedTokenAuth.cs",
+      "sha256_utf8_lf": "c889539af59d631d9bf060fcdcd81b770a21642eaeba166b807bf1196834e7be",
+      "local_author_attempts": [
+        {
+          "id": 26,
+          "run": "author-v4",
+          "response_sha256": "9cf1c4c1604b5c734e44dd36aa01e74c49ad52dfc9e2fa8df2bffb8179888f25"
+        },
+        {
+          "id": 70,
+          "run": "author-v4",
+          "response_sha256": "f8910482f377cf69661bdfea6e46152529bf8d7eb42d3d899ab8041519551ac9",
+          "reviewed_edit_indices": [
+            0
+          ]
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedCgiRead.cs",
+      "sha256_utf8_lf": "93de5e7cdefa17f0cff12ef4e0edc96936719d3ff9bad5ad6a19d99598891d5c",
+      "local_author_attempts": [
+        {
+          "id": 73,
+          "run": "author-v4",
+          "response_sha256": "5594c1e8dab6529a62c1a0180a317df01f8bb5cbd6d1fefb4267e71248fb0e62"
+        },
+        {
+          "id": 81,
+          "run": "author-v4",
+          "response_sha256": "af986f2c659f46a87f5c7e337c8801823f641cb072c239dd4a525e37c5921cd8",
+          "reviewed_edit_indices": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": 94,
+          "run": "author-v4",
+          "response_sha256": "7d1a30685724ecc8aa3891c2dad19d057cebcea0074311c3fd5e6f7b8041152e",
+          "reviewed_edit_indices": [
+            0
+          ]
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedCgiHeader.cs",
+      "sha256_utf8_lf": "0c1f38bff301bfce96a9b433a844c4819cbc3977594508cb48f7de819e4fd4c8",
+      "local_author_attempts": [
+        {
+          "id": 74,
+          "run": "author-v4",
+          "response_sha256": "c517df9ad859204e8c4c7f5d2e1789598d83b07d660f4554f38a18e9e7250c49"
+        },
+        {
+          "id": 101,
+          "run": "author-v4",
+          "response_sha256": "4e1b8af087d313c32d06165711b8a2e8571e43ecd649c9822ccec09117f3d99e",
+          "reviewed_edit_indices": [
+            0,
+            1,
+            2
+          ]
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedCgiHeaders.cs",
+      "sha256_utf8_lf": "5073fb48ccfc036bdfdcbc0b55bb9cc04f77424a02f3453955ac03cea90599df",
+      "local_author_attempts": [
+        {
+          "id": 83,
+          "run": "author-v4",
+          "response_sha256": "e16d9c2508c2cacc37b44821613640cb16f08366d4f18527464c16a94c6d8fb1"
+        },
+        {
+          "id": 95,
+          "run": "author-v4",
+          "response_sha256": "617e5afcb215b241fb8537be719f7960bea4ac96c12ebc8fd4221cdbbadc2980",
+          "reviewed_edit_indices": [
+            1
+          ]
+        }
+      ],
+      "formatting": {
+        "operation": "remove end-of-line spaces/tabs and extra blank EOF lines only",
+        "before_sha256_utf8_lf": "8d33d6a02fcc1c79e36a5b00012866e737cf45fbc5a0b26f380c603f0297f8c0",
+        "logic_modified": false
+      },
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedCgi.cs",
+      "sha256_utf8_lf": "f079c44052ae1beabefdb3e2b877db1080c4bfd474a4123d3a26791904bfc2d9",
+      "local_author_attempts": [
+        {
+          "id": 76,
+          "run": "author-v4",
+          "response_sha256": "09b4dddcfb236cc31023cca5c6a118009250e834f6c3624b642bc586eea42410"
+        },
+        {
+          "id": 84,
+          "run": "author-v4",
+          "response_sha256": "d2728dd97a851c1853ac1139803a633fd224bf38368c11eff176025e37dfa362",
+          "reviewed_edit_indices": [
+            0
+          ]
+        },
+        {
+          "id": 96,
+          "run": "author-v4",
+          "response_sha256": "7fc0ba4f608f81dab6247fb097c731282c15c2c389cd3caf5edbce2c1fa321dc",
+          "reviewed_edit_indices": [
+            0
+          ]
+        }
+      ],
+      "formatting": {
+        "operation": "remove end-of-line spaces/tabs and extra blank EOF lines only",
+        "before_sha256_utf8_lf": "0989af8557c73d6ccab53db5419e49fd644c4f8e3656846737738788020e54f1",
+        "logic_modified": false
+      },
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedWebPolicy.cs",
+      "sha256_utf8_lf": "50987ad4f81f4290b21d12b0140062589d44a51480a18889d6d14444cf70f1b0",
+      "local_author_attempts": [
+        {
+          "id": 89,
+          "run": "author-v4",
+          "response_sha256": "50987ad4f81f4290b21d12b0140062589d44a51480a18889d6d14444cf70f1b0"
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedHttp.cs",
+      "sha256_utf8_lf": "f3259992e63dcd063b6db3ccf1ae71f019bab0835531cc69587e30be55a48770",
+      "local_author_attempts": [
+        {
+          "id": 97,
+          "run": "author-v4",
+          "response_sha256": "81e525d6e08bbfe725a4c569eff72267da9d51016978d1238dc21785d5dd9722"
+        },
+        {
+          "id": 103,
+          "run": "author-v4",
+          "response_sha256": "2f82439ef700000be5d4aaa42a97bdd00ee8bb5b5f1a2df8518b111ed68c8df9",
+          "reviewed_edit_indices": [
+            0,
+            1
+          ]
+        }
+      ],
+      "formatting": {
+        "operation": "remove end-of-line spaces/tabs and extra blank EOF lines only",
+        "before_sha256_utf8_lf": "8798c3747105275aae76b8e840f802f235fda4a6988043277f6e3bdcd13eb9ed",
+        "logic_modified": false
+      },
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedHttpFacade.cs",
+      "sha256_utf8_lf": "d1d5b959a3261b2e4cf280da3e568a99c9083330d1b57788b3dee65e4f537d2e",
+      "local_author_attempts": [
+        {
+          "id": 102,
+          "run": "author-v4",
+          "response_sha256": "d1d5b959a3261b2e4cf280da3e568a99c9083330d1b57788b3dee65e4f537d2e"
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedRun.cs",
+      "sha256_utf8_lf": "134f5b1bfeae4ad41fedfec9c3595dbc60d8463d6211adff477461fc58e4935a",
+      "local_author_attempts": [
+        {
+          "id": 98,
+          "run": "author-v4",
+          "response_sha256": "61dae0cad48e0de2d95684333a7ab2b1e9b04c6d48b43ab45ecc9976b181d680"
+        },
+        {
+          "id": 104,
+          "run": "author-v4",
+          "response_sha256": "e1cc2338726e51c1cca285349570f9b94cc009b203f6f0699da1829a827758a1",
+          "reviewed_edit_indices": [
+            0,
+            1
+          ]
+        }
+      ],
+      "formatting": {
+        "operation": "remove end-of-line spaces/tabs and extra blank EOF lines only",
+        "before_sha256_utf8_lf": "5497116c7647e13d2eb136d90c43dd557777c662e3bd509dcefa549e3617ba2e",
+        "logic_modified": false
+      },
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedHttpRoutes.cs",
+      "sha256_utf8_lf": "653bee33dcea631f112feb3653640e972af5566a7351b5834347a066001779b1",
+      "local_author_attempts": [
+        {
+          "id": 99,
+          "run": "author-v4",
+          "response_sha256": "653bee33dcea631f112feb3653640e972af5566a7351b5834347a066001779b1"
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedTransport.cs",
+      "sha256_utf8_lf": "b3ab04ade67e87ba12c48929a1f3bdacc41e214ccfef5439d6003c35599cb5c5",
+      "local_author_attempts": [
+        {
+          "id": 109,
+          "run": "author-v4",
+          "response_sha256": "b3ab04ade67e87ba12c48929a1f3bdacc41e214ccfef5439d6003c35599cb5c5"
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/Program.cs",
+      "sha256_utf8_lf": "0d215e9afb90d0e0b072fd7a72032ed3ed691f4ef189a1363831271407778906",
+      "local_author_attempts": [
+        {
+          "id": 29,
+          "run": "author-v4",
+          "response_sha256": "4716f8261fd1d4452d220a3bd128d8f9f7a05580be397423563a23ad969d8031",
+          "reviewed_edit_indices": [
+            0
+          ]
+        },
+        {
+          "id": 87,
+          "run": "author-v4",
+          "response_sha256": "e9a9757180a137fed1976aaa5e00fd55eec4bdc139030b23ad5757aee6a0ecf8",
+          "reviewed_edit_indices": [
+            0
+          ]
+        },
+        {
+          "id": 90,
+          "run": "author-v4",
+          "response_sha256": "0ec7988148b98bd77596a8524c74168b9d0a408f620af75b74c239f6ac00d68e",
+          "reviewed_edit_indices": [
+            0
+          ]
+        },
+        {
+          "id": 105,
+          "run": "author-v4",
+          "response_sha256": "48a7a349aa4cb335234e1d7d0a4efe4c7623c2f3701c97bc2b2475c397ed95f6",
+          "reviewed_edit_indices": [
+            0
+          ]
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/DeliverySetup.cs",
+      "sha256_utf8_lf": "255e8e7fd02f8572c85a5e1c406d17ef367c6398594dea3ef88b085539487b6a",
+      "local_author_attempts": [
+        {
+          "id": 30,
+          "run": "author-v4",
+          "response_sha256": "0da4e0229599972c6558ec1114dd83c498fc2951fdf4ef53a178181693ca9220",
+          "reviewed_edit_indices": [
+            0
+          ]
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/Store.cs",
+      "sha256_utf8_lf": "9ff464e9cc293b699809d1a6415c5f5e7d09aa6ee3de3a4498416c56a8777b7d",
+      "local_author_attempts": [
+        {
+          "id": 31,
+          "run": "author-v4",
+          "response_sha256": "e2c608bdba3de28a3c0b4b358f5c7ab6fff207a7812233fbfa692a82c3eacab7",
+          "reviewed_edit_indices": [
+            0
+          ]
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "frontend/app/git.tsx",
+      "sha256_utf8_lf": "17fa9ff1951f0760bccff11afde4a1a5d4561a9d83c1c1fe86fad454c861fa03",
+      "local_author_attempts": [
+        {
+          "id": 32,
+          "run": "author-v4",
+          "response_sha256": "df56b4823e026cfa8dade82e37196bac75a4b6863cd74072b5acc169f656d15e",
+          "reviewed_edit_indices": [
+            0,
+            1
+          ]
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedRoute.cs",
+      "sha256_utf8_lf": "aaaf182b4ab7ced7e11c1f06533e35561ee3487f1e5f6681ad7a282d9d867b6d",
+      "local_author_attempts": [
+        {
+          "id": 106,
+          "run": "author-v4",
+          "response_sha256": "8b630dc2bb8dfa006a34f81392bc00c47de175ee030fb891b57e9ef9c5e7534b"
+        },
+        {
+          "id": 114,
+          "run": "author-v4",
+          "response_sha256": "b0b6704eace5e4e3bebd3de9c8996a9cf006355f6115dd5c77a0f9fea83f3f78",
+          "reviewed_edit_indices": [
+            0
+          ]
+        },
+        {
+          "id": 123,
+          "run": "author-v4",
+          "response_sha256": "e909018b8ebb5057c1af0d46e6b2f5d2ad6e64ff07847da94e660c41416c6a80",
+          "reviewed_edit_indices": [
+            0
+          ]
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedBodyPolicy.cs",
+      "sha256_utf8_lf": "9b1736154f98fc5e1910a80df76437236f92c05fb91977e249f706d8577535b9",
+      "local_author_attempts": [
+        {
+          "id": 115,
+          "run": "author-v4",
+          "response_sha256": "9b1736154f98fc5e1910a80df76437236f92c05fb91977e249f706d8577535b9"
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedAuthorize.cs",
+      "sha256_utf8_lf": "3234ce14431a684532f9b202def78012211ef14c2bcbcffac49dca2b68ec4f02",
+      "local_author_attempts": [
+        {
+          "id": 116,
+          "run": "author-v4",
+          "response_sha256": "4782e1ff229e1a080a6ee832f5f7dce060bbe0828dddaa1a7d4bd8efe20fbd42"
+        },
+        {
+          "id": 124,
+          "run": "author-v4",
+          "response_sha256": "1d9e0ada615e0c73d8e82f1fde13f0e048f597ab7723b353c3ab71ba020e511e",
+          "reviewed_edit_indices": [
+            0
+          ]
+        }
+      ],
+      "formatting": {
+        "operation": "remove end-of-line spaces/tabs and extra blank EOF lines only",
+        "before_sha256_utf8_lf": "38cf128c5850f6dc383e3866dd9da426dbb4fe4d5005c9ee0ca45d2f7b19bfe2",
+        "logic_modified": false
+      },
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedInput.cs",
+      "sha256_utf8_lf": "15f0f3c2697d6db7a317c939a7855dd2ca72e870da5c4351309421b5d837ec88",
+      "local_author_attempts": [
+        {
+          "id": 125,
+          "run": "author-v4",
+          "response_sha256": "15f0f3c2697d6db7a317c939a7855dd2ca72e870da5c4351309421b5d837ec88"
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedEndpoints.cs",
+      "sha256_utf8_lf": "c53c553c1531de13a87028e01e2e9344a7009b6868d9dec9178f1db282122707",
+      "local_author_attempts": [
+        {
+          "id": 126,
+          "run": "author-v4",
+          "response_sha256": "c53c553c1531de13a87028e01e2e9344a7009b6868d9dec9178f1db282122707"
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedViewRoute.cs",
+      "sha256_utf8_lf": "adef9dfac9ed10246ef35e22110f38b275d8dbb35949e058607d9645cce422ee",
+      "local_author_attempts": [
+        {
+          "id": 127,
+          "run": "author-v4",
+          "response_sha256": "adef9dfac9ed10246ef35e22110f38b275d8dbb35949e058607d9645cce422ee"
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedObjectRoute.cs",
+      "sha256_utf8_lf": "18204b9e4dd7c8d1bc132e550872ab7536013a4a8e13b638596391c71ee2f8a9",
+      "local_author_attempts": [
+        {
+          "id": 129,
+          "run": "author-v4",
+          "response_sha256": "18204b9e4dd7c8d1bc132e550872ab7536013a4a8e13b638596391c71ee2f8a9"
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedTokenList.cs",
+      "sha256_utf8_lf": "61fe818ac44fef807a9020de6149f8e2a72969ff0f5c0b805e1a8c041775d781",
+      "local_author_attempts": [
+        {
+          "id": 38,
+          "run": "author-v4",
+          "response_sha256": "7577c68f25876a89edf87443bb16f205b46a0e99055b164142204d27b1f0fd32"
+        },
+        {
+          "id": 120,
+          "run": "author-v4",
+          "response_sha256": "6c5c23bae76f19402ccb973a646c8655a453455c14fd39672fbef67b622719eb",
+          "reviewed_edit_indices": [
+            0
+          ]
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedCreateRoute.cs",
+      "sha256_utf8_lf": "236c1f9f45c88e018cd006179fda829673ea723e2d27d01a04e9885859ce443b",
+      "local_author_attempts": [
+        {
+          "id": 131,
+          "run": "author-v4",
+          "response_sha256": "236c1f9f45c88e018cd006179fda829673ea723e2d27d01a04e9885859ce443b"
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedTokenRoute.cs",
+      "sha256_utf8_lf": "3511d8fc256cefdd1337cdc8d6d519943322821f8b65bec07d38a408aa0c0be7",
+      "local_author_attempts": [
+        {
+          "id": 39,
+          "run": "author-v4",
+          "response_sha256": "3511d8fc256cefdd1337cdc8d6d519943322821f8b65bec07d38a408aa0c0be7"
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "backend/HostedReadRoute.cs",
+      "sha256_utf8_lf": "4293f8c8c5214aafcdc3124638b515cd21446c90f02f2bf73892f8ec5ccaeb4a",
+      "local_author_attempts": [
+        {
+          "id": 40,
+          "run": "author-v4",
+          "response_sha256": "3d7eb90a710d8ac4b892c372aa037b03a14f4c7c94a89f0c0441869a0afd5f8c"
+        },
+        {
+          "id": 134,
+          "run": "author-v4",
+          "response_sha256": "c107b3f8c56bbe1c9bc9cbbf0d3cd952f945b5dd401a6abe993f1d0aa65dd7c5",
+          "reviewed_edit_indices": [
+            0
+          ]
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "frontend/app/hosted-token.tsx",
+      "sha256_utf8_lf": "9b938ec7746c0a851fe5de15a166187fad92ceb02d946043adc09231a70c1a54",
+      "local_author_attempts": [
+        {
+          "id": 135,
+          "run": "author-v4",
+          "response_sha256": "3e250d41438d62abd029ec147d4338dcdccf108262019bf26c42b1b5c487ffc9"
+        },
+        {
+          "id": 137,
+          "run": "author-v4",
+          "response_sha256": "802073d09a9a2f73462567dd68af8c9bcf916815f304285a931743a12eb41d86",
+          "reviewed_edit_indices": [
+            0,
+            3,
+            5,
+            6,
+            8
+          ]
+        },
+        {
+          "id": 139,
+          "run": "author-v4",
+          "response_sha256": "81db0044e1fc3e749471c4670ff47c41468587745e4b7384afed2b7fa123cd3a",
+          "reviewed_edit_indices": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": 140,
+          "run": "author-v4",
+          "response_sha256": "ab19fda2ef93ae46949db33a4b671887091fbc8a81f75fc111b893aeddb6da52",
+          "reviewed_edit_indices": [
+            1
+          ]
+        },
+        {
+          "id": 141,
+          "run": "author-v4",
+          "response_sha256": "b9a4c628dd9e50d155d69d3fb3b1cb83047f49bf1e5a8c5da402c8fb956847a1",
+          "reviewed_edit_indices": [
+            1
+          ]
+        },
+        {
+          "id": 147,
+          "run": "author-v4",
+          "response_sha256": "7ebe92d16dad19df2519ddd334e80af57ff8af1dc356cf36b61c53d8d31e61cf",
+          "reviewed_edit_indices": [
+            0
+          ]
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "frontend/app/hosted-source.tsx",
+      "sha256_utf8_lf": "9663daaece781905c4a15f35233ff3d9b23d09ac434bbdbf41ab6d9a095b5735",
+      "local_author_attempts": [
+        {
+          "id": 14,
+          "run": "author-v3",
+          "response_sha256": "45d198efbfc9cb6f3acf7738eb2e06b74aaaaf0e3b7609b9f970b7dc824592ea"
+        },
+        {
+          "id": 136,
+          "run": "author-v4",
+          "response_sha256": "ca0544ec26dfbe22c276360a555b3376127f299a8700700a109a15b8ad29e3c2",
+          "reviewed_edit_indices": [
+            0,
+            1
+          ]
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "frontend/app/hosted-commits.tsx",
+      "sha256_utf8_lf": "9715aede4043550169e7733cb1c266f9ed096accfe86dba4f1f8f25c58ed4cda",
+      "local_author_attempts": [
+        {
+          "id": 16,
+          "run": "author-v3",
+          "response_sha256": "ba357b61622d3bc84222ef9183c164253188b7beda047ba32ecc9e5dae89ba3b"
+        },
+        {
+          "id": 45,
+          "run": "author-v4",
+          "response_sha256": "86655b641118dc6dc4add137b5c4db57892c23dff6ac778c8804100e0e5c9ab4",
+          "reviewed_edit_indices": [
+            0,
+            1
+          ]
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "frontend/app/hosted-repository.tsx",
+      "sha256_utf8_lf": "e18b2af1dea13caa7374746f914d3d238ae77d8b9c589e19a04a7936ea1f6656",
+      "local_author_attempts": [
+        {
+          "id": 138,
+          "run": "author-v4",
+          "response_sha256": "dc03b73abdd273214b597d3d9b7428b7fe48a7b6339646c5586e4001c3a93788"
+        },
+        {
+          "id": 143,
+          "run": "author-v4",
+          "response_sha256": "efa2065500f50b0873b3358a9eaf7aad26cce900b1da9a2b5d9844f7589c8ab8",
+          "reviewed_edit_indices": [
+            1
+          ]
+        },
+        {
+          "id": 149,
+          "run": "author-v4",
+          "response_sha256": "45e19d6c5389b1825e30d6384e62a5de6ab18419301bc245e4e20bb35d307e4f",
+          "reviewed_edit_indices": [
+            0
+          ]
+        },
+        {
+          "id": 144,
+          "run": "author-v4",
+          "response_sha256": "ac87bf2a5e122a8cf4e79300cb644ec5c7b12082402554cf1fd45afeeb3109bc",
+          "reviewed_edit_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        },
+        {
+          "id": 145,
+          "run": "author-v4",
+          "response_sha256": "e21c61cfc7f72261329b5ae6519dbddfebbb1c0c58baba3bdef24c5bc6ad86c5",
+          "reviewed_edit_indices": [
+            1
+          ]
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "frontend/app/hosted.css",
+      "sha256_utf8_lf": "f4a51345cddbe288e360a5ed8403bee805c85b6651c13b7e7ac82a0125f2e75a",
+      "local_author_attempts": [
+        {
+          "id": 44,
+          "run": "author-v4",
+          "response_sha256": "d3017430cd73aa03cbedb11d9afd30b38a005f54463acec432610f934166663e"
+        },
+        {
+          "id": 146,
+          "run": "author-v4",
+          "response_sha256": "e4822fcfc295109bacd976515ed02d2630faf98243d5c49f29a61e455b922dd0",
+          "reviewed_edit_indices": [
+            0
+          ]
+        },
+        {
+          "id": 150,
+          "run": "author-v4",
+          "response_sha256": "3e99255621d3182e76b3446b2236f956e48dd1ddf59dbb1dcac0f95917217c14",
+          "reviewed_edit_indices": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": 152,
+          "run": "author-v4",
+          "response_sha256": "cbc6ec094ecfb5a92056fd8b41c4f8192f5f1adf45a335860fa91932d7bbfc05",
+          "assembly": "exact additive CSS fragment; newline join only"
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    },
+    {
+      "file": "frontend/app/layout.tsx",
+      "sha256_utf8_lf": "601dae0319f0477d07f7dba799ccbae6647dd84ffb23b335a949cb8873752c81",
+      "local_author_attempts": [
+        {
+          "id": 33,
+          "run": "author-v4",
+          "response_sha256": "2c78f2fd4310316d6be0e8cfd969fbc5b4aab0b5146760a20fd86073635e9359",
+          "reviewed_edit_indices": [
+            0
+          ]
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/exact model patch/exact additive fragment; declared mechanical whitespace formatting only; no reviewer logic repair"
+    }
+  ],
+  "limitations": [
+    "Workspace-wide roles; no separate project membership ACL",
+    "20 MiB request, 512 MiB total Git volume, 16000-byte file preview and bounded metadata",
+    "No SSH, LFS, pull requests or code editor",
+    "Native push stores code; deployment uses the separate reviewed GitHub CI recipe",
+    "The development UI on port3100 is a preview; native HTTPS Git requires the configured gateway"
+  ],
+  "hml_acceptance": "Confirmed separately by exact CI revision and private real HTTPS Git receipt; no stored credentials in this document"
+}

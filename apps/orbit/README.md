@@ -1,8 +1,30 @@
 # Orbit — projetos, Git e entregas
 
 C#/.NET 10, Next.js 16 e PostgreSQL. Quadros Scrum/Kanban, backlog, sprints,
-gráficos de fluxo, equipe e auditoria. **Código e entregas** associa GitHub ao
-projeto, relaciona commits às tarefas e acompanha pull, push e publicação.
+gráficos de fluxo, equipe e auditoria. **Código e entregas** hospeda um repositório
+Git privado por projeto e também pode associar GitHub para pull, push e publicação.
+
+## Repositório do próprio Orbit
+
+Abra Código e entregas e use **Criar repositório neste projeto** como administrador
+ou gestor. Copie a URL para clone e crie seu token pessoal; colaboradores podem
+marcar Permitir push, leitores só podem gerar acesso de leitura. No Git, use seu
+e-mail Orbit como usuário e o token como senha. Não coloque o token na URL.
+
+Clone, faça commits localmente e envie para `main`. O Orbit guarda o histórico no
+servidor, exibe arquivos/branches/commits e relaciona as chaves às tarefas. Token
+expira em 30 dias e pode ser revogado na mesma tela. O token do Orbit é independente
+do token GitHub da seção abaixo. Todos os usuários ativos do workspace podem ler;
+não há ACL de membros independente por projeto nesta versão.
+
+Limites: 20 MiB por requisição/push, 32 MiB por resposta Git, 512 MiB compartilhados
+com os checkouts; prévia textual até 16 KB, 200 entradas por árvore, 100 branches,
+20 commits e enumeração de objetos limitada. Para projetos maiores, clone para
+consultar e dimensione armazenamento/limites com revisão. Force push e exclusão
+de branches são recusados. Não há Git LFS, SSH Git, pull requests ou editor online.
+
+Push para a hospedagem própria armazena o código; a receita de deploy já entregue
+continua sendo disparada no GitHub. Novos repositórios precisam de pipeline revisado.
 
 O experimento original foi preservado. `README_EXPERIMENTO_LOCAL.md` é o registro
 histórico e descreve a versão antiga; seus comandos não são o procedimento desta
@@ -52,3 +74,7 @@ Banco separado, chaves persistentes, Git limitado a 512 MiB; não altera aplica�
 ShopAir existentes. Inferência LocalAuthor permanece na máquina local.
 
 Procedimento completo: [ops/PASSO_A_PASSO_HML.md](ops/PASSO_A_PASSO_HML.md).
+
+A UI direta na porta 3100 é o preview de desenvolvimento. Git nativo por HTTPS
+usa o gateway configurado em `ops/Caddyfile`; para clone/push desta entrega,
+use a URL mostrada no endereço HML acima.

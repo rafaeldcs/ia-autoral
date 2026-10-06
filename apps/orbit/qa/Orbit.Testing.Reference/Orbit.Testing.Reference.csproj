@@ -29,6 +29,10 @@
     <Compile Include="../../backend/GitCheckout.cs" Link="GitCheckout.cs" />
     <Compile Include="../../backend/GitHubDelivery.cs" Link="GitHubDelivery.cs" />
     <Compile Include="../../backend/GitDeliveryWatch.cs" Link="GitDeliveryWatch.cs" />
+    <Compile Include="../../backend/HostedPolicy.cs" Link="HostedPolicy.cs" />
+    <Compile Include="../../backend/HostedHttpStart.cs" Link="HostedHttpStart.cs" />
+    <Compile Include="../../backend/HostedCgi*.cs" Link="%(Filename)%(Extension)" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
 </Project>

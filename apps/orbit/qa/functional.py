@@ -122,6 +122,8 @@ try:
     report={'tests':result.testsRun,'failures':len(result.failures),'errors':len(result.errors),'skips':len(result.skipped)}
     (E/'functional.json').write_text(json.dumps(report,indent=2))
     if not result.wasSuccessful():raise RuntimeError('API/proxy cases failed')
+    from hosted import run_hosted
+    run_hosted(Functional,request,client,sql)
     # Startup recovery uses durable DB state. No rerun is attempted for delivery-phase recovery.
     stop(api_process)
     for phase in ['git','delivery']:

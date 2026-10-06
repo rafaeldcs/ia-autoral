@@ -1,0 +1,77 @@
+.hosted-repository {
+  min-width: 0;
+  max-width: 100%;
+  padding: 1rem;
+  border: 1px solid #dfe1eb;
+  border-radius: 12px;
+  display: grid;
+  gap: 1rem;
+}
+.hosted-repository * {
+  box-sizing: border-box;
+}
+.hosted-repository textarea {
+  width: 100%;
+  min-height: 4em;
+  resize: vertical;
+}
+.hosted-repository input[type="text"], .hosted-repository input[type="password"] {
+  width: 100%;
+  padding: 0.5rem;
+}
+.hosted-repository input[type="checkbox"] {
+  width: auto;
+}
+.hosted-repository label {
+  display: flex;
+  gap: 0.5rem;
+}
+.hosted-repository .hosted-token form { display: grid; gap: 1rem;
+  grid-gap: 0.6rem;
+}
+.hosted-repository button {
+  visibility: visible;
+  border: 1px solid;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background-color: #6658d9;
+  color: white;
+}
+.hosted-repository button:hover {
+  background-color: #5a4fcf;
+}
+.hosted-repository button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.hosted-repository .hosted-file-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.hosted-repository .hosted-token-item, .hosted-repository .hosted-commit {
+  border: 1px solid;
+  padding: 0.5rem;
+  overflow-wrap: anywhere;
+}
+.hosted-repository pre, .hosted-repository code {
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-width: 100%;
+  background-color: #f8f8fc;
+  color: #202239;
+  font-family: monospace;
+}
+.hosted-repository h3, .hosted-repository h4 {
+  margin: 0;
+}
+@media (max-width: 390px) {
+  .hosted-repository {
+    overflow-wrap: anywhere;
+  }
+}
+
+.hosted-repository .hosted-token-item > div {
+  display: grid;
+  gap: 0.25rem;
+}

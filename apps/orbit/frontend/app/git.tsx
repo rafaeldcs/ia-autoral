@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import {api,type Account} from './client';
 import {GitConfig} from './git-config';
 import {GitHistory} from './git-history';
+import {HostedRepositoryPanel} from './hosted-repository';
 import type { GitState } from './git-types';
 
 export function GitPanel({ project, account, issues, onOpen }: { project: string; account: Account; issues: { id: string; key: string }[]; onOpen: (id: string) => void }) {
@@ -77,6 +78,14 @@ const pending = data.jobs.some(j => j.status === 'queued' || j.status === 'runni
 return (
   <section className="list-panel" style={{display: 'grid', gap: '1rem', padding: '1rem', overflowWrap: 'anywhere'}}>
     <h2>Código e entregas.</h2>
+    <HostedRepositoryPanel
+      project={project}
+      account={account}
+      issues={issues}
+      onOpen={onOpen}
+      key={project}
+    />
+    <h3>Conexão com GitHub</h3>
     {account.role === 'admin' && (
       <GitConfig
         key={project + (repo?.url || '')}

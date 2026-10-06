@@ -6,6 +6,12 @@ public sealed partial class GitProcess
 {
     public async Task<string> Run(string directory, string token, CancellationToken cancel, params string[] args)
     {
+        var result = await RunExact(directory, token, cancel, args);
+        return result.Trim();
+    }
+
+    public async Task<string> RunExact(string directory, string token, CancellationToken cancel, params string[] args)
+    {
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancel);
         cts.CancelAfter(TimeSpan.FromSeconds(60));
         using var p = new Process { StartInfo = Start(directory, token, args) };
@@ -24,6 +30,6 @@ public sealed partial class GitProcess
             throw new InvalidOperationException("Operação Git cancelada ou excedeu o tempo limite.");
         }
         if (p.ExitCode != 0) throw new InvalidOperationException("Erro no processo Git.");
-        return (await stdout).Trim();
+        return await stdout;
     }
 }

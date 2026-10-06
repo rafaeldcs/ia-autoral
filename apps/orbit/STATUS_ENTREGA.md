@@ -2,7 +2,7 @@
 
 ## Estado da entrega
 
-Implementação integrada e validada no laboratório Linux: 73 testes unitários,
+Integração GitHub anterior validada no laboratório Linux: 73 testes unitários,
 9 cenários de API com PostgreSQL, retomada após reinício, bloqueio de setup,
 7 testes da política de pacotes e navegador real nos quatro papéis, desktop e
 celular. Compilações .NET Release e Next.js/TypeScript aprovadas.
@@ -22,6 +22,50 @@ mais o SHA retornado por `/api/health`; este documento não substitui o recibo d
 
 Infraestrutura isolada ativa em HML: configuração privada, chave CI restrita,
 volume Git de 512 MiB, rota HTTPS própria, banco e chaves persistentes.
+
+## Hospedagem Git própria — autoria e aceite
+
+Resultado do laboratório em 06/10/2026: **96 testes unitários, 21 cenários de
+API (12 de hospedagem nativa), 11 verificações da infraestrutura, navegador nos
+quatro papéis e tela de 390 px aprovados**. .NET Release e Next.js/TypeScript
+compilaram. As 48 fontes/alterações de produto têm hashes e origens locais no
+recibo. A suíte geral LocalAuthor teve 415 aprovações e três testes de symlink
+indisponíveis no Windows; o CI Linux executa a suíte geral separadamente.
+
+A ampliação oferece um repositório bare privado por projeto, URL para clone e
+push por HTTPS, arquivos, branches e commits vinculados às tarefas. Tokens
+pessoais expiram em 30 dias, são revogáveis e limitados a um projeto. O papel
+atual da conta e a permissão do token são verificados em cada operação.
+
+O requisito do usuário é que o **LocalAuthor escreva a implementação**. Um
+rascunho que recebeu reparos diretos do Codex foi separado e não compõe essa
+entrega. As novas fontes são respostas locais e patches locais aplicados
+literalmente depois da revisão. O Codex especifica contratos, devolve erros,
+prepara testes e opera a infraestrutura. O recibo específico dessa ampliação é
+`LOCAL_AI_HOSTING_PROVENANCE.json`; ele não altera a autoria da versão original.
+
+O aceite exige compilação .NET/TypeScript, testes de política e CGI, PostgreSQL
+descartável, clientes Git reais e navegador nos quatro papéis. Inclui entrada
+fragmentada, cancelamento com liberação do escritor, token de leitura emitido
+por colaborador, revogação, alteração de papel, limite de bytes e hooks
+desativados. Resultados definitivos constam do recibo, CI e SHA de saúde.
+
+O código rastreado de `apps/orbit` é importado como repositório independente no
+projeto ORB, com a revisão GitHub de origem registrada no commit e no recibo
+privado. Seu SHA Git pode diferir do SHA do monorepositório servido pela API.
+Isso permite navegar pelo próprio código do Orbit sem carregar toda a história
+do LocalAuthor. A importação inicial não substitui histórico existente.
+
+Limites: 20 MiB por requisição de push, volume de 512 MiB compartilhado com a
+integração GitHub, prévia de arquivo até 16.000 bytes e orçamento de 32 KiB para
+metadados. Histórias grandes podem exigir clone para leitura. Os papéis são
+globais no workspace; não há ACL independente por projeto. Não há LFS, SSH,
+pull requests nem editor de código nesta ampliação. Push no repositório nativo
+armazena código; deploy continua pela receita GitHub revisada do Orbit.
+
+A lição durável usa o mecanismo de consulta do LocalAuthor, com hash e versão.
+Esse registro e a orientação nas tentativas não são treinamento dos pesos nem
+prova de autonomia geral.
 
 O Orbit original foi preservado em `apps/orbit`, no repositório `ia-autoral`,
 para manter o histórico sem alterar a pasta original do experimento.

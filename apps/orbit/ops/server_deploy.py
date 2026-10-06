@@ -54,6 +54,34 @@ def load_once(path,tag,sha):
         if image.get('User')!='10001:10001' or image.get('Labels',{}).get('org.opencontainers.image.revision')!=sha or image.get('Labels',{}).get('io.localauthor.application')!='orbit-hml':raise ValueError('Occupied release tag rejected')
         # A rerun must not replace the currently deployed or rollback image with
         # a new build under the same SHA. Dependency updates require a new commit.
+
+def backup_repositories(source,target):
+    """Caller pauses only the Orbit API. Preserve links without following them."""
+    source=pathlib.Path(source);target=pathlib.Path(target)
+    if source.is_symlink() or not source.is_dir():raise ValueError('Invalid repository root')
+    total=0
+    for directory,_,files in os.walk(source,followlinks=False):
+        for name in files:
+            path=pathlib.Path(directory)/name
+            if not path.is_symlink():total+=path.stat().st_size
+    if total>512*1024**2:raise ValueError('Repository snapshot exceeds capacity')
+    with os.fdopen(os.open(target,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600),'wb') as output:
+        with tarfile.open(fileobj=output,mode='w:gz',dereference=False) as archive:
+            archive.add(source,arcname='repos')
+
+def backup_state(repositories):
+    """Pause the sole application writer before both database and Git snapshots."""
+    backups=ROOT/'backups';backups.mkdir(mode=0o700,exist_ok=True)
+    stamp=time.strftime('%Y%m%d-%H%M%S')
+    compose('stop','api')
+    try:
+        with os.fdopen(os.open(backups/(stamp+'.sql'),os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600),'wb') as output:
+            result=subprocess.run(['docker','compose','--project-directory',str(ROOT),'exec','-T','db','pg_dump','-U','orbit','orbit'],stdout=output,stderr=subprocess.PIPE,timeout=60)
+            if result.returncode:raise RuntimeError('Orbit backup failed')
+        backup_repositories(repositories,backups/(stamp+'-repos.tar.gz'))
+    except Exception:
+        compose('start','api')
+        raise
 def main():
     command=os.environ.get('SSH_ORIGINAL_COMMAND','')
     match=re.fullmatch(r'deploy ([0-9a-f]{40})',command)
@@ -89,10 +117,7 @@ def main():
         old=environment(); previous=old.get('ORBIT_RELEASE_SHA','')
         # Additive schema changes only; backup before restarting this application's single worker.
         if previous:
-            backups=ROOT/'backups';backups.mkdir(mode=0o700,exist_ok=True)
-            with (backups/(time.strftime('%Y%m%d-%H%M%S')+'.sql')).open('wb') as output:
-                r=subprocess.run(['docker','compose','--project-directory',str(ROOT),'exec','-T','db','pg_dump','-U','orbit','orbit'],stdout=output,stderr=subprocess.PIPE,timeout=60)
-                if r.returncode:raise RuntimeError('Orbit backup failed')
+            backup_state(repositories)
         save_environment(old|{'ORBIT_RELEASE_SHA':sha})
         try:
             compose('up','-d','--no-build','--pull','never');health(sha)

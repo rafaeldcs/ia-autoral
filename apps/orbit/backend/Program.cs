@@ -17,10 +17,14 @@ builder.WebHost.ConfigureKestrel(options=>options.Limits.MaxRequestBodySize=100_
 builder.Services.AddSingleton(NpgsqlDataSource.Create(runtime["connectionString"]!.GetValue<string>()));
 builder.Services.AddSingleton<Store>();
 DeliverySetup.Services(builder);
-builder.Services.AddRateLimiter(o=>{o.AddFixedWindowLimiter("login",p=>{p.PermitLimit=15;p.Window=TimeSpan.FromMinutes(1);p.QueueLimit=0;});o.OnRejected=async(c,t)=>{c.HttpContext.Response.StatusCode=429;await c.HttpContext.Response.WriteAsJsonAsync(new{error="Muitas tentativas. Aguarde um minuto."},t);};});
+builder.Services.AddRateLimiter(o=>{o.AddFixedWindowLimiter("login",p=>{p.PermitLimit=15;p.Window=TimeSpan.FromMinutes(1);p.QueueLimit=0;});o.AddFixedWindowLimiter("git",p=>{p.PermitLimit=120;p.Window=TimeSpan.FromMinutes(1);p.QueueLimit=0;});o.OnRejected=async(c,t)=>{c.HttpContext.Response.StatusCode=429;await c.HttpContext.Response.WriteAsJsonAsync(new{error="Muitas tentativas. Aguarde um minuto."},t);};});
 var app=builder.Build();
 app.UseRouting();app.UseRateLimiter();
 app.Use(async(context,next)=>{
+    if (context.Request.Path.StartsWithSegments("/git")) {
+        await next();
+        return;
+    }
     var token=context.Request.Headers["X-Orbit-Token"].ToString();
     if(!CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(token),Encoding.UTF8.GetBytes(proxyToken))) {
         context.Response.StatusCode=401; await context.Response.WriteAsJsonAsync(new{error="Acesso local não autorizado."});return;
@@ -34,7 +38,7 @@ app.Use(async(context,next)=>{
             var role=Accounts.Role(context);var write=context.Request.Method!="GET";
             var admin=path.StartsWith("/api/users")||path=="/api/audit";
             var manager=(path=="/api/projects"&&write)||(path.Contains("/sprints")&&write);
-            if((admin&&role!="admin")||(manager&&!Accounts.Manage(context))||(write&&role=="viewer"&&path!="/api/auth/logout")) {
+            if((admin&&role!="admin")||(manager&&!Accounts.Manage(context))||(write&&role=="viewer"&&!HostedWebPolicy.ReadOnlyPost(path,context.Request.Method)&&path!="/api/auth/logout")) {
                 context.Response.StatusCode=403;await context.Response.WriteAsJsonAsync(new{error="Seu nível de acesso não permite esta ação."});return;
             }
         }
@@ -49,6 +53,8 @@ app.Use(async(context,next)=>{
 await app.Services.GetRequiredService<Store>().Initialize();
 Accounts.Map(app);Planning.Map(app);Workflow.Map(app);
 GitEndpoints.Map(app);
+HostedEndpoints.Map(app);
+HostedHttp.Map(app);
 
 app.MapGet("/api/health",async(Store db)=>{
     try { await db.Query("SELECT 1::text"); return Results.Ok(new{status="ok",database="PostgreSQL",mode=Environment.GetEnvironmentVariable("ORBIT_PUBLIC_ORIGIN") is null?"local-experimental":"homologacao",revision=Environment.GetEnvironmentVariable("ORBIT_RELEASE_SHA")??"local-development"}); }

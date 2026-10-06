@@ -17,7 +17,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Prepare trusted dependencies (no project execution)
-        run: docker build -f apps/orbit/ops/qa.Dockerfile -t orbit-ci-qa apps/orbit
+        run: |
+          docker build -f apps/orbit/ops/qa.Dockerfile -t orbit-ci-qa apps/orbit
+          docker pull caddy:2-alpine
+      - name: Validate trusted gateway configuration
+        run: |
+          docker run --rm --network none --read-only --cap-drop ALL --cap-add NET_BIND_SERVICE \
+            --security-opt no-new-privileges --memory 64m --memory-swap 64m --cpus 0.5 --pids-limit 32 \
+            --tmpfs /data:rw,nosuid,nodev,size=16m --tmpfs /config:rw,nosuid,nodev,size=16m \
+            --mount "type=bind,src=${{ github.workspace }}/apps/orbit/ops/Caddyfile,dst=/etc/caddy/Caddyfile,readonly" \
+            --entrypoint caddy caddy:2-alpine validate --config /etc/caddy/Caddyfile
       - name: Verify isolation, build, unit and functional tests
         run: python3 apps/orbit/ops/build_verified.py --image orbit-ci-qa --sha "$GITHUB_SHA"
       - uses: actions/upload-artifact@v4

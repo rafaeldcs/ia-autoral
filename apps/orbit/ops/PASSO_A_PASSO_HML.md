@@ -15,7 +15,33 @@ revise, teste no sandbox, faça commit e push. Push na branch de trabalho dispar
 **Orbit HML**. Aguarde testes e saúde, não apenas o início do job. Git, Actions e
 `/api/health` precisam identificar a mesma revisão.
 
-## CI e servidor
+## Hospedagem Git
+
+Código e entregas possui Repositório do Orbit, além da conexão GitHub. Crie como
+administrador/gestor, copie URL HTTPS, gere token pessoal e use no cliente Git com
+seu e-mail. O token GitHub não autentica na hospedagem própria. Faça o primeiro
+commit e `git push origin main`; os demais desenvolvedores usam clone/pull/push.
+
+Diretórios bare ficam em `data/repos/hosted/UUID.git`, no volume persistente de
+512 MiB. Não remova essa pasta nas atualizações. `/git/*` é encaminhado pelo gateway
+à API e exige token com projeto/escopo/papel/expiração válidos. Os papéis são globais
+no workspace. Para revogar, use a lista de tokens pessoais ou desative a conta.
+
+O controlador faz snapshot de `data/repos` com a API pausada antes da troca de
+imagens; mantém também backup PostgreSQL. Conserve ambos com as chaves. Restauração
+é manual com a API parada, validação `git fsck`, conferência das refs e permissões
+UID 10001. Não restaure snapshots seguindo links para fora da pasta de dados.
+
+Antes da primeira entrega desta funcionalidade, o administrador precisa aplicar
+o novo `ops/Caddyfile` em `/opt/orbit-hml/Caddyfile` e a versão revisada do controlador
+em `/usr/local/libexec/orbit-hml-deploy.py`, guardar originais e validar o Caddy.
+Esses arquivos privilegiados continuam fora do pacote automático de imagens.
+
+Um push apenas na URL Orbit não dispara o workflow GitHub. A receita existente
+continua publicando o Orbit por `codex/local-learning-execution`; novos projetos
+e pipelines exigem configuração e revisão próprias.
+
+## CI e servidor (configuração)
 
 Secrets `ORBIT_HML_DEPLOY_KEY` e `ORBIT_HML_KNOWN_HOSTS` são exclusivos da receita.
 No servidor, a chave usa `restrict` e comando forçado: apenas `deploy SHA_COMPLETO`.
