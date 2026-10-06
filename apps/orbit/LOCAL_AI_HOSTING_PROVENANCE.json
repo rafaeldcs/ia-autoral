@@ -9,7 +9,7 @@
   "local_inference_only": true,
   "context_tokens": 4096,
   "output_tokens": 2048,
-  "authorship": "LocalAuthor Qwen3-8B exact responses, exact reviewed model patches and one exact additive CSS fragment. Existing baseline retains its prior authorship. Codex specifications, intensive review, tests, operator infrastructure and documentation.",
+  "authorship": "LocalAuthor Qwen3-8B exact responses, exact reviewed model patches and one exact additive CSS fragment. Existing baseline retains its prior authorship. Codex specifications, intensive review, tests, operator infrastructure and documentation. Nine C# files received declared mechanical trailing-whitespace formatting; no product logic was repaired by the reviewer.",
   "reviewer_repaired_draft": "preserved privately and excluded from publication",
   "application": "No reviewer-written repair of product logic. Every accepted contribution has its original response hash. Some valid edits were selected from otherwise rejected proposals.",
   "autonomous_programmer_qualified": false,
@@ -45,7 +45,8 @@
     ],
     "real_git_clients": true,
     "cancelled_upload_releases_gate": true,
-    "clone_source_preview_escapes_html": true
+    "clone_source_preview_escapes_html": true,
+    "initial_git_config_waits_for_data": true
   },
   "knowledge": {
     "identity": "ORBIT_HOSPEDAGEM_GIT",
@@ -682,7 +683,7 @@
     },
     {
       "file": "frontend/app/git.tsx",
-      "sha256_utf8_lf": "17fa9ff1951f0760bccff11afde4a1a5d4561a9d83c1c1fe86fad454c861fa03",
+      "sha256_utf8_lf": "c9f52a756f82973f16c8118294cf511bb76860bba418aad9bf97d5af7e627693",
       "local_author_attempts": [
         {
           "id": 32,
@@ -691,6 +692,17 @@
           "reviewed_edit_indices": [
             0,
             1
+          ]
+        },
+        {
+          "id": 153,
+          "run": "author-v4",
+          "response_sha256": "50ea67ba63e01697aadfaf0a7a8557959fbcc7dacbf4a4a0c729007ea30fce5d",
+          "reviewed_edit_indices": [
+            0,
+            1,
+            2,
+            3
           ]
         }
       ],

@@ -13,11 +13,22 @@ const {chromium, expect} = require(fs.existsSync('/opt/qa/node_modules/@playwrig
       await page.getByLabel('E-mail',{exact:true}).fill(role+'@orbit.test');
       await page.getByLabel('Senha',{exact:true}).fill(process.env.ORBIT_QA_PASSWORD);
       await page.getByRole('button',{name:'Entrar',exact:true}).click();
+      let releaseInitialGit, firstGitBlocked=false, holdFirstGit=role==='admin';
+      const initialGitReady=new Promise(resolve=>{releaseInitialGit=resolve;});
+      if(role==='admin')await page.route('**/api/projects/*/git',async route=>{
+        if(holdFirstGit&&route.request().method()==='GET'){
+          holdFirstGit=false;firstGitBlocked=true;await initialGitReady;
+        }
+        await route.continue();
+      });
       const gitTab=page.getByRole('main').getByRole('button',{name:'Código e entregas',exact:true});
       await expect(gitTab).toBeVisible();
       await gitTab.click();
       await expect(page.getByRole('heading',{name:/Código e entregas/})).toBeVisible();
       if(role==='admin') {
+        await expect.poll(()=>firstGitBlocked).toBe(true);
+        try {await expect(page.getByRole('button',{name:'Salvar repositório'})).toHaveCount(0);}
+        finally {releaseInitialGit();}
         await expect(page.getByRole('button',{name:'Salvar repositório'})).toBeVisible();
         await page.getByLabel('Branch',{exact:true}).fill('invalid branch');
         await page.getByRole('button',{name:'Salvar repositório'}).click();

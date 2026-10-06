@@ -10,6 +10,7 @@ export function GitPanel({ project, account, issues, onOpen }: { project: string
   const [data, setData] = useState<GitState>({ repository: null, jobs: [] });
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const [confirmAction, setConfirmAction] = useState<'push' | 'deploy' | ''>('');
   const [notice, setNotice] = useState('');
   const canManage = account.role==='admin'||account.role==='manager';
@@ -19,6 +20,7 @@ export function GitPanel({ project, account, issues, onOpen }: { project: string
     try {
       const res = await api<GitState>(`/projects/${project}/git`);
       setData(res);
+      setLoaded(true);
       setError(null);
     } catch (err) {
       setError('Erro ao carregar dados do repositório');
@@ -27,6 +29,7 @@ export function GitPanel({ project, account, issues, onOpen }: { project: string
 
   useEffect(() => {
     if (project) {
+      setLoaded(false);
       load();
     }
     return () => {
@@ -86,7 +89,7 @@ return (
       key={project}
     />
     <h3>Conexão com GitHub</h3>
-    {account.role === 'admin' && (
+    {account.role === 'admin' && loaded && (
       <GitConfig
         key={project + (repo?.url || '')}
         project={project}
