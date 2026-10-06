@@ -1,0 +1,73 @@
+{
+  "model_id": "Qwen/Qwen3-8B-GGUF",
+  "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+  "weights_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+  "weights_modified": false,
+  "context_tokens": 4096,
+  "output_tokens": 2048,
+  "reasoning_budget": 1024,
+  "product_authorship": "Local model; original baseline Codex; tests and controllers Codex",
+  "complete_delivery": false,
+  "files": [
+    {
+      "file": "backend/GitPolicy.cs",
+      "output_sha256": "5cc7ff3d759896732f2fee0244ac0ebb8424c1c77cf7471bb263e2507d49afd8",
+      "source_attempts": [
+        "001.json",
+        "007.json"
+      ],
+      "assembly": "unchanged AI file",
+      "review": "Reviewed; Linux real suite passed 60/60"
+    },
+    {
+      "file": "backend/GitUrlPolicy.cs",
+      "output_sha256": "16d2b007d7f98d9ed9a8d28803d95d760ae18e5daecc3d617c2b0639baac45e9",
+      "source_attempts": [
+        "005.json"
+      ],
+      "assembly": "unchanged AI file",
+      "review": "Reviewed; Linux real suite passed 60/60"
+    },
+    {
+      "file": "backend/GitBranchPolicy.cs",
+      "output_sha256": "99ce2d3948bd45ea91abfdcac64905105963e5ab99e0b86bc811218f4fa1cf63",
+      "source_attempts": [
+        "006.json",
+        "010.json",
+        "010a.json",
+        "010b.json"
+      ],
+      "assembly": "unchanged AI file",
+      "review": "Reviewed; Linux real suite passed 60/60"
+    },
+    {
+      "file": "backend/GitProcess.cs",
+      "output_sha256": "5b767934aae466ef76101d5190addeec636355bc93fb5f5435c4fcadf2d169ec",
+      "source_attempts": [
+        "004.json"
+      ],
+      "assembly": "unchanged AI file",
+      "review": "Reviewed; Linux real suite passed 60/60"
+    },
+    {
+      "file": "backend/GitStart.cs",
+      "output_sha256": "c0492259a91f5dc6bb92c1b61a2ad940cb878e66a73f81c7185e7d5d7bef39d3",
+      "source_attempts": [
+        "002.json",
+        "009.json"
+      ],
+      "assembly": "unchanged AI file",
+      "review": "Reviewed; Linux real suite passed 60/60"
+    },
+    {
+      "file": "backend/GitReadOutput.cs",
+      "output_sha256": "16c135fba7451352092601dd48382a5f339e96939ac65b0258d73b8c4d0bf382",
+      "source_attempts": [
+        "003.json",
+        "008.json"
+      ],
+      "assembly": "AI class header plus AI method",
+      "review": "Reviewed; Linux real suite passed 60/60"
+    }
+  ]
+}
