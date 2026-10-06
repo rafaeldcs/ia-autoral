@@ -11,7 +11,7 @@ no banco; vazio preserva o salvo e Remover token limpa a credencial. Não apague
 as chaves de Data Protection: perder essas chaves torna tokens guardados ilegíveis.
 
 Desenvolva no computador de trabalho, faça pull antes de editar, resolva conflitos,
-revise, teste no sandbox, faça commit e push. Alterações de `apps/orbit` disparam
+revise, teste no sandbox, faça commit e push. Push na branch de trabalho dispara
 **Orbit HML**. Aguarde testes e saúde, não apenas o início do job. Git, Actions e
 `/api/health` precisam identificar a mesma revisão.
 
@@ -22,6 +22,11 @@ No servidor, a chave usa `restrict` e comando forçado: apenas `deploy SHA_COMPL
 Nunca copie chave de administrador para o workflow. O controlador root-owned em
 `/usr/local/libexec/orbit-hml-deploy.py` recebe apenas imagens API/Web permitidas;
 não executa scripts enviados no pacote.
+
+Controlador e Compose são instalados pelo administrador após revisão. O pacote
+automático não substitui esses arquivos privilegiados; mudanças de infraestrutura
+ou novas receitas precisam dessa etapa de manutenção. Imagens existentes de um
+SHA não são sobrescritas por rerun: atualização de dependência exige novo commit.
 
 Destino `/opt/orbit-hml`: `compose.yml`, `Caddyfile`, `.env`, `runtime.json`, `data/`
 e backups. Preserve permissões e sigilo. Banco: volume `orbit-hml_db`; chaves:
@@ -51,7 +56,8 @@ conferência do backup e manutenção, não é automática.
 
 Na HML: `docker compose --project-directory /opt/orbit-hml ps` e logs apenas do
 Orbit. Não divulgue env/runtime/cookies/tokens/backups. Nunca use prune global;
-o controlador retém somente atual/anterior das imagens Orbit. Backups precisam
+o controlador retém somente atual/anterior das imagens Orbit, além de remover
+imagens sem tag identificadas explicitamente como Orbit. Backups precisam
 de retenção/revisão conforme o uso; armazenamento infinito não é prometido.
 
 Falta de espaço, credencial ou conexão deve ser resolvida antes de reenfileirar.

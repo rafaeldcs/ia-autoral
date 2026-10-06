@@ -7,7 +7,6 @@
   "output_tokens": 2048,
   "reasoning_budget": 1024,
   "product_authorship": "Local model new product modules; original baseline Codex; mechanical assembly/review, tests and infrastructure Codex",
-  "complete_delivery": false,
   "files": [
     {
       "file": "backend/DeliverySetup.cs",
@@ -161,7 +160,7 @@
     },
     {
       "file": "frontend/app/git.tsx",
-      "sha256_utf8_lf": "e85c727e5f68eb758f19833d5b966a7acfe9b07770038eee53148da6f3b5658c",
+      "sha256_utf8_lf": "66f21f120e9ae9ce15144953576fa951cad05565497631a5174fa616781d2eb1",
       "authorship": "local Qwen3-8B, specification/review/fragment assembly by Codex",
       "status": "Linux build, 73 unit cases and API/browser acceptance passed"
     },
@@ -213,9 +212,17 @@
       "viewer"
     ],
     "desktop_mobile": true,
-    "archive_policy_tests": 5,
+    "archive_policy_tests": 7,
     "build_sandbox": "non-root Linux Docker, network none, source/read-only root, caps dropped, no-new-privileges, bounded CPU/memory/pids",
-    "actual_hml_delivery": "pending GitHub workflow"
+    "actual_hml_delivery": {
+      "initial_live_sha": "42da83eef6accc4bb610cf3fabd26f96f967a25e",
+      "https_health": true,
+      "actual_pull": true,
+      "actual_authenticated_push": true,
+      "temporary_credential_removed": true,
+      "authoritative_receipt": "GitHub Actions Orbit HML for each SHA and matching live /api/health; metadata is not CI approval"
+    },
+    "missing_credential_ui": true
   },
   "preserved_attempts": [
     {
@@ -1000,6 +1007,27 @@
       "attempt": "058.json",
       "file": "checkbox.css",
       "output_sha256": "9f5fc9b84b3923a6d17c8a64b32ef13a8fe9b23282c2de43f01dbb8d02c02719",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "059.json",
+      "file": "credential-notice.txt",
+      "output_sha256": "5c447c4eba6452dae1e16dbcae68ded50e849e5a9c15ae5364030fa1700d4294",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "060.json",
+      "file": "credential-push-patch.json",
+      "output_sha256": "44395a1843dddde0e7f3bf6d1530e7b88901581fdd7556c64b68302b0ba5e40c",
+      "truncated": false
+    },
+    {
+      "phase": "reasoning-v2",
+      "attempt": "061.json",
+      "file": "credential-deploy-patch.json",
+      "output_sha256": "4d3d5e63aa59205e20b951085632fb96d77467855aed2dd6aa873d6fd4e87e27",
       "truncated": false
     }
   ]

@@ -43,7 +43,9 @@ Dependências são preparadas separadamente. Código roda apenas em sandbox Linu
 verificado, sem rede/privilégios, com fontes somente leitura e limites de recursos.
 Evidências ficam em `artifacts` (ignorado pelo Git) e no artifact do Actions.
 
-Commit/push em `apps/orbit` dispara `.github/workflows/orbit-hml.yml`. HML recebe
+Push na branch de trabalho dispara `.github/workflows/orbit-hml.yml`, inclusive
+quando só a documentação mudou, para que todo SHA exibido no Git tenha pipeline.
+HML recebe
 imagens por SHA, verifica saúde e restaura as anteriores se necessário. A troca
 provoca breve reinício do Orbit; o worker retoma entregas sem iniciar novo deploy.
 Banco separado, chaves persistentes, Git limitado a 512 MiB; não altera aplicações

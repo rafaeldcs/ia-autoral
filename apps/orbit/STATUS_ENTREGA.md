@@ -4,13 +4,24 @@
 
 Implementação integrada e validada no laboratório Linux: 73 testes unitários,
 9 cenários de API com PostgreSQL, retomada após reinício, bloqueio de setup,
-5 testes da política de pacotes e navegador real nos quatro papéis, desktop e
+7 testes da política de pacotes e navegador real nos quatro papéis, desktop e
 celular. Compilações .NET Release e Next.js/TypeScript aprovadas.
-Esta revisão aguarda primeiro workflow e entrega real em HML; esses testes
-**não** comprovam push autenticado ou deploy completo.
+Também houve login, pull e push autenticado reais na HML, na revisão
+`42da83eef6accc4bb610cf3fabd26f96f967a25e`. O push confirmou sincronização de uma
+árvore limpa; não criou mudança remota artificial. A credencial temporária foi
+removida antes da próxima publicação e não permanece configurada para uso diário.
 
-Infraestrutura isolada preparada em HML: configuração privada, chave CI restrita
-e volume Git de 512 MiB. A rota pública ainda não foi ativada.
+O endereço HTTPS respondeu saudável nessa revisão. As primeiras duas tentativas
+do CI validaram o produto, mas falharam na preparação Docker. Dependências ausentes,
+opções tmpfs no YAML e capability necessária ao executável oficial Caddy foram
+corrigidas na infraestrutura do Codex. O controlador agora interpreta Compose
+com o CLI real antes do laboratório. Não se atribuem esses erros ao modelo local.
+
+O resultado definitivo de **cada publicação** é o job Orbit HML no GitHub Actions,
+mais o SHA retornado por `/api/health`; este documento não substitui o recibo de CI.
+
+Infraestrutura isolada ativa em HML: configuração privada, chave CI restrita,
+volume Git de 512 MiB, rota HTTPS própria, banco e chaves persistentes.
 
 O Orbit original foi preservado em `apps/orbit`, no repositório `ia-autoral`,
 para manter o histórico sem alterar a pasta original do experimento.
@@ -34,7 +45,7 @@ sistema de arquivos somente leitura, código montado somente para leitura, ausê
 de rede/portas/socket Docker, limites de memória/CPU/processos e área temporária.
 Código gerado não foi executado diretamente no Windows.
 
-## Comportamento previsto para a entrega completa
+## Comportamento implementado
 
 - Projeto Scrum/Kanban ligado a um repositório GitHub e branch explícita.
 - Administradores configuram conexão; administradores/gestores executam operações.
@@ -43,9 +54,17 @@ Código gerado não foi executado diretamente no Windows.
 - Deploy separado no servidor HML da ShopAir, por revisão imutável, com testes,
   verificação de saúde e recuperação da versão anterior.
 
-O endereço candidato `orbit.hml-app.shopair.com.br` aponta para o servidor HML e
-está coberto pelo certificado existente. A criação da rota depende da validação
-da aplicação completa. Os demais sites, bancos e containers devem ser preservados.
+`https://orbit.hml-app.shopair.com.br` usa o servidor HML e o certificado existente.
+Os demais sites, bancos e containers são preservados. A cópia original do Orbit
+na área de trabalho não foi migrada nem teve seu banco alterado: o workspace HML
+é separado, com os exemplos originais identificados e sua própria conta.
+
+A credencial administradora do Orbit fica privada, protegida por DPAPI no Windows,
+com auxiliar de acesso na pasta privada da entrega; não é a conta Super ShopAir.
+Configure um token GitHub restrito ao repositório para usar escrita/publicação
+pela interface. Sem token, ela informa a necessidade e desabilita os botões de
+escrita, mantendo pull público disponível. O pipeline do push feito por Git no
+computador de trabalho funciona com sua chave CI própria.
 
 Referências: [Git pull](https://git-scm.com/docs/git-pull),
 [controle de deploys no GitHub](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/control-deployments)

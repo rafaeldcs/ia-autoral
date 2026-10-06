@@ -42,7 +42,7 @@ services:
       - ./runtime.json:/run/orbit/runtime.json:ro
       - ./data/keys:/var/lib/orbit/keys
       - ./data/repos:/var/lib/orbit/repos
-    tmpfs: [/tmp:rw,nosuid,nodev,size=64m]
+    tmpfs: ['/tmp:rw,nosuid,nodev,size=64m']
     depends_on:
       db: {condition: service_healthy}
     mem_limit: 256m
@@ -64,7 +64,7 @@ services:
       ORBIT_PUBLIC_ORIGIN: https://orbit.hml-app.shopair.com.br
       ORBIT_RELEASE_SHA: ${ORBIT_RELEASE_SHA}
       NEXT_TELEMETRY_DISABLED: '1'
-    tmpfs: [/tmp:rw,nosuid,nodev,size=64m]
+    tmpfs: ['/tmp:rw,nosuid,nodev,size=64m']
     depends_on: [api]
     mem_limit: 320m
     cpus: 0.40
@@ -74,10 +74,12 @@ services:
     image: caddy:2-alpine
     restart: unless-stopped
     cap_drop: [ALL]
+    # Official Caddy binary carries this file capability; dropping it prevents exec.
+    cap_add: [NET_BIND_SERVICE]
     security_opt: [no-new-privileges:true]
     ports: ['127.0.0.1:8089:8080']
     volumes: [./Caddyfile:/etc/caddy/Caddyfile:ro]
-    tmpfs: [/data:rw,nosuid,nodev,size=16m, /config:rw,nosuid,nodev,size=16m]
+    tmpfs: ['/data:rw,nosuid,nodev,size=16m', '/config:rw,nosuid,nodev,size=16m']
     depends_on: [web]
     mem_limit: 48m
     cpus: 0.10

@@ -15,6 +15,17 @@ def main():
     a = p.parse_args()
     if len(a.sha) != 40 or any(c not in '0123456789abcdef' for c in a.sha):
         raise ValueError('A full immutable SHA is required')
+    # Compose is interpreted by the real Docker CLI, without starting any host application.
+    compose_env=os.environ|{'ORBIT_RELEASE_SHA':a.sha,'ORBIT_DB_PASSWORD':'synthetic-policy-check','ORBIT_PROXY_TOKEN':'synthetic-policy-check'}
+    plan=json.loads(subprocess.run(['docker','compose','-f',str(ROOT/'ops/compose.yml'),'config','--format','json'],env=compose_env,capture_output=True,text=True,check=True).stdout)
+    for service in ['api','web']:
+        settings=plan['services'][service]
+        assert settings['tmpfs']==['/tmp:rw,nosuid,nodev,size=64m']
+        assert settings['user']=='10001:10001' and settings['read_only'] and settings['cap_drop']==['ALL']
+        assert not settings.get('ports') and settings['pids_limit']<=96
+    gateway=plan['services']['gateway']
+    assert gateway['tmpfs']==['/data:rw,nosuid,nodev,size=16m','/config:rw,nosuid,nodev,size=16m']
+    assert len(gateway['ports'])==1 and gateway['ports'][0]['host_ip']=='127.0.0.1' and gateway['ports'][0]['published']=='8089'
     image = run('docker', 'image', 'inspect', a.image, '--format', '{{.Id}}').stdout.strip()
     container = run('docker', 'create', '--network', 'none', '--read-only', '--user', '10001:10001',
         '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges', '--memory', '3g', '--memory-swap', '3g',

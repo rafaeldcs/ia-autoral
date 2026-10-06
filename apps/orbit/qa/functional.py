@@ -135,6 +135,8 @@ try:
         stop(api_process)
     env['ORBIT_DISABLE_SETUP']='1';api_process=start(['dotnet','/tmp/api/Orbit.Api.dll'],'api-final');wait_api()
     assert request(client(),'/api/auth/setup','POST',{'name':'x','email':'x@x.test','password':password})[0]==403
+    # Synthetic protected credential enables confirmation/cancel tests; no network action is executed.
+    assert request(Functional.admin,Functional.path,'POST',Functional.config|{'token':'synthetic-ui-only'})[0]==200
     browser_env=env|{'ORBIT_QA_PASSWORD':password,'ORBIT_QA_PROJECT':Functional.project}
     browser=subprocess.run(['node','/tmp/qa/browser.cjs'],env=browser_env)
     assert browser.returncode==0

@@ -7,7 +7,7 @@ No uploaded script, Compose file, shell command or path is executed on the host.
 import fcntl, hashlib, json, os, pathlib, re, shutil, subprocess, sys, tarfile, tempfile, time, urllib.request
 
 ROOT=pathlib.Path('/opt/orbit-hml')
-MAX=400*1024**2
+MAX=700*1024**2
 def run(*args,**kwargs):
     return subprocess.run(args,check=True,capture_output=True,text=True,timeout=180,**kwargs)
 def check_revision(sha):
@@ -32,7 +32,9 @@ def health(sha):
     raise RuntimeError('Orbit revision health check failed')
 def validate_image(path,tag,sha):
     with tarfile.open(path,'r:') as archive:
-        manifest=json.load(archive.extractfile('manifest.json'))
+        member=archive.getmember('manifest.json')
+        if not member.isfile() or member.size>65536:raise ValueError('Manifest size/type rejected')
+        manifest=json.loads(archive.extractfile(member).read(65537))
         if len(manifest)!=1 or manifest[0].get('RepoTags')!=[tag]:raise ValueError('Unexpected image tags')
         config_name=manifest[0]['Config']
         if not re.fullmatch(r'(?:blobs/sha256/)?[0-9a-f]{64}(?:\.json)?',config_name):raise ValueError('Invalid config path')
@@ -41,7 +43,17 @@ def validate_image(path,tag,sha):
         expected=config_name.removeprefix('blobs/sha256/').removesuffix('.json')
         if hashlib.sha256(config_bytes).hexdigest()!=expected:raise ValueError('Image config digest mismatch')
         c=config['config']
-        if c.get('User')!='10001:10001' or c.get('Labels',{}).get('org.opencontainers.image.revision')!=sha:raise ValueError('Image identity check failed')
+        if c.get('User')!='10001:10001' or c.get('Labels',{}).get('org.opencontainers.image.revision')!=sha or c.get('Labels',{}).get('io.localauthor.application')!='orbit-hml':raise ValueError('Image identity check failed')
+def load_once(path,tag,sha):
+    validate_image(path,tag,sha)
+    existing=subprocess.run(['docker','image','inspect',tag],capture_output=True,text=True,timeout=20)
+    if existing.returncode:
+        run('docker','load','-i',str(path))
+    else:
+        image=json.loads(existing.stdout)[0]['Config']
+        if image.get('User')!='10001:10001' or image.get('Labels',{}).get('org.opencontainers.image.revision')!=sha or image.get('Labels',{}).get('io.localauthor.application')!='orbit-hml':raise ValueError('Occupied release tag rejected')
+        # A rerun must not replace the currently deployed or rollback image with
+        # a new build under the same SHA. Dependency updates require a new commit.
 def main():
     command=os.environ.get('SSH_ORIGINAL_COMMAND','')
     match=re.fullmatch(r'deploy ([0-9a-f]{40})',command)
@@ -50,7 +62,14 @@ def main():
     ROOT.mkdir(mode=0o700,exist_ok=True)
     lock=(ROOT/'deploy.lock').open('a');fcntl.flock(lock,fcntl.LOCK_EX)
     check_revision(sha)
-    if shutil.disk_usage(ROOT).free<1024**3:raise ValueError('Insufficient disk capacity; no other applications are cleaned')
+    repositories=ROOT/'data/repos'
+    if not os.path.ismount(repositories) or shutil.disk_usage(repositories).total>512*1024**2:raise ValueError('Bounded repository mount unavailable')
+    if shutil.disk_usage(ROOT).free<3*MAX+128*1024**2:raise ValueError('Insufficient disk capacity; no other applications are cleaned')
+    # Bootstrap only this recipe's two trusted infrastructure dependencies.
+    # No SDK/build image is installed on HML, and existing services are not restarted.
+    for image in ['postgres:18.6-alpine','caddy:2-alpine']:
+        present=subprocess.run(['docker','image','inspect',image],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,timeout=20)
+        if present.returncode:run('docker','pull',image)
     with tempfile.TemporaryDirectory(prefix='incoming-',dir=ROOT) as work:
         work=pathlib.Path(work);bundle=work/'bundle.tgz';total=0
         with bundle.open('wb') as output:
@@ -65,8 +84,7 @@ def main():
             for member in members:
                 with (work/member.name).open('wb') as output:shutil.copyfileobj(archive.extractfile(member),output)
         for part in ['api','web']:
-            path=work/(part+'.tar');validate_image(path,'orbit-hml-'+part+':'+sha,sha)
-            run('docker','load','-i',str(path))
+            path=work/(part+'.tar');load_once(path,'orbit-hml-'+part+':'+sha,sha)
         check_revision(sha)
         old=environment(); previous=old.get('ORBIT_RELEASE_SHA','')
         # Additive schema changes only; backup before restarting this application's single worker.
@@ -89,6 +107,11 @@ def main():
                 tag=image.rsplit(':',1)[-1]
                 if re.fullmatch('[0-9a-f]{40}',tag) and tag not in [sha,previous]:
                     subprocess.run(['docker','image','rm',image],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+        # Re-running the same SHA may replace its tag. Only explicitly labelled,
+        # unused Orbit images are eligible; Docker still refuses any image in use.
+        dangling=run('docker','images','--filter','label=io.localauthor.application=orbit-hml','--filter','dangling=true','--format','{{.ID}}').stdout.splitlines()
+        for image in dangling:
+            subprocess.run(['docker','image','rm',image],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
         print(json.dumps({'status':'healthy','revision':sha,'application':'orbit-hml'}))
 if __name__=='__main__':
     try:main()

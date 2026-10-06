@@ -3,7 +3,6 @@ run-name: Orbit HML ${{ github.sha }}
 on:
   push:
     branches: [codex/local-learning-execution]
-    paths: ['apps/orbit/**', '.github/workflows/orbit-hml.yml']
   pull_request:
     paths: ['apps/orbit/**', '.github/workflows/orbit-hml.yml']
 permissions:
@@ -35,8 +34,8 @@ jobs:
       - name: Package validated runtime files
         if: github.event_name == 'push'
         run: |
-          docker build -f apps/orbit/ops/api.Dockerfile --label "org.opencontainers.image.revision=$GITHUB_SHA" -t "orbit-hml-api:$GITHUB_SHA" apps/orbit
-          docker build -f apps/orbit/ops/web.Dockerfile --label "org.opencontainers.image.revision=$GITHUB_SHA" -t "orbit-hml-web:$GITHUB_SHA" apps/orbit
+          docker build -f apps/orbit/ops/api.Dockerfile --label io.localauthor.application=orbit-hml --label "org.opencontainers.image.revision=$GITHUB_SHA" -t "orbit-hml-api:$GITHUB_SHA" apps/orbit
+          docker build -f apps/orbit/ops/web.Dockerfile --label io.localauthor.application=orbit-hml --label "org.opencontainers.image.revision=$GITHUB_SHA" -t "orbit-hml-web:$GITHUB_SHA" apps/orbit
           docker save "orbit-hml-api:$GITHUB_SHA" -o /tmp/api.tar
           docker save "orbit-hml-web:$GITHUB_SHA" -o /tmp/web.tar
           tar -C /tmp -czf /tmp/orbit-release.tgz api.tar web.tar

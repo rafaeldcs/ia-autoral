@@ -103,14 +103,14 @@ return (
             <button
               className="button secondary"
               onClick={() => setConfirmAction('push')}
-              disabled={busy || pending || !repo.head}
+              disabled={busy || pending || !repo.head || !repo.hasCredential}
             >
               Enviar commits
             </button>
             <button
               className="button secondary"
               onClick={() => setConfirmAction('deploy')}
-              disabled={busy || pending || !repo.head || !repo.autoDeploy}
+              disabled={busy || pending || !repo.head || !repo.autoDeploy || !repo.hasCredential}
             >
               Publicar homologação
             </button>
@@ -133,6 +133,8 @@ return (
     )}
     {notice && <p role="status">{notice}</p>}
     {error && <p role="alert">{error}</p>}
+{canManage && repo && !repo.hasCredential && <p role="status">Para enviar commits ou publicar, peça ao administrador para configurar um token GitHub. Atualizar código de repositórios públicos não exige token.</p>}
+
     <GitHistory
       repository={repo}
       jobs={data.jobs}

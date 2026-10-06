@@ -50,6 +50,18 @@ const {chromium, expect} = require(fs.existsSync('/opt/qa/node_modules/@playwrig
       }
       expect(errors).toEqual([]);report.push({role,passed:true});await context.close();
     }
+    const missing=await browser.newContext();const page=await missing.newPage();
+    await page.goto('http://127.0.0.1:3100');
+    await page.getByLabel('E-mail',{exact:true}).fill('admin@orbit.test');
+    await page.getByLabel('Senha',{exact:true}).fill(process.env.ORBIT_QA_PASSWORD);
+    await page.getByRole('button',{name:'Entrar',exact:true}).click();
+    await page.getByRole('main').getByRole('button',{name:'Código e entregas',exact:true}).click();
+    await page.getByLabel('Remover token salvo').check();
+    await page.getByRole('button',{name:'Salvar repositório'}).click();
+    await expect(page.getByRole('button',{name:'Enviar commits'})).toBeDisabled();
+    await expect(page.getByRole('button',{name:'Publicar homologação'})).toBeDisabled();
+    await expect(page.getByRole('status').filter({hasText:'peça ao administrador'})).toBeVisible();
+    await missing.close();
     fs.writeFileSync('/tmp/evidence/browser.json',JSON.stringify({roles:report,passed:true},null,2));
   } finally {await browser.close();}
 })().catch(error=>{console.error(error.message);process.exitCode=1;});
