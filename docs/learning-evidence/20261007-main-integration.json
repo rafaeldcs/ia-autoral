@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "at": "2026-10-07T16:33:23.221521+00:00",
+  "classification": "supervised-local-model-integration-not-weight-training",
+  "parents": [
+    "ea06d19",
+    "bf1013953b61e945d8cf2365cb207ae0fe6b9513"
+  ],
+  "target_branch": "main",
+  "proposal_author": {
+    "product": "LocalAuthor",
+    "base_model": "Qwen/Qwen3-8B-GGUF",
+    "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+    "license": "Apache-2.0",
+    "backend": "gguf-docker",
+    "network": "none",
+    "cuda": "local RTX2060",
+    "weights_modified": false
+  },
+  "reviewer": "Codex; not a human approval for training or activation",
+  "changes": [
+    "Preserve efficiency profiles, single model residency, GGUF backend and training provenance together.",
+    "Retain failed runtime ownership, retry closing before allocating a replacement.",
+    "Preserve source packaging after successful main CI.",
+    "Extend contract regression tests; correct incomplete test doubles and actual size-change fixture."
+  ],
+  "validation": {
+    "tests_run": 506,
+    "passed": 506,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "complete": true,
+    "platform": "linux",
+    "python": "3.12.3 (main, Jun 18 2025, 17:59:45) [GCC 13.3.0]",
+    "elapsed_seconds": 20.611479881000378
+  },
+  "sandbox": {
+    "image": "sha256:f4f7a0cb6d853da0e73708d654a8a5c573cf203ce7abceb8bb6705938f3fc705",
+    "readonly_root": true,
+    "network": "none",
+    "user": "10001:10001",
+    "capabilities": "none",
+    "no_new_privileges": true,
+    "memory_bytes": 2147483648,
+    "cpus": 2
+  },
+  "limits": [
+    "Contract tests use explicit doubles; this is not independent model qualification.",
+    "No new pretrained checkpoint trained or promoted in this increment.",
+    "Failed local-model drafts remain private; none were silently reported as successful.",
+    "Full Nemotron forward and weight streaming are not implemented by this merge.",
+    "Temporary learning instructions remain until all mandatory completion criteria are met."
+  ],
+  "executed_worktree_files_sha256": {
+    "src/localauthor/application.py": "8752f26e421ac27350c1d0889219021954472fc27a282d34a3049e10fd26e4a2",
+    "src/localauthor/foundation/models.py": "ec1ce0a650f7a32a4676d09bdb784d5497602ce5da98f8a0dc7adb427ecb0056",
+    "src/localauthor/foundation/runtime.py": "2f65ed25ec8ffa9d2161c9ea2209ce646d562a083a9974d42ce5044761b8c95b",
+    "src/localauthor/foundation/service.py": "11b3e135036781db3e43c8195ca1ef9958cd626914243a626c0ea6795a50b503",
+    "src/localauthor/foundation/__main__.py": "a130f6ddba0c90025a8407ef0b3e6635ead1c17d09abc0ee6ea64e1ffd5eabf5",
+    "tests/test_efficiency_foundation.py": "6490c76f87a6377c8ab2a8fa28c69b3dbf71cca31a589ad6ed5a044c99c05c30",
+    "tests/test_foundation.py": "7c1495fa3d81773e2ce47c6035dfb019732263b1abbca87f18d22eb554a266bb",
+    "tests/test_foundation_visual.py": "e17acf77204a382283e9ceaa6c915bc7b8a3ac42cfed53750486ee9e1bc6adae",
+    "tests/test_efficiency.py": "0be567f141a046eb19e922a1b6d2fee146e7b31b10ace6169e9cb24618badb95",
+    ".github/workflows/ci.yml": "e388920396ce1b59c9daad3c856cc7440bf8916dcb3cc6626b679483194df501"
+  },
+  "git_staged_files_sha256": {
+    "src/localauthor/application.py": "d069b27773ffca8c83d68d2d5df8445cf9902f32c724de861542a051e598b570",
+    "src/localauthor/foundation/models.py": "834f9a0052bd8d2cf370cf84cb819e95aec9f6a233afb645162b8a07f1e83d94",
+    "src/localauthor/foundation/runtime.py": "1d60e93e115483b4bcef0889cc97a53e4a83bb098739376137c5aec7321fee09",
+    "src/localauthor/foundation/service.py": "e75fe8372be8cef339e4d509b921202f69b56fdf0f62ab18c32ce22b532f60c8",
+    "src/localauthor/foundation/__main__.py": "7db8184264d1aa46a7d9881eb8f17dc734043a8d4affcafd314f5d4e8b2d717a",
+    "tests/test_efficiency_foundation.py": "e86691a60494ed87fe87ec679a69cd419e1bc6c4136980fb3e7d17ab14d41fa9",
+    "tests/test_foundation.py": "d4fb14c0afe124fe3bcc34bad8bf87551fb4f00966d4aac8eb4c22de6d362ad3",
+    "tests/test_foundation_visual.py": "139e77074c540ff8f8e7b2a5bc1a7bd34976254fc161e19c796ff538a49859f9",
+    "tests/test_efficiency.py": "f40fd8335a3f9b4ac40c933fdce318145e0a300f652e347d2980654153f2a730",
+    ".github/workflows/ci.yml": "581ff8db9250948fcf29baf1d7452a06cdacd134f0482f8e6693f989ba5cb742"
+  },
+  "line_endings": "Executed Windows worktree may contain CRLF; Git staged hashes record portable repository bytes separately."
+}

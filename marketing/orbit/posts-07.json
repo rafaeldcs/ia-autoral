@@ -1,0 +1,70 @@
+{
+  "posts": [
+    {
+      "id": "p07",
+      "headline": "Tarefa vinculada a commit",
+      "subtitle": "Vincule tarefas a commits no HML",
+      "caption": "Explore como vincular tarefas a commits no HML. HML oferece integração direta entre tarefas e commits. Contato a configurar.",
+      "day": 14,
+      "channel": "linkedin",
+      "cta": "Conheça o Orbit",
+      "visual": "product",
+      "alt": "Captura QA do Orbit com dados fictícios"
+    },
+    {
+      "id": "p08",
+      "headline": "Detalhes da sprint",
+      "subtitle": "Revisando relatório do sprint",
+      "caption": "Gerencie sprints Scrum com relatórios claros. HML suporta auditoria de papéis globais. Bio a configurar.",
+      "day": 16,
+      "channel": "instagram",
+      "cta": "Conheça o Orbit",
+      "visual": "planning",
+      "alt": "Foto conceitual gerada de planejamento"
+    },
+    {
+      "id": "p09",
+      "headline": "Papéis globais e auditoria",
+      "subtitle": "Audite papéis globais no HML",
+      "caption": "Audite papéis globais com relatórios detalhados. HML integra auditoria e relatórios. Contato a configurar.",
+      "day": 18,
+      "channel": "facebook",
+      "cta": "Conheça o Orbit",
+      "visual": "workstation",
+      "alt": "Foto conceitual gerada de estação de trabalho"
+    },
+    {
+      "id": "p10",
+      "headline": "Clone, Pull e Push HTTPS",
+      "subtitle": "Gerencie cópias e atualizações com Git privado",
+      "caption": "HML oferece controle sobre cópias e atualizações. Contato a configurar.",
+      "day": 20,
+      "channel": "linkedin",
+      "cta": "Conheça o Orbit",
+      "visual": "product",
+      "alt": "Captura QA do Orbit com dados fictícios"
+    },
+    {
+      "id": "p11",
+      "headline": "Branches e Histórico",
+      "subtitle": "Visualize mudanças e histórico de commits",
+      "caption": "HML permite rastrear mudanças e histórico. Bio a configurar.",
+      "day": 22,
+      "channel": "instagram",
+      "cta": "Conheça o Orbit",
+      "visual": "planning",
+      "alt": "Foto conceitual gerada de planejamento"
+    },
+    {
+      "id": "p12",
+      "headline": "Demonstração Acompanhada",
+      "subtitle": "Acompanhe passo a passo a demonstração",
+      "caption": "HML facilita a demonstração guiada. Contato a configurar.",
+      "day": 24,
+      "channel": "facebook",
+      "cta": "Conheça o Orbit",
+      "visual": "workstation",
+      "alt": "Foto conceitual gerada de estação de trabalho"
+    }
+  ]
+}

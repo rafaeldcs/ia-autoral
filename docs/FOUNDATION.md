@@ -80,6 +80,94 @@ Para atualizar/remover uma fonte importada, pare o servidor, preserve um backup 
 
 ## Processo operacional implementado
 
+Nas orientações de cada projeto, selecione Geral, Desenvolvimento ou Marketing.
+O perfil persiste somente naquele projeto e orienta respostas do modo foundation;
+não concede ferramentas, publicação, uso de verba ou autorização para treinamento.
+Scrum/Kanban, WIP e critério de pronto entram no contexto como dados do projeto.
+Os contratos antigos de preferências continuam compatíveis. Há uma única fila de
+inferência; ao trocar texto/imagem, o serviço libera o modelo anterior antes de
+carregar outro, após verificar o candidato. Não mantém ambos residentes na RAM.
+
+Na tela de modelos locais, “Comparar campanhas” calcula CTR, conversão por
+clique, CPC e CPA sem carregar um modelo. Usa contagens inteiras e custos em
+centavos; compara taxas exatas antes de arredondar para exibição. Preserva empates
+e denominadores ausentes. Os números são fornecidos pelo usuário e não provam
+publicação ou gasto real. “Usar análise no pedido” preenche um rascunho, sem enviar
+automaticamente. Alterar dados/projeto ou sair descarta a comparação anterior.
+
+`knowledge/skills/MARKETING_SHOPAIR.md` orienta briefing, propostas e medição.
+Importe somente no projeto pertinente após revisar o conteúdo; nenhum aprendizado
+dos pesos decorre da presença do Markdown no Git.
+
+### Laboratório GGUF opcional
+
+`qa/foundation/Dockerfile.gguf` usa o arquivo oficial CPU do llama.cpp b11429,
+com SHA-256 conferido e extração limitada. `Dockerfile.cuda118-builder` prepara
+uma compilação separada CUDA 11.8 para Turing/sm75, sem alterar o driver Windows.
+Essas imagens não contêm pesos. O aplicativo só as utiliza se um operador
+registrar explicitamente o backend opcional `gguf-docker`; nunca baixa a imagem.
+
+Para usar GGUF no chat, há um backend separado de inferência por IPC no Docker
+local. Ele reutiliza o modelo entre pedidos, conta tokens com o template real,
+para a própria instância no cancelamento/encerramento e recarrega após cancelamento.
+A imagem é selecionada por SHA-256, nunca por uma tag mutável. Antes de iniciar,
+o controlador confere imagem, usuário, rede desabilitada, root somente leitura,
+capabilities, mounts somente leitura, 6 GiB de RAM, quatro CPUs e limite de PIDs.
+O worker repete os canários de isolamento e confere o hash GGUF no volume.
+Nenhuma porta de inferência é publicada; não se monta o socket Docker nem a pasta
+de dados do aplicativo. Somente mensagens limitadas atravessam o IPC.
+
+Docker Desktop com suporte GPU é infraestrutura adicional **do servidor**.
+Os computadores clientes continuam usando o LocalAuthor pela rede local.
+Falta de Docker/GPU, imagem ausente ou divergência do volume gera erro; não há
+fallback para inferência no host nem API externa. Esse backend não treina GGUF:
+o trainer/export Qwen continua restrito ao perfil Safetensors aprovado.
+
+Registro técnico em uma pasta de laboratório nova, após adquirir e revisar pesos,
+licença, imagem e volume. Substitua os valores por identidades realmente conferidas;
+não execute contra a instalação ativa para contornar promoção/aprovação:
+
+```powershell
+& $python -m localauthor.foundation --home "D:\LocalAuthor-Laboratorio" register-model text "D:\Modelos\GGUF-revisado" --model-id "ORIGEM/MODELO" --revision "REVISAO_IMUTAVEL" --license "LICENCA_REVISADA" --reviewed-by "OPERADOR" --backend gguf-docker --device cuda --context-tokens 4096 --output-tokens 1536 --reasoning-budget 512 --gguf-image-id "sha256:HASH_REAL_DE_64_HEXADECIMAIS" --gguf-volume "localauthor-volume-revisado"
+```
+
+O produto mantém uma geração por vez para não carregar três modelos na GPU de
+6 GB. Pedidos dos projetos entram na fila persistente; perfis de trabalho não
+substituem autenticação por usuário. Registro/carregamento e testes da fila não
+qualificam competência profissional. Contêineres encerrados ficam preservados.
+Antes da parada, o controlador captura um snapshot do diagnóstico já expurgado
+da chave interna em `foundation/runtime`, com limite por arquivo e quota de 512 MB.
+O snapshot não inclui necessariamente eventos posteriores à cópia. Falha de
+diagnóstico não impede a parada; não existe limpeza automática de evidências.
+
+`scripts/foundation-gguf-probe.py` executa pesos GGUF locais conferidos em sandbox
+Linux verificada, sem rede, root ou execução do código produzido. `--gpu` exige
+CUDA0 e offload completo comprovado no log; não cai silenciosamente para CPU.
+Registra contexto real, truncamento, saídas originais, hashes e latência.
+Casos de captura não contam como acertos; resultados são de desenvolvimento,
+sem treinamento, promoção ou equivalência com modelos de fronteira.
+
+O perfil padrão desativa raciocínio. `--reasoning-budget N` habilita um orçamento
+de até 1024 tokens de raciocínio, menor que `--tokens`; a contagem usa o mesmo
+template da geração. `--json-output` restringe a sintaxe JSON sem fornecer
+respostas esperadas. Registre a mudança de perfil: ela não treina pesos e pode
+aumentar a latência. Raciocínio privado não é uma resposta nem prova de acerto.
+
+`scripts/foundation-code-oracle-worker.py` observa artefatos originais de C#,
+JavaScript e PostgreSQL em **outra** sandbox inspecionada, sem pesos, segredos,
+gabaritos ou mounts graváveis do host. Recebe apenas entradas via stdin.
+O controlador externo preserva e compara resultados esperados. Nunca execute
+esse worker como alternativa no Windows nem monte a pasta privada inteira.
+Compilação, saída do worker e testes com dublês não qualificam o modelo.
+Para C#, o worker observa também se a classe e o método têm a interface pública
+estática solicitada. Comportamento correto com interface incompatível continua
+sendo uma falha no contrato.
+
+`scripts/foundation-visual-briefs.py` captura até 20 briefings originais congelados
+em CUDA, com checker ativo, hashes, recuperação de PNG e resultados individuais.
+Use sandbox inspecionada e pesos somente leitura. As notas humanas começam vazias;
+entregar 20 imagens não aprova qualidade, direitos comerciais ou uma campanha.
+
 Pedido validado → contexto limitado e isolado por projeto → inferência local → checagem de cancelamento → resultado e procedência → experiência não aprovada → gravação da conversa → revisão humana. Falha ao salvar a conversa dispara limpeza compensatória do resultado não revisado; não apaga experiências já revisadas. Uma queda abrupta entre os dois bancos pode deixar um candidato órfão, nunca autorizado para treino; requer reconciliação manual.
 
 Código gerado é texto. Para aplicar, use o fluxo existente de snapshot/proposta/diff/testes/revisão. O novo modo não tem shell, Git, acesso de escrita ao projeto nem ferramentas agentivas. Instruções dentro do código ou da documentação não podem conceder essas capacidades.

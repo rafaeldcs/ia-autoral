@@ -31,6 +31,8 @@ def register_fixture(home, directory, kind="text"):
     directory.mkdir(parents=True, exist_ok=True)
     (directory / "config.json").write_text('{"model_type":"unit_test_double"}', encoding="utf-8")
     (directory / "model.safetensors").write_bytes(b"fixture-not-a-trained-model")
+    if kind == "image":
+        (directory / "model_index.json").write_text('{"_class_name":"StableDiffusionPipeline"}', encoding="utf-8")
     target = home / "foundation" / f"{kind}-model.json"
     register_model(directory, target, model_id="test-double", revision="fixture-v1", license="test-fixture",
                    reviewed_by="test-suite", capability=kind, context_tokens=8192)
@@ -72,12 +74,22 @@ class DummyImage:
     def __init__(self, spec):
         self.spec = spec
 
-    def generate(self, prompt, cancel=None):
+    def generate(self, prompt, cancel=None, *, options=None):
         check_cancel(cancel)
         return DummyImageArtifact()
 
 
 class FoundationModelTests(WorkspaceCase):
+    def test_token_count_requests_ids_instead_of_counting_batch_fields(self):
+        runtime = TextRuntime.__new__(TextRuntime)
+        class Tokenizer:
+            def apply_chat_template(self, messages, **kwargs):
+                return [1] * 301 if kwargs.get("return_dict") is False else {"input_ids": [1] * 301, "attention_mask": [1] * 301}
+        runtime.tokenizer = Tokenizer()
+        runtime.model = object()
+        runtime.spec = SimpleNamespace(enable_thinking=False)
+        self.assertEqual(runtime.count([{"role": "user", "content": "fixture"}]), 301)
+
     def model(self, kind="text"):
         return register_fixture(self.settings.home, self.root / ("weights-" + kind), kind)
 
@@ -171,14 +183,21 @@ class FoundationModelTests(WorkspaceCase):
     def test_image_runtime_uses_local_only_and_callback_contract(self):
         spec = self.model("image")
         class Pipeline:
+            safety_checker = object()
+            feature_extractor = object()
             def to(self, device): return self
             def __call__(self, prompt, callback_on_step_end=None): pass
         loader = Mock(); loader.from_pretrained.return_value = Pipeline()
         with patch.dict(sys.modules, {"torch": SimpleNamespace(float32="float32"),
-                                     "diffusers": SimpleNamespace(AutoPipelineForText2Image=loader)}):
+                                     "diffusers": SimpleNamespace(StableDiffusionPipeline=loader)}):
             ImageRuntime(spec)
         self.assertTrue(loader.from_pretrained.call_args.kwargs["local_files_only"])
         self.assertTrue(loader.from_pretrained.call_args.kwargs["use_safetensors"])
+        loader.from_pretrained.return_value.safety_checker = None
+        with patch.dict(sys.modules, {"torch": SimpleNamespace(float32="float32"),
+                                     "diffusers": SimpleNamespace(StableDiffusionPipeline=loader)}):
+            with self.assertRaisesRegex(PolicyError, "verificador"):
+                ImageRuntime(spec)
 
 
 class FoundationContextTests(WorkspaceCase):
@@ -335,6 +354,50 @@ class FoundationIntegrationTests(WorkspaceCase):
         with self.assertRaises(PolicyError):
             self.respond()
 
+    def test_switching_modality_releases_other_engine_and_preserves_weights(self):
+        from unittest.mock import Mock
+        self.respond()
+        service = self.app.chat.foundation
+        text = service._cache["text"][2]
+        text.close = Mock()
+        before = (self.spec.directory / "model.safetensors").read_bytes()
+        self.respond("Quadrado de laboratório", "image")
+        text.close.assert_called_once()
+        self.assertEqual(set(service._cache), {"image"})
+        self.respond("Voltar ao texto")
+        self.assertEqual(set(service._cache), {"text"})
+        self.assertIsNot(service._cache["text"][2], text)
+        self.assertEqual((self.spec.directory / "model.safetensors").read_bytes(), before)
+
+    def test_closed_engine_is_reloaded_for_next_request(self):
+        self.respond()
+        old = self.app.chat.foundation._cache["text"][2]
+        old.closed = True
+        self.assertFalse(self.app.chat.foundation.status()["capabilities"]["text"]["loaded"])
+        self.respond("Novo pedido depois do cancelamento")
+        self.assertIsNot(self.app.chat.foundation._cache["text"][2], old)
+
+    def test_application_shutdown_closes_resident_engine(self):
+        from unittest.mock import Mock
+        self.respond()
+        engine = self.app.chat.foundation._cache["text"][2]; engine.close = Mock()
+        self.app.close()
+        engine.close.assert_called_once()
+        self.assertEqual(self.app.chat.foundation._cache, {})
+
+    def test_unconfirmed_shutdown_keeps_owned_engine_for_retry(self):
+        from unittest.mock import Mock
+        self.respond()
+        service = self.app.chat.foundation
+        engine = service._cache["text"][2]
+        engine.closed = True
+        engine.close = Mock(side_effect=PolicyError("fixture unconfirmed stop"))
+        with self.assertRaises(PolicyError): self.respond("Outro pedido")
+        self.assertIs(service._cache["text"][2], engine)
+        engine.close = Mock()
+        self.respond("Tentar depois da parada confirmada")
+        self.assertIsNot(service._cache["text"][2], engine)
+
     def test_image_saved_with_hash_and_project_access_check(self):
         result = self.respond("Um quadrado", "image")
         metadata = result["messages"][-1]["metadata"]
@@ -402,6 +465,17 @@ class FoundationHttpTests(WorkspaceCase):
         status, data = self.request("/api/foundation/status")
         self.assertEqual(status, 200)
         self.assertFalse(data["remote_fallback"])
+
+    def test_marketing_metrics_require_project_auth_and_do_not_load_a_model(self):
+        from tests.test_foundation_marketing import row
+        body={"project_id":self.project["id"],"campaigns":[row(),row("B",1000,30,3,6000)]}
+        self.assertEqual(self.request("/api/foundation/marketing-metrics",body,authenticated=False)[0],401)
+        self.assertEqual(self.request("/api/foundation/marketing-metrics",{**body,"project_id":"unknown"})[0],404)
+        self.assertEqual(self.request("/api/foundation/marketing-metrics",{**body,"campaigns":[row(conversions=61)]})[0],400)
+        status,result=self.request("/api/foundation/marketing-metrics",body)
+        self.assertEqual(status,200);self.assertEqual(result["best_ctr"],["B"])
+        self.assertEqual(self.app.chat.foundation._cache,{})
+        self.assertEqual(self.app.jobs.list(),[])
 
     def test_chat_runs_through_persistent_job(self):
         conversation = self.app.chat.create(self.project["id"], "HTTP")

@@ -6,6 +6,14 @@ $config = Get-Content -LiteralPath (Join-Path $dataRoot 'server.json') -Raw | Co
 $mutex = [Threading.Mutex]::new($false, 'Local\LocalAuthorLanSupervisor')
 if (-not $mutex.WaitOne(0)) { Write-Output 'Supervisor já está ativo.'; exit }
 function Ensure-Servers {
+    # Operator-only bounded maintenance pause, also honored when the desktop
+    # client relaunches this supervisor. Expired files do not stop normal boot.
+    $maintenance = Join-Path $dataRoot 'maintenance-until.txt'
+    if (Test-Path -LiteralPath $maintenance) {
+        $until = [DateTimeOffset]::ParseExact((Get-Content -LiteralPath $maintenance -Raw).Trim(), 'o', [Globalization.CultureInfo]::InvariantCulture)
+        if ($until -gt [DateTimeOffset]::UtcNow.AddHours(2)) { throw 'Prazo de manutenção excede o limite de duas horas.' }
+        if ($until -gt [DateTimeOffset]::UtcNow) { return }
+    }
     $runtime = Get-Content -LiteralPath (Join-Path $dataRoot 'runtime.json') -Raw | ConvertFrom-Json
     $config = Get-Content -LiteralPath (Join-Path $dataRoot 'server.json') -Raw | ConvertFrom-Json
     $backendListener = Get-NetTCPConnection -State Listen -LocalPort $config.BackendPort -ErrorAction SilentlyContinue

@@ -113,7 +113,7 @@ class WeightStoreTests(unittest.TestCase):
     def test_file_change_invalidates_a_cache_hit(self):
         store = self.store()
         store.get("a")
-        self.path.write_bytes(b"changed-size")
+        self.path.write_bytes(b"changed-size!")
         with self.assertRaises(PolicyError):
             store.get("a")
         self.assertEqual(store.stats()["resident_bytes"], 0)

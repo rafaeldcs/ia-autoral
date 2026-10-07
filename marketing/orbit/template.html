@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Orbit - Demonstração</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #101325;
+      color: white;
+    }
+    #art {
+      width: 1080px;
+      height: 1350px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      padding: 72px;
+      gap: 24px;
+      margin: 0 auto;
+    }
+    .logo {
+      font-size: 40px;
+    }
+    .tag {
+      font-size: 24px;
+    }
+    .headline {
+      font-size: 76px;
+      line-height: 1.08;
+      max-height: 164px;
+
+    }
+    .subtitle {
+      font-size: 36px;
+      line-height: 1.2;
+      max-height: 164px;
+
+    }
+    #photo {
+      width: 936px;
+      height: 480px;
+      object-fit: contain;
+    }
+    .cta {
+      font-size: 32px;
+    }
+    .note {
+      font-size: 32px;
+      color: #fff;
+    }
+    #art.story {
+      height: 1920px;
+      padding: 120px 72px;
+    }
+    .story #photo {
+      height: 760px;
+    }
+  </style>
+</head>
+<body>
+  <div id="art">
+    <div class="logo">Orbit</div>
+    <div class="tag">Demonstração</div>
+    <div class="headline" id="headline">Tarefas, sprints e código</div>
+    <div class="subtitle" id="subtitle">Conheça o Orbit em uma demonstração</div>
+    <img id="photo" src="images/product.png" alt="QA Product Image">
+    <div class="cta" id="cta">Conheça o Orbit</div>
+    <div class="note" id="note">Orbit em homologação · demonstração acompanhada</div>
+    <div class="note" id="conceptNote"></div>
+  </div>
+  <script>
+    const post = {
+      src: "images/product.png",
+      alt: "captura QA com dados fictícios",
+      headline: "Tarefas, sprints e código",
+      subtitle: "Conheça o Orbit em uma demonstração",
+      visual: "product",
+      note: undefined
+    };
+    const art = document.getElementById('art');
+    const photo = document.getElementById('photo');
+    const headline = document.getElementById('headline');
+    const subtitle = document.getElementById('subtitle');
+    const cta = document.getElementById('cta');
+    const note = document.getElementById('note');
+    const conceptNote = document.getElementById('conceptNote');
+
+window.setCreative=(post,src,format)=>{if(typeof src!="string"||!src.startsWith("images/")||!/^[a-z0-9-]+[.]png$/.test(src.slice(7))||["feed","story"].indexOf(format)==-1)throw new Error("Entrada inválida");headline.textContent=post.headline;subtitle.textContent=post.subtitle;cta.textContent=post.cta;note.textContent="Orbit em homologação · demonstração acompanhada";conceptNote.textContent=post.visual==="product"?"Captura QA · dados fictícios":"Imagem conceitual gerada";art.classList.toggle("story",format==="story");photo.alt=post.alt;photo.style.objectFit=post.visual==="product"?"contain":"cover";delete art.dataset.ready;photo.onload=()=>art.dataset.ready="true";photo.src=src};
+window.setCreative({...post, cta: "Conheça o Orbit"}, post.src, "feed");
+  </script>
+</body>
+</html>

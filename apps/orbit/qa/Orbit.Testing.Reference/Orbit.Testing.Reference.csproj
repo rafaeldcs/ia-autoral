@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Compile Include="../../backend/WorkflowRules.cs" Link="WorkflowRules.cs" />
+    <Compile Include="../../backend/GitPolicy.cs" Link="GitPolicy.cs" />
+    <Compile Include="../../backend/GitUrlPolicy.cs" Link="GitUrlPolicy.cs" />
+    <Compile Include="../../backend/GitBranchPolicy.cs" Link="GitBranchPolicy.cs" />
+    <Compile Include="../../backend/GitProcess.cs" Link="GitProcess.cs" />
+    <Compile Include="../../backend/GitStart.cs" Link="GitStart.cs" />
+    <Compile Include="../../backend/GitReadOutput.cs" Link="GitReadOutput.cs" />
+    <Compile Include="../../backend/GitInit.cs" Link="GitInit.cs" />
+    <Compile Include="../../backend/GitClone.cs" Link="GitClone.cs" />
+    <Compile Include="../../backend/GitCommits.cs" Link="GitCommits.cs" />
+    <Compile Include="../../backend/GitCheckout.cs" Link="GitCheckout.cs" />
+    <Compile Include="../../backend/GitHubDelivery.cs" Link="GitHubDelivery.cs" />
+    <Compile Include="../../backend/GitDeliveryWatch.cs" Link="GitDeliveryWatch.cs" />
+    <Compile Include="../../backend/HostedPolicy.cs" Link="HostedPolicy.cs" />
+    <Compile Include="../../backend/HostedHttpStart.cs" Link="HostedHttpStart.cs" />
+    <Compile Include="../../backend/HostedCgi*.cs" Link="%(Filename)%(Extension)" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+</Project>

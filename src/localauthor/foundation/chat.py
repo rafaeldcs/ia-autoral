@@ -43,7 +43,9 @@ class FoundationChatService(ChatService):
         if removed and response.get("origin") == "foundation_image":
             child(self.settings.home / "foundation" / "artifacts", f"{project_id}/{run_id}.png").unlink(missing_ok=True)
 
-    def respond(self, project_id, conversation_id, message, mode="guide", cancel=None, input_format="text"):
+    def respond(self, project_id, conversation_id, message, mode="guide", cancel=None, input_format="text", image_options=None):
+        if image_options is not None and mode != "image":
+            raise PolicyError("Parâmetros visuais exigem modo imagem.")
         if mode not in {"foundation", "image"}:
             return super().respond(project_id, conversation_id, message, mode, cancel, input_format)
         self.validate_message(message, mode, input_format)
@@ -53,12 +55,14 @@ class FoundationChatService(ChatService):
             if len(conversation["messages"]) >= 200:
                 raise PolicyError("Conversa cheia. Inicie outra conversa.")
             if mode == "image":
-                response = self.foundation.create_image(project_id, message, cancel)
+                response = self.foundation.create_image(project_id, message, cancel, options=image_options)
             else:
+                preferences = self.preferences(project_id)
                 found = self.knowledge.consult(message[:1000], project_id, False)
                 evidence = [{**item, "scope": project_id} for item in found["evidence"]]
                 response = self.foundation.answer(project_id, message, conversation["messages"],
-                    evidence, cancel, input_format=input_format)
+                    evidence, cancel, input_format=input_format, work_profile=preferences["work_profile"],
+                    project_guidance={k: preferences[k] for k in ("method", "wip_limit", "definition_of_done")})
             try:
                 check_cancel(cancel)
                 metadata = json.dumps({k: v for k, v in response.items() if k != "content"}, ensure_ascii=False)

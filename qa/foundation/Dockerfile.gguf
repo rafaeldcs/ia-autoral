@@ -1,0 +1,10 @@
+# Operator-acquired official CPU archive. No weights or downloads in this image.
+# Build with --network=none --build-context llama_bundle=/private/acquisition/llama-b11429
+FROM localauthor-terreiro-simulation:1
+USER root
+COPY --from=llama_bundle /runtime.tar.gz /opt/llama-runtime.tar.gz
+RUN python3 -c 'import hashlib, tarfile; from pathlib import Path; p=Path("/opt/llama-runtime.tar.gz"); assert hashlib.sha256(p.read_bytes()).hexdigest()=="f6d25dde8f51133143d1453da4fd5f73b145127177612a283bf7995957af3392"; t=tarfile.open(p); ms=t.getmembers(); assert len(ms)<128 and sum(m.size for m in ms)<64000000; assert all(m.name=="llama-b11429" or m.name.startswith("llama-b11429/") for m in ms); t.extractall("/opt", filter="data"); p.unlink()'
+ENV LD_LIBRARY_PATH=/opt/llama-b11429
+USER 10001:10001
+WORKDIR /workspace
+ENTRYPOINT ["python3"]

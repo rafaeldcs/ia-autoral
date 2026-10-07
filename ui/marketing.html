@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Marketing — LocalAuthor</title>
+    <link rel="stylesheet" href="/marketing.css" />
+    <script src="/marketing.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <a href="/">← Projetos e conversas</a
+      ><strong>LocalAuthor · Marketing</strong>
+    </header>
+    <main>
+      <form id="login-form">
+        <h1>Da pesquisa à campanha</h1>
+        <p>
+          Crie peças com fontes, escolha a referência e revise antes de
+          distribuir.
+        </p>
+        <label
+          >Token local<input
+            id="token"
+            type="password"
+            required
+            autocomplete="off" /></label
+        ><button>Entrar</button>
+      </form>
+      <div id="workspace" hidden>
+        <label>Projeto<select id="project"></select></label>
+        <p id="availability" role="status"></p>
+        <section>
+          <h1>Marketing do seu projeto</h1>
+          <p>
+            A IA propõe. Você escolhe as referências e aprova as peças.
+            Publicações precisam de uma conta conectada e confirmação separada.
+          </p>
+          <label
+            >Campanhas<select id="campaigns">
+              <option value="">Nova campanha</option>
+            </select></label
+          >
+          <form id="brief">
+            <h2>1. Defina o resultado</h2>
+            <div class="grid">
+              <label
+                >Marca<input
+                  id="brand"
+                  value="ShopAir"
+                  maxlength="500"
+                  required /></label
+              ><label
+                >Público<input
+                  id="audience"
+                  value="Donos de pequenas lojas e restaurantes"
+                  maxlength="500"
+                  required
+              /></label>
+            </div>
+            <label
+              >Objetivo<input
+                id="objective"
+                value="Solicitar demonstração da plataforma"
+                maxlength="500"
+                required /></label
+            ><label
+              >Página de destino<input
+                id="destination"
+                type="url"
+                value="https://shopair.com.br/"
+                required
+            /></label>
+            <fieldset>
+              <legend>Onde preparar as peças?</legend>
+              <label
+                ><input
+                  type="checkbox"
+                  name="channel"
+                  value="instagram"
+                  checked
+                />
+                Instagram</label
+              ><label
+                ><input
+                  type="checkbox"
+                  name="channel"
+                  value="facebook"
+                  checked
+                />
+                Facebook</label
+              ><label
+                ><input type="checkbox" name="channel" value="linkedin" />
+                LinkedIn</label
+              ><label
+                ><input type="checkbox" name="channel" value="youtube" />
+                YouTube</label
+              ><label
+                ><input type="checkbox" name="channel" value="website" />
+                Site</label
+              >
+            </fieldset>
+            <button>Salvar briefing</button>
+          </form>
+        </section>
+        <section id="research-section" hidden>
+          <h2>2. Pesquise antes de criar</h2>
+          <p>
+            Informe fontes públicas relevantes. A coleta respeita os domínios
+            autorizados e robots.txt. Uma falha de leitura fica visível; não
+            será tratada como pesquisa concluída.
+          </p>
+          <form id="research">
+            <label
+              >Site do produto<input
+                id="product-url"
+                type="url"
+                value="https://shopair.com.br/"
+                required /></label
+            ><label
+              >Modelo existente para comparar (opcional)<input
+                id="reference-url"
+                type="url"
+                value="https://blog.hubspot.com/marketing/marketing-campaigns" /></label
+            ><label
+              >Fonte sobre medição (opcional)<input
+                id="measurement-url"
+                type="url"
+                value="https://developers.google.com/analytics/devguides/collection/ga4/reference/config"
+            /></label>
+            <details>
+              <summary>Outras fontes relevantes</summary>
+              <label
+                >Dados do público (opcional)<input id="audience-url" type="url"
+              /></label>
+              <label
+                >Concorrente a comparar (opcional)<input
+                  id="competitor-url"
+                  type="url"
+              /></label>
+              <label
+                >Documentação do canal (opcional)<input
+                  id="channel-url"
+                  type="url"
+                  value="https://developers.facebook.com/docs/pages-api/posts/"
+              /></label>
+            </details>
+            <button id="plan-research" type="button">
+              Pedir plano de pesquisa à IA
+            </button>
+            <div id="research-proposal"></div>
+            <button>Confirmar e pesquisar fontes</button>
+          </form>
+          <div id="sources"></div>
+        </section>
+        <section id="choice-section" hidden>
+          <h2>3. Você decide a referência</h2>
+          <p>
+            Usar uma referência não significa copiar textos, imagens ou
+            promessas. Uma leitura bloqueada não pode fundamentar uma adaptação.
+          </p>
+          <form id="choice">
+            <label
+              >Como criar?<select id="choice-mode">
+                <option value="original">
+                  Criar proposta original; referências só para conferência
+                </option>
+                <option value="adapt">
+                  Adaptar a estrutura de uma referência
+                </option>
+              </select></label
+            ><label id="reference-label" hidden
+              >Referência coletada<select id="reference-id"></select></label
+            ><button>Confirmar minha escolha</button>
+          </form>
+          <p id="choice-description"></p>
+          <button id="generate" type="button" disabled>
+            Gerar propostas com a IA local
+          </button>
+        </section>
+        <section id="draft-section" hidden>
+          <h2>4. Revise as peças</h2>
+          <p id="draft-status"></p>
+          <div id="assets"></div>
+          <form id="review">
+            <label
+              ><input id="reviewed" type="checkbox" required /> Conferi fatos,
+              linguagem, público, direitos dos criativos e destino desta
+              versão.</label
+            ><button>Aprovar esta versão</button>
+          </form>
+          <button id="export" type="button" disabled>
+            Preparar pacote para distribuição
+          </button>
+          <div id="export-result" hidden>
+            <label
+              >Pacote preparado<textarea
+                id="export-json"
+                readonly
+                rows="8"
+              ></textarea>
+            </label>
+            <button id="copy-export" type="button">Copiar pacote</button>
+            <button id="download-export" type="button">
+              Baixar arquivo no navegador
+            </button>
+          </div>
+          <p>
+            Links UTM ajudam a identificar a origem. A coleta de eventos e
+            conversões precisa ser configurada no site; os links sozinhos não
+            medem resultados.
+          </p>
+        </section>
+        <section>
+          <h2>5. Conecte os canais</h2>
+          <div id="channels-state">Nenhuma conta confirmada.</div>
+          <p>
+            Facebook Page: texto e link. Instagram profissional: um JPEG público
+            já revisado. Os demais canais recebem o pacote para publicação
+            manual nesta versão.
+          </p>
+          <details>
+            <summary>Configurar conta Meta</summary>
+            <p>
+              Use o token e os IDs do aplicativo Meta autorizado. Não use sua
+              senha do Instagram/Facebook. As credenciais ficam protegidas no
+              usuário Windows do servidor.
+            </p>
+            <form id="connect-channel">
+              <label
+                >Canal<select id="connect-kind">
+                  <option value="facebook">Facebook Page</option>
+                  <option value="instagram">
+                    Instagram profissional vinculado a uma Page
+                  </option>
+                </select></label
+              >
+              <div class="grid">
+                <label
+                  >ID da conta<input
+                    id="account"
+                    inputmode="numeric"
+                    pattern="[0-9]{1,40}"
+                    required /></label
+                ><label
+                  >Versão Graph API do aplicativo<input
+                    id="api-version"
+                    placeholder="Versão vigente no painel Meta"
+                    pattern="v[1-9][0-9]{0,2}\.0"
+                    required
+                /></label>
+              </div>
+              <label
+                >Token autorizado<input
+                  id="channel-token"
+                  type="password"
+                  autocomplete="off"
+                  required /></label
+              ><button>Verificar identidade e conectar</button>
+            </form>
+          </details>
+          <div id="deliveries"></div>
+        </section>
+      </div>
+      <p id="message" role="status" aria-live="polite"></p>
+    </main>
+    <dialog id="send-dialog">
+      <h2>Confira antes de publicar</h2>
+      <pre id="send-preview"></pre>
+      <p>
+        Instagram: o texto da legenda não cria um link clicável no feed. Confira
+        também o link da bio. Não há anúncio pago nesta operação.
+      </p>
+      <form id="send">
+        <label
+          ><input id="send-authorized" type="checkbox" required /> Autorizo
+          publicar organicamente esta peça nesta conta, com o texto, destino e
+          imagem exibidos.</label
+        ><button>Publicar agora</button
+        ><button id="close-send" type="button" class="secondary">
+          Voltar à revisão
+        </button>
+      </form>
+    </dialog>
+  </body>
+</html>

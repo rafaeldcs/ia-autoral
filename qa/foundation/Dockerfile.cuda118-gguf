@@ -1,0 +1,19 @@
+# Locally compiled, operator-reviewed b11429 source; no weights in the image.
+# Acquire/compile using Dockerfile.cuda118-builder, then package build/bin only.
+# Pass --network=none --build-context cuda_bundle=/private/compiled-runtime
+# and --build-arg CUDA_RUNTIME_SHA256=<recorded SHA-256 of runtime.tar.gz>.
+FROM localauthor-cuda118-builder:1 AS libraries
+FROM localauthor-terreiro-simulation:1
+ARG CUDA_RUNTIME_SHA256
+USER root
+COPY --from=cuda_bundle /runtime.tar.gz /tmp/runtime.tar.gz
+RUN python3 -c 'import hashlib,os,re,tarfile; from pathlib import Path; p=Path("/tmp/runtime.tar.gz"); expected=os.environ["CUDA_RUNTIME_SHA256"]; assert re.fullmatch("[a-f0-9]{64}",expected) and hashlib.sha256(p.read_bytes()).hexdigest()==expected; t=tarfile.open(p); ms=t.getmembers(); assert len(ms)<200 and sum(m.size for m in ms)<600000000; assert all((m.name=="." or m.name.startswith("./")) and (m.isfile() or m.isdir() or m.issym()) for m in ms); t.extractall("/opt/llama-b11429",filter="data"); p.unlink()'
+COPY --from=libraries /usr/local/cuda-11.8/targets/x86_64-linux/lib/libcudart.so* /opt/cuda-libs/
+COPY --from=libraries /usr/local/cuda-11.8/targets/x86_64-linux/lib/libcublas.so* /opt/cuda-libs/
+COPY --from=libraries /usr/local/cuda-11.8/targets/x86_64-linux/lib/libcublasLt.so* /opt/cuda-libs/
+COPY --from=libraries /usr/lib/x86_64-linux-gnu/libnccl.so* /opt/cuda-libs/
+# Driver comes from --gpus all. SDK stubs are NEVER copied into runtime.
+ENV LD_LIBRARY_PATH=/opt/llama-b11429:/opt/cuda-libs NVIDIA_DRIVER_CAPABILITIES=compute,utility
+USER 10001:10001
+WORKDIR /workspace
+ENTRYPOINT ["python3"]

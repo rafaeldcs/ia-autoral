@@ -1,0 +1,112 @@
+{
+  "reels": [
+    {
+      "id": "r01",
+      "topic": "sprints",
+      "scenes": [
+        {
+          "start": 0,
+          "end": 5,
+          "shot": "Scrum backlog",
+          "overlay": "Prioritizando user stories para próximo sprint",
+          "narration": "Revisando prioridades do backlog"
+        },
+        {
+          "start": 5,
+          "end": 10,
+          "shot": "Task detail",
+          "overlay": "Detalhando requisitos e responsáveis da tarefa",
+          "narration": "Visualizando detalhes da tarefa"
+        },
+        {
+          "start": 10,
+          "end": 15,
+          "shot": "Active sprint planning",
+          "overlay": "Mapeando tarefas e prazos do sprint ativo",
+          "narration": "Planejando tarefas do sprint ativo"
+        },
+        {
+          "start": 15,
+          "end": 20,
+          "shot": "Sprint report",
+          "overlay": "Analisando progresso e métricas do sprint",
+          "narration": "Revisando relatório do sprint"
+        }
+      ],
+      "caption": "Sprints no Orbit - ainda não gravado. HML",
+      "cta": "Conheça o Orbit, contato comercial a configurar."
+    },
+    {
+      "id": "r02",
+      "topic": "Kanban",
+      "scenes": [
+        {
+          "start": 0,
+          "end": 5,
+          "shot": "Kanban board",
+          "overlay": "Organizando tarefas por status e prioridade",
+          "narration": "Visualizando quadro Kanban"
+        },
+        {
+          "start": 5,
+          "end": 10,
+          "shot": "Task detail",
+          "overlay": "Detalhando requisitos e responsáveis da tarefa",
+          "narration": "Detalhando tarefa em andamento"
+        },
+        {
+          "start": 10,
+          "end": 15,
+          "shot": "Status filters",
+          "overlay": "Filtrando tarefas por estágio de desenvolvimento",
+          "narration": "Filtrando tarefas por status"
+        },
+        {
+          "start": 15,
+          "end": 20,
+          "shot": "Reports",
+          "overlay": "Gerando visão geral de métricas de desempenho",
+          "narration": "Gerando relatório de métricas"
+        }
+      ],
+      "caption": "Kanban no Orbit - ainda não gravado. HML",
+      "cta": "Conheça o Orbit, contato comercial a configurar."
+    },
+    {
+      "id": "r03",
+      "topic": "Git próprio",
+      "scenes": [
+        {
+          "start": 0,
+          "end": 5,
+          "shot": "Mostrar tela de repositório com branches ativos",
+          "overlay": "Repositório Git",
+          "narration": "Visualize o repositório Git"
+        },
+        {
+          "start": 5,
+          "end": 10,
+          "shot": "Mostrar tela de commits com histórico de alterações",
+          "overlay": "Histórico de commits",
+          "narration": "Histórico de commits no repositório"
+        },
+        {
+          "start": 10,
+          "end": 15,
+          "shot": "Mostrar tela de clonagem com URL HTTPS",
+          "overlay": "Clonagem via HTTPS",
+          "narration": "Clonagem via HTTPS disponível"
+        },
+        {
+          "start": 15,
+          "end": 20,
+          "shot": "Gravação de pull e push no terminal com repositório sintético, sem interface de aplicação falsa ou credenciais visíveis.",
+          "overlay": "Pull/push em andamento",
+          "narration": "Pull/push em andamento no repositório"
+        }
+      ],
+      "caption": "Git próprio no Orbit - ainda não gravado. HML",
+      "cta": "Conheça o Orbit, contato comercial a configurar."
+    }
+  ]
+}

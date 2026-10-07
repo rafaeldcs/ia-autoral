@@ -106,6 +106,7 @@ class EfficiencyFoundationTests(unittest.TestCase):
         with self.assertRaises(PolicyError): self.service._engine("image")
         replacement.assert_not_called()
         self.assertTrue(self.service.status()["unload_failed"])
+        engine.close = Mock()
 
     def test_cached_model_mutation_releases_and_refuses(self):
         self.service._engine("text")
@@ -173,6 +174,34 @@ class EfficiencyFoundationTests(unittest.TestCase):
         self.assertEqual(result["results"]["uncached"]["read_bytes"], 393216)
         self.assertEqual(result["results"]["cached"]["read_bytes"], 24576)
         self.assertFalse(result["results"]["cached"]["physical_disk_io_measured"])
+
+    def test_close_failure_blocks_future_allocation(self):
+        engine = self.service._engine('text')[1]
+        engine.close = Mock(side_effect=RuntimeError('fixture close failure'))
+        with self.assertRaises(PolicyError):
+            self.service.close()
+        replacement = Mock()
+        self.service.factories['image'] = replacement
+        with self.assertRaises(PolicyError):
+            self.service._engine('image')
+        replacement.assert_not_called()
+        self.assertTrue(self.service.status()['unload_failed'])
+        engine.close = Mock()
+
+    def test_merged_model_profile_preserves_backend_provenance(self):
+        path = self.manifest('text')
+        data = json.loads(path.read_text(encoding='utf-8'))
+        data['enable_thinking'] = True
+        data['generation_seconds'] = 120
+        path.write_text(json.dumps(data), encoding='utf-8')
+        spec = ModelSpec.load(path, 'text')
+        self.assertTrue(spec.enable_thinking)
+        self.assertEqual(spec.generation_seconds, 120)
+        self.assertEqual(spec.backend, 'transformers')
+        self.assertEqual(spec.derivation, {})
+        self.assertEqual(spec.runtime_profile, {})
+        self.assertFalse(spec.provenance()['derived_checkpoint'])
+
 
 
 if __name__ == "__main__":

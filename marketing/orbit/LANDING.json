@@ -1,0 +1,44 @@
+{
+  "hero": {
+    "headline": "Orbit: Gestão de tarefas e código com foco em sprints",
+    "subtitle": "Solução experimental em fase de homologação para equipes de desenvolvimento no Brasil",
+    "cta": "Conheça o Orbit"
+  },
+  "features": [
+    {
+      "title": "Tarefas e commits vinculados",
+      "description": "Integração entre tarefas e commits para maior rastreabilidade e organização."
+    },
+    {
+      "title": "Repositório Git privado via HTTPS",
+      "description": "Controle de repositórios Git com acesso via HTTPS e histórico"
+    },
+    {
+      "title": "Arquivos e histórico de versão",
+      "description": "Gerenciamento de arquivos e histórico de versão em cada projeto."
+    }
+  ],
+  "faq": [
+    {
+      "question": "Qual é o estágio atual do Orbit?",
+      "answer": "O Orbit está em fase de homologação e não é uma oferta SaaS pronta."
+    },
+    {
+      "question": "Qual é o preço do Orbit?",
+      "answer": "O preço ainda não foi definido e está pendente do dono."
+    },
+    {
+      "question": "GitHub e publicação são parte do Orbit?",
+      "answer": "GitHub e publicação são áreas separadas. A receita CI revisada publica apenas o próprio Orbit."
+    },
+    {
+      "question": "Existem papéis e ACL por projeto?",
+      "answer": "Não há ACL independente por projeto, mas existem papéis globais de usuário."
+    },
+    {
+      "question": "Qual é o próximo passo?",
+      "answer": "Próximo passo: demonstração e contato para configuração"
+    }
+  ],
+  "status": "HML"
+}

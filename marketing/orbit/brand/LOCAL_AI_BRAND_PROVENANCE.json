@@ -1,0 +1,301 @@
+{
+  "schema": 1,
+  "date": "2026-10-07",
+  "author": "LocalAuthor",
+  "model": "Qwen/Qwen3-8B-GGUF",
+  "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+  "weights_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+  "license": "Apache-2.0",
+  "sources": [
+    {
+      "request": "07",
+      "task": "marca-corrigida.svg",
+      "sha256": "a0d8f155ddbbd1314c55c8b4d66e514977e1a1fa97ee0387e91f39fa7ca46418"
+    },
+    {
+      "request": "10",
+      "task": "marca-phase-edits.json",
+      "sha256": "1b538de3af20bd7c02ddc32200093ef2dd5020f82d26544ec037dae62b7bfd5b"
+    },
+    {
+      "request": "12",
+      "task": "marca-terminal-edits.json",
+      "sha256": "7d2b990de6011b7f5ae43f9ff0763a1e0d3be451fe2dfad981119be40a7b6be5"
+    },
+    {
+      "request": "13",
+      "task": "orbit-logo.svg",
+      "sha256": "ab67798077fa6efe94cae0e399dc5deb57386a97ce4db5f2fbb7e5f6758e6b84"
+    },
+    {
+      "request": "20",
+      "task": "logo-geometry-edits.json",
+      "sha256": "69ae64173dc8798e4d639ad0e2fdbb60880b0efcdd14a87cd212347358168ad5"
+    },
+    {
+      "request": "18",
+      "task": "icon.svg",
+      "sha256": "d0f8e778e172dde99d66ca029cf5bf0e65cf21fa5166a78a066f11512043fdff"
+    },
+    {
+      "request": "22",
+      "task": "favicon-terminal-edits.json",
+      "sha256": "5065cdbdad02ad4a866d3c1728093de4811388d3c1b23c7ac1c3c5e6b1b5dad6"
+    },
+    {
+      "request": "14",
+      "task": "brand.tsx",
+      "sha256": "fbc2c6f13b0559d5a236a3406faf36b8f99367f1d6a165e5b9b431fa1e83df58"
+    },
+    {
+      "request": "17",
+      "task": "product-brand-edits.json",
+      "sha256": "195a38ffde5ac9c6c60e74b3b7308c7614b7c7716c38aa4dd124c684aea690c8"
+    },
+    {
+      "request": "24",
+      "task": "page-import-short-edits.json",
+      "sha256": "80157a594f49c91d4b242ce2f762357a31ab849639f59232556e20b302d0ee7f"
+    },
+    {
+      "request": "17",
+      "task": "product-brand-edits.json",
+      "sha256": "195a38ffde5ac9c6c60e74b3b7308c7614b7c7716c38aa4dd124c684aea690c8"
+    },
+    {
+      "request": "17",
+      "task": "product-brand-edits.json",
+      "sha256": "195a38ffde5ac9c6c60e74b3b7308c7614b7c7716c38aa4dd124c684aea690c8"
+    },
+    {
+      "request": "19",
+      "task": "ad-brand-edits.json",
+      "sha256": "01ddc78e57d92cc042a7ec6188e475e7a1ee0dbae6f5819ac176a7a0499a47c4"
+    },
+    {
+      "request": "23",
+      "task": "ad-logo-css-edits.json",
+      "sha256": "477b3c8aa29762f6e403f254ceb09bb43b57fc11203e75955578a7269d15e7db"
+    },
+    {
+      "request": "05",
+      "task": "pesquisa-marca.json",
+      "sha256": "bc9c3cc14da9a63bbb345b3e03f067b6dfd7a79c72517a16f6f31bc47af6cae5"
+    },
+    {
+      "request": "08",
+      "task": "pesquisa-method-edits.json",
+      "sha256": "0cfd600168b4abede31eca2a5f65d06a788583ffe5cc8a1b5777292be562da86"
+    },
+    {
+      "request": "15",
+      "task": "brand-usage.json",
+      "sha256": "8508fffa4490afdc5f38e732775ac6e541a901a42600b11ec956fbb09416ddfb"
+    },
+    {
+      "request": "11",
+      "task": "IDENTIDADE_VISUAL_COM_EVIDENCIA-v3.md",
+      "sha256": "5c09132bda5de3e01db066651dff54351be3da2b782787a384e9de97535cb65e"
+    },
+    {
+      "request": "16",
+      "task": "lesson-precision-edits.json",
+      "sha256": "54048f1b0fae28d75da9f7154057d999ac266580cdcad096b9be5eb26729a6af"
+    },
+    {
+      "request": "26",
+      "task": "remaining-icon-import-corrected.json",
+      "sha256": "79374275e79fbfa4ee574dcf07bc8af216357f7a13e48ddc4fb2ac1c3919f2bd"
+    },
+    {
+      "request": "27",
+      "task": "lesson-retrieval-edits.json",
+      "sha256": "d23a6dc99ddfa2932273ed538a75ace93bb9f0863ea0939814c2e6df94460088"
+    }
+  ],
+  "research": {
+    "collector": "LocalAuthor ResearchService",
+    "url_discovery": "Codex official-source search; no general search engine in LocalAuthor",
+    "training_allowed": false,
+    "sources": [
+      {
+        "role": "Jira/Atlassian",
+        "url": "https://atlassian.design/foundations/logos",
+        "collected": true,
+        "sha256": "5222793a3f3ae3da343b1917bc73228e47094d90f3ad2a143ab97283e34c81cb",
+        "title": "https://atlassian.design/foundations/logos",
+        "checked_at": "2026-10-07T14:58:12.241128+00:00"
+      },
+      {
+        "role": "Linear",
+        "url": "https://linear.app/brand",
+        "collected": true,
+        "sha256": "03513554c4721cb6acf17d30b9c2dbf1162d21b8211e62ac6bd4c5b2f9a6cf54",
+        "title": "https://linear.app/brand",
+        "checked_at": "2026-10-07T14:58:13.825940+00:00"
+      },
+      {
+        "role": "GitHub",
+        "url": "https://brand.github.com/foundations/logo",
+        "collected": true,
+        "sha256": "f08c4d26451c2e0d17809861270c5ebf7b52ac382c0d61b2ed6b9de438eb4459",
+        "title": "https://brand.github.com/foundations/logo",
+        "checked_at": "2026-10-07T14:58:14.819391+00:00"
+      },
+      {
+        "role": "ClickUp",
+        "url": "https://clickup.com/brand",
+        "collected": true,
+        "sha256": "b59b9a3a1271ebb0dc6e4df6df731e1f9cccdbec2f593d02b6ce261e088e260c",
+        "title": "https://clickup.com/brand",
+        "checked_at": "2026-10-07T14:58:15.884851+00:00"
+      }
+    ]
+  },
+  "supervision": "Reviewer supplied product brief, general reference principles and geometric constraints; inspected actual pixels, selected reviewed edits, performed deterministic color binding and operated QA. Not autonomous visual design.",
+  "selected": [
+    "07 plus10first edit and12: symbol",
+    "13 plus20: wordmark",
+    "18 plus22: favicon",
+    "14 component;17 selected edits plus24 corrected import",
+    "19 first edit plus23: advertisement branding",
+    "05 research plus08 date correction;15 usage",
+    "11 lesson plus16 precision",
+    "26 retained required non-brand lucide Orbit import after real TypeScript check",
+    "27 title and first intro clause only; editorial full stop, no guaranteed brand recognition"
+  ],
+  "rejected": [
+    "00 concept descriptions did not match geometry",
+    "01 symbol exceeded bounds;02 solid blobs;03 repeated squares",
+    "04 dash equals circumference and terminal inherited excessive stroke",
+    "07 misplaced gap/terminal corrected",
+    "06 and09 lessons with inaccurate guidance; originals preserved",
+    "10 second/third edits rejected; only rotation removal selected",
+    "13 missing dash;17 broken import;21 truncated response preserved, not applied;18 invisible terminal;19 CSS no-op; replaced by local corrections",
+    "Initial Next build found two remaining Orbit icon references; reviewer removal instruction was too broad. 25 invented OrbitLayoutDashboard, rejected;26 corrected import. Original candidate and failed logs preserved privately.",
+    "Initial consultation lesson did not match ordinary logo query.27 implied guaranteed recognition; that clause excluded. Title and factual purpose retained for discoverability."
+  ],
+  "external_ai_used": false,
+  "training_allowed": false,
+  "weights_changed": false,
+  "global_uniqueness_verified": false,
+  "commercial_recognition_verified": false,
+  "owner_approval": "pending",
+  "validation": {
+    "isolated_linux_docker": true,
+    "network_disabled": true,
+    "glyph_consistency_verified": true,
+    "brand_visual_cases": 24,
+    "sales_gallery_cases": 3,
+    "issues": [],
+    "sizes": [
+      16,
+      24,
+      32,
+      64
+    ],
+    "contrasts": {
+      "purple_on_white": 5.700590046673144,
+      "ink_on_white": 14.07885949142884,
+      "white_on_dark": 18.3904813024053,
+      "white_on_purple": 5.700590046673144
+    },
+    "pixel_review": "Supervisor inspected brand sheet, actual desktop/mobile product captures and updated salesad; no LocalAuthor pixel vision claimed.",
+    "app_build": [
+      {
+        "check": "deployment-policy",
+        "exit_code": 0
+      },
+      {
+        "check": "api-build",
+        "exit_code": 0
+      },
+      {
+        "check": "unit",
+        "exit_code": 0
+      },
+      {
+        "check": "web-build",
+        "exit_code": 0
+      },
+      {
+        "check": "functional",
+        "exit_code": 0
+      }
+    ],
+    "dotnet_tests": {
+      "total": 96,
+      "passed": 96,
+      "failed": 0
+    },
+    "functional_api_tests": 9,
+    "functional_native_git_tests": 12,
+    "browser_roles": [
+      {
+        "role": "admin",
+        "passed": true
+      },
+      {
+        "role": "manager",
+        "passed": true
+      },
+      {
+        "role": "member",
+        "passed": true
+      },
+      {
+        "role": "viewer",
+        "passed": true
+      }
+    ],
+    "browser_mobile_no_overflow": true,
+    "platform_tests": {
+      "run": 418,
+      "passed": 415,
+      "failed": 0,
+      "errors": 0,
+      "allowed_windows_symlink_skips": 3
+    },
+    "candidate_base_revision": "68c213a03cc2f029b58134ae23b4b1868b7a519c",
+    "candidate_worktree_snapshot": true,
+    "changed_source_hashes": {
+      "frontend/app/auth.tsx": "ae7746348ab20d10b6b3c92943745880ae0be289edc3e87399970554ddceecaa",
+      "frontend/app/brand.tsx": "173d2c4949f364a9a349dcd42f600b33b916e4cd887bd88c7d4e1d950cec4e00",
+      "frontend/app/globals.css": "1a54c293256c67574774757958b5eb19a4db940a79e159e0f1a6a10e19d86395",
+      "frontend/app/icon.svg": "7e96485fbc288883fb95940c0cf35e82478d850706903c801bf51090e263c78e",
+      "frontend/app/page.tsx": "60579292dc0d2076c8338c4d3dfbeed3672bfbdbc0f562cf8b8a17ddf352666a",
+      "frontend/public/brand/orbit-logo-inverse.svg": "8bb912d99210f3a57f0b85a37707349394e0d6066c35c1efd0fd77ae47e7598d",
+      "frontend/public/brand/orbit-logo-mono.svg": "72aeff1487f216aeb2a5161775e6585a72b12e65202d50e2fd3d12c50ce42867",
+      "frontend/public/brand/orbit-logo.svg": "d29ec8c344ebb2bd2c56871099cb3509b7a918cd877728814b6e10b788d88ebb"
+    }
+  },
+  "typography": "SVG uses Arial/Helvetica/sans-serif, no embedded font or font download. PNG exports preserve reviewed glyph appearance.",
+  "consultation": {
+    "identity": "IDENTIDADE_VISUAL_COM_EVIDENCIA",
+    "sha256": "c6d1ba0faf70a9eb7bd8545895b7a32e69f4c02bf61f8d35f8e7ff94a0d4b31b",
+    "version": 2,
+    "retrieval_queries": [
+      {
+        "query": "melhorar a logo do Orbit",
+        "retrieved": true
+      },
+      {
+        "query": "criar identidade visual SVG legível",
+        "retrieved": true
+      },
+      {
+        "query": "logo marca concorrentes",
+        "retrieved": true
+      }
+    ],
+    "backup_crc_verified": true,
+    "server_health": "ok",
+    "training_allowed": false
+  },
+  "product_capture": {
+    "source": "Orbit real isolated functional QA screenshot, synthetic fixture data",
+    "sha256": "1efd829089391ae8276f08775c79f6c5e8b10595ead0512406480913dc4fdbe3",
+    "local_author_capture": false,
+    "reviewer_operated": true
+  }
+}

@@ -67,6 +67,7 @@ jobs:
         with:
           node-version: '22'
       - run: node --check ui/foundation.js
+      - run: node --check ui/marketing.js
       - run: python -m pip install -r requirements-dev.txt
       - run: python -m playwright install --with-deps chromium
       - run: python scripts/ui-smoke.py
@@ -82,6 +83,7 @@ jobs:
             reports/foundation-ui-smoke.json
             reports/foundation-desktop.png
             reports/foundation-mobile.png
+            reports/work-profile-mobile.png
   source-package:
     needs: [python-tests, dotnet-build, browser-ui]
     if: ${{ success() && github.ref == 'refs/heads/main' }}

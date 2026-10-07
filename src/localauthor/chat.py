@@ -15,6 +15,8 @@ CHAT_SCHEMA = """
 CREATE TABLE IF NOT EXISTS project_preferences(
  project_id TEXT PRIMARY KEY REFERENCES projects(id), method TEXT NOT NULL,
  wip_limit INTEGER NOT NULL, definition_of_done TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS project_ai_profiles(
+ project_id TEXT PRIMARY KEY REFERENCES projects(id), profile TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS conversations(
  id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES projects(id),
  title TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
@@ -42,17 +44,24 @@ class ChatService:
         self.store.project(project_id)
         with self.store.connect() as db:
             row = db.execute("SELECT * FROM project_preferences WHERE project_id=?", (project_id,)).fetchone()
-        return {**(dict(row) if row else {"project_id": project_id, "method": "kanban", "wip_limit": 3, "definition_of_done": DONE}), "quality": QUALITY, "sources": SOURCES}
+            profile = db.execute("SELECT profile FROM project_ai_profiles WHERE project_id=?", (project_id,)).fetchone()
+        return {**(dict(row) if row else {"project_id": project_id, "method": "kanban", "wip_limit": 3, "definition_of_done": DONE}),
+                "work_profile": profile["profile"] if profile else "general", "quality": QUALITY, "sources": SOURCES}
 
-    def save_preferences(self, project_id, method, wip_limit, definition_of_done):
+    def save_preferences(self, project_id, method, wip_limit, definition_of_done, work_profile=None):
         self.store.project(project_id)
         if method not in {"scrum", "kanban"} or type(wip_limit) is not int or not 1 <= wip_limit <= 100:
             raise PolicyError("Selecione Scrum ou Kanban e um limite de 1 a 100 itens.")
         if not isinstance(definition_of_done, str) or not 1 <= len(definition_of_done.strip()) <= 2000:
             raise PolicyError("Definição de pronto deve ter de 1 a 2.000 caracteres.")
         reject_secrets(definition_of_done)
+        if work_profile is not None:
+            from .foundation.work_profiles import orientation
+            orientation(work_profile)
         with self.store.connect() as db:
             db.execute("INSERT INTO project_preferences VALUES(?,?,?,?) ON CONFLICT(project_id) DO UPDATE SET method=excluded.method,wip_limit=excluded.wip_limit,definition_of_done=excluded.definition_of_done", (project_id, method, wip_limit, definition_of_done.strip()))
+            if work_profile is not None:
+                db.execute("INSERT INTO project_ai_profiles VALUES(?,?) ON CONFLICT(project_id) DO UPDATE SET profile=excluded.profile", (project_id, work_profile))
         return self.preferences(project_id)
 
     def conversations(self, project_id):

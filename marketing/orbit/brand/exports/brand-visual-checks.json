@@ -1,0 +1,358 @@
+{
+  "cases": [
+    {
+      "file": "orbit-symbol.svg",
+      "svg": {
+        "vb": {
+          "w": 64,
+          "h": 64
+        },
+        "shapes": [
+          {
+            "tag": "circle",
+            "x": 12,
+            "y": 12,
+            "w": 40,
+            "h": 40,
+            "text": ""
+          },
+          {
+            "tag": "rect",
+            "x": 41.5,
+            "y": 13.5,
+            "w": 9,
+            "h": 9,
+            "text": ""
+          }
+        ]
+      },
+      "export": [
+        512,
+        512
+      ]
+    },
+    {
+      "file": "orbit-logo.svg",
+      "svg": {
+        "vb": {
+          "w": 224,
+          "h": 64
+        },
+        "shapes": [
+          {
+            "tag": "circle",
+            "x": 12,
+            "y": 12,
+            "w": 40,
+            "h": 40,
+            "text": ""
+          },
+          {
+            "tag": "rect",
+            "x": 41.5,
+            "y": 13.5,
+            "w": 9,
+            "h": 9,
+            "text": ""
+          },
+          {
+            "tag": "text",
+            "x": 76,
+            "y": 5,
+            "w": 106.671875,
+            "h": 53,
+            "text": "Orbit"
+          }
+        ]
+      },
+      "export": [
+        1120,
+        320
+      ]
+    },
+    {
+      "file": "orbit-logo-inverse.svg",
+      "svg": {
+        "vb": {
+          "w": 224,
+          "h": 64
+        },
+        "shapes": [
+          {
+            "tag": "circle",
+            "x": 12,
+            "y": 12,
+            "w": 40,
+            "h": 40,
+            "text": ""
+          },
+          {
+            "tag": "rect",
+            "x": 41.5,
+            "y": 13.5,
+            "w": 9,
+            "h": 9,
+            "text": ""
+          },
+          {
+            "tag": "text",
+            "x": 76,
+            "y": 5,
+            "w": 106.671875,
+            "h": 53,
+            "text": "Orbit"
+          }
+        ]
+      },
+      "export": [
+        1120,
+        320
+      ]
+    },
+    {
+      "file": "orbit-logo-mono.svg",
+      "svg": {
+        "vb": {
+          "w": 224,
+          "h": 64
+        },
+        "shapes": [
+          {
+            "tag": "circle",
+            "x": 12,
+            "y": 12,
+            "w": 40,
+            "h": 40,
+            "text": ""
+          },
+          {
+            "tag": "rect",
+            "x": 41.5,
+            "y": 13.5,
+            "w": 9,
+            "h": 9,
+            "text": ""
+          },
+          {
+            "tag": "text",
+            "x": 76,
+            "y": 5,
+            "w": 106.671875,
+            "h": 53,
+            "text": "Orbit"
+          }
+        ]
+      },
+      "export": [
+        1120,
+        320
+      ]
+    },
+    {
+      "file": "orbit-symbol-inverse.svg",
+      "svg": {
+        "vb": {
+          "w": 64,
+          "h": 64
+        },
+        "shapes": [
+          {
+            "tag": "circle",
+            "x": 12,
+            "y": 12,
+            "w": 40,
+            "h": 40,
+            "text": ""
+          },
+          {
+            "tag": "rect",
+            "x": 41.5,
+            "y": 13.5,
+            "w": 9,
+            "h": 9,
+            "text": ""
+          }
+        ]
+      },
+      "export": [
+        512,
+        512
+      ]
+    },
+    {
+      "file": "orbit-symbol-mono.svg",
+      "svg": {
+        "vb": {
+          "w": 64,
+          "h": 64
+        },
+        "shapes": [
+          {
+            "tag": "circle",
+            "x": 12,
+            "y": 12,
+            "w": 40,
+            "h": 40,
+            "text": ""
+          },
+          {
+            "tag": "rect",
+            "x": 41.5,
+            "y": 13.5,
+            "w": 9,
+            "h": 9,
+            "text": ""
+          }
+        ]
+      },
+      "export": [
+        512,
+        512
+      ]
+    },
+    {
+      "file": "orbit-icon.svg",
+      "svg": {
+        "vb": {
+          "w": 64,
+          "h": 64
+        },
+        "shapes": [
+          {
+            "tag": "rect",
+            "x": 0,
+            "y": 0,
+            "w": 64,
+            "h": 64,
+            "text": ""
+          },
+          {
+            "tag": "circle",
+            "x": 12,
+            "y": 12,
+            "w": 40,
+            "h": 40,
+            "text": ""
+          },
+          {
+            "tag": "rect",
+            "x": 41.5,
+            "y": 13.5,
+            "w": 9,
+            "h": 9,
+            "text": ""
+          }
+        ]
+      },
+      "export": [
+        512,
+        512
+      ]
+    },
+    {
+      "size": 16,
+      "file": "orbit-symbol.svg",
+      "background": "#FFFFFF",
+      "image_loaded": true
+    },
+    {
+      "size": 16,
+      "file": "orbit-symbol-inverse.svg",
+      "background": "#101325",
+      "image_loaded": true
+    },
+    {
+      "size": 16,
+      "file": "orbit-symbol-mono.svg",
+      "background": "#FFFFFF",
+      "image_loaded": true
+    },
+    {
+      "size": 16,
+      "file": "orbit-icon.svg",
+      "background": "#FFFFFF",
+      "image_loaded": true
+    },
+    {
+      "size": 24,
+      "file": "orbit-symbol.svg",
+      "background": "#FFFFFF",
+      "image_loaded": true
+    },
+    {
+      "size": 24,
+      "file": "orbit-symbol-inverse.svg",
+      "background": "#101325",
+      "image_loaded": true
+    },
+    {
+      "size": 24,
+      "file": "orbit-symbol-mono.svg",
+      "background": "#FFFFFF",
+      "image_loaded": true
+    },
+    {
+      "size": 24,
+      "file": "orbit-icon.svg",
+      "background": "#FFFFFF",
+      "image_loaded": true
+    },
+    {
+      "size": 32,
+      "file": "orbit-symbol.svg",
+      "background": "#FFFFFF",
+      "image_loaded": true
+    },
+    {
+      "size": 32,
+      "file": "orbit-symbol-inverse.svg",
+      "background": "#101325",
+      "image_loaded": true
+    },
+    {
+      "size": 32,
+      "file": "orbit-symbol-mono.svg",
+      "background": "#FFFFFF",
+      "image_loaded": true
+    },
+    {
+      "size": 32,
+      "file": "orbit-icon.svg",
+      "background": "#FFFFFF",
+      "image_loaded": true
+    },
+    {
+      "size": 64,
+      "file": "orbit-symbol.svg",
+      "background": "#FFFFFF",
+      "image_loaded": true
+    },
+    {
+      "size": 64,
+      "file": "orbit-symbol-inverse.svg",
+      "background": "#101325",
+      "image_loaded": true
+    },
+    {
+      "size": 64,
+      "file": "orbit-symbol-mono.svg",
+      "background": "#FFFFFF",
+      "image_loaded": true
+    },
+    {
+      "size": 64,
+      "file": "orbit-icon.svg",
+      "background": "#FFFFFF",
+      "image_loaded": true
+    },
+    {
+      "contrasts": {
+        "purple_on_white": 5.700590046673144,
+        "ink_on_white": 14.07885949142884,
+        "white_on_dark": 18.3904813024053,
+        "white_on_purple": 5.700590046673144
+      }
+    }
+  ],
+  "issues": []
+}

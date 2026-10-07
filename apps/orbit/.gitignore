@@ -1,0 +1,10 @@
+node_modules/
+.next/
+bin/
+obj/
+.env*
+!.env.example
+*.log
+artifacts/
+
+.next-flow/

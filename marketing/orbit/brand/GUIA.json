@@ -1,0 +1,19 @@
+{
+  "meaning": "O aberto e terminal quadrado sugerem conexão entre projetos e código; essa é uma interpretação de design, não uma prova de reconhecimento comercial.",
+  "colors": {
+    "primary": "#6554CB",
+    "ink": "#252B3D",
+    "dark_background": "#101325"
+  },
+  "clear_space": "Espaço claro ao redor pelo menos 1/4 da altura do símbolo.",
+  "minimum_sizes": {
+    "symbol": "16px",
+    "preferred": "24px (interface)"
+  },
+  "variants": {
+    "white_on_dark": "Versão branca em fundo escuro",
+    "black_single_color": "Versão preta para uso de uma cor"
+  },
+  "avoid": "Nenhum efeito, redesenho em cada tela, fontes embutidas ou garantias de qualidade, exclusividade ou registro de marca.",
+  "limitation": "Preserve proporções, use Arial/Helvetica/sans-serif em SVG, PNG exportado preserva aparência. Não invente testes, vendas ou treinamento de pesos."
+}

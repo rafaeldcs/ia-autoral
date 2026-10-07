@@ -32,10 +32,22 @@ def main(argv=None) -> int:
     register.add_argument("--output-tokens", type=int, default=768)
     register.add_argument("--enable-thinking", action="store_true", help="Exige template/modelo textual homologado; não altera os pesos.")
     register.add_argument("--generation-seconds", type=int, default=300, help="Orçamento cooperativo de geração, entre 1 e 3600 segundos; não limita carregamento.")
+    register.add_argument("--backend", choices=["transformers", "gguf-docker"], default="transformers")
+    register.add_argument("--gguf-image-id")
+    register.add_argument("--gguf-volume")
+    register.add_argument("--reasoning-budget", type=int, default=0)
     knowledge = commands.add_parser("import-md")
     knowledge.add_argument("project_id")
     knowledge.add_argument("file", type=Path)
     knowledge.add_argument("--title", required=True)
+    knowledge.add_argument("--source-id", help="Identidade estável; nova versão invalida derivados antigos")
+    revoke = commands.add_parser("revoke-source")
+    revoke.add_argument("project_id")
+    revoke.add_argument("source_id")
+    recall = commands.add_parser("recall")
+    recall.add_argument("project_id")
+    recall.add_argument("query")
+    recall.add_argument("--code-revision", required=True)
     show = commands.add_parser("experience")
     show.add_argument("project_id")
     show.add_argument("run_id")
@@ -51,57 +63,33 @@ def main(argv=None) -> int:
     export = commands.add_parser("export-training")
     export.add_argument("project_id")
     export.add_argument("kind", choices=["text", "code", "image"])
+    export.add_argument("--split", choices=["train", "validation"], default="train")
     args = parser.parse_args(argv)
     try:
         home = local_path(args.home)
         if args.command == "status":
             result = FoundationService(home).status()
         elif args.command == "register-model":
+            if args.backend == "transformers" and (args.gguf_image_id or args.gguf_volume or args.reasoning_budget):
+                raise PolicyError("Opções GGUF exigem backend gguf-docker.")
+            runtime_profile = {"image_id": args.gguf_image_id, "volume": args.gguf_volume,
+                               "reasoning_budget": args.reasoning_budget} if args.backend == "gguf-docker" else {}
             target = home / "foundation" / f"{args.kind}-model.json"
             register_model(args.directory, target, model_id=args.model_id,
                 revision=args.revision, license=args.license, reviewed_by=args.reviewed_by,
                 capability=args.kind, reviewed_local_code=args.reviewed_local_code,
                 device=args.device, dtype=args.dtype, context_tokens=args.context_tokens,
-                output_tokens=args.output_tokens, enable_thinking=args.enable_thinking,
-                generation_seconds=args.generation_seconds)
+                output_tokens=args.output_tokens, enable_thinking=args.enable_thinking, generation_seconds=args.generation_seconds, backend=args.backend, runtime_profile=runtime_profile)
             result = {"manifest": str(target), "registered": True, "inference_tested": False}
         elif args.command == "import-md":
-            identifier(args.project_id)
-            if (home / "server.lock").exists():
-                raise PolicyError("Encerre o servidor antes de atualizar o manifesto Markdown pelo CLI.")
-            file = local_path(args.file)
-            if file.suffix.lower() != ".md":
-                raise PolicyError("Selecione Markdown.")
-            with file.open("rb") as stream:
-                raw = stream.read(200001)
-            if len(raw) > 200000:
-                raise PolicyError("Markdown excede 200 KB.")
-            text = raw.decode("utf-8")
-            from ..safety import reject_secrets
-            reject_secrets(text)
-            root = local_path(home / "foundation" / "knowledge" / args.project_id)
-            root.mkdir(parents=True, exist_ok=True)
-            manifest = root / "sources.json"
-            data = read_object(manifest) if manifest.exists() else {"schema": 1, "sources": []}
-            if data.get("schema") != 1 or not isinstance(data.get("sources"), list) or len(data["sources"]) >= 200:
-                raise PolicyError("Manifesto inválido ou limite de fontes atingido.")
-            name = uuid.uuid4().hex + ".md"
-            destination = child(root, name)
-            fd = os.open(destination, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-            with os.fdopen(fd, "wb") as stream:
-                stream.write(raw)
-            data["sources"].append({"path": name, "scope": args.project_id,
-                "title": args.title, "sha256": hashlib.sha256(raw).hexdigest(), "training_allowed": False})
-            temporary = root / (uuid.uuid4().hex + ".json")
-            try:
-                write_new(temporary, data)
-                local_path(manifest)
-                os.replace(temporary, manifest)
-            except Exception:
-                destination.unlink(missing_ok=True)
-                temporary.unlink(missing_ok=True)
-                raise
-            result = {"source": name, "scope": args.project_id, "training_allowed": False}
+            from .knowledge import import_markdown
+            entry = import_markdown(home, args.project_id, args.file, args.title, args.source_id)
+            result = {**entry, "source": entry["path"]}
+        elif args.command == "revoke-source":
+            from .knowledge import revoke_source
+            result = revoke_source(home, args.project_id, args.source_id)
+        elif args.command == "recall":
+            result = ExperienceStore(home).recall(args.project_id, args.query, code_revision=args.code_revision)
         elif args.command == "experience":
             result = ExperienceStore(home).get(args.project_id, args.run_id)
         elif args.command == "review":
@@ -112,7 +100,7 @@ def main(argv=None) -> int:
                 verification_note=args.verification_note, split=args.split)
             result = {"reviewed": True, "weights_modified": False}
         else:
-            rows = ExperienceStore(home).training_rows(args.project_id, args.kind)
+            rows = ExperienceStore(home).training_rows(args.project_id, args.kind, args.split)
             if not rows:
                 raise PolicyError("Não há experiências autorizadas e verificadas para exportação.")
             if args.kind == "image":

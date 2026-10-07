@@ -27,6 +27,10 @@ CREATE TABLE IF NOT EXISTS reviews (
  id INTEGER PRIMARY KEY, experience_id TEXT NOT NULL, created_at TEXT NOT NULL,
  decision TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS source_revocations (
+ project_id TEXT NOT NULL, source_id TEXT NOT NULL, sha256 TEXT NOT NULL,
+ PRIMARY KEY(project_id,source_id,sha256)
+);
 """
 
 
@@ -113,24 +117,74 @@ class ExperienceStore:
             raise PolicyError("Revisão excessiva.")
         with self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
-            row = db.execute("SELECT output_hash FROM experiences WHERE project_id=? AND id=?",
+            row = db.execute("SELECT output_hash,metadata FROM experiences WHERE project_id=? AND id=?",
                              (identifier(project_id), identifier(run_id))).fetchone()
             if row is None or row["output_hash"] != expected_hash:
                 raise PolicyError("A revisão não corresponde à saída registrada.")
+            if (accepted or training_allowed) and self._revoked(db, project_id, json.loads(row["metadata"])):
+                raise PolicyError("Experiência depende de fonte revogada; gere nova experiência com contexto atualizado.")
             db.execute("UPDATE experiences SET accepted=?,training_allowed=?,rights_reviewed=?,verified=?,reviewer=?,verification_note=?,split=? WHERE id=?",
                        (*flags, reviewer.strip(), verification_note.strip(), split, run_id))
             db.execute("INSERT INTO reviews(experience_id,created_at,decision) VALUES(?,?,?)",
                        (run_id, now(), json.dumps(decision, ensure_ascii=False)))
 
-    def training_rows(self, project_id: str, kind: str) -> list[dict]:
+    def invalidate_source(self, project_id: str, source_id: str, sha256: str) -> int:
+        """Revoke consultation/training approval; preserve the original evidence."""
+        affected = 0
+        with self.connect() as db:
+            db.execute("BEGIN IMMEDIATE")
+            db.execute("INSERT OR IGNORE INTO source_revocations VALUES(?,?,?)", (identifier(project_id), source_id, sha256))
+            rows = db.execute("SELECT id,metadata FROM experiences WHERE project_id=?",
+                              (identifier(project_id),)).fetchall()
+            for row in rows:
+                metadata = json.loads(row["metadata"])
+                if any(e.get("source_id") == source_id and e.get("sha256") == sha256
+                       for e in metadata.get("evidence", [])):
+                    db.execute("UPDATE experiences SET accepted=0,verified=0,training_allowed=0 WHERE id=?", (row["id"],))
+                    db.execute("INSERT INTO reviews(experience_id,created_at,decision) VALUES(?,?,?)",
+                               (row["id"], now(), json.dumps({"invalidated_source": source_id, "sha256": sha256})))
+                    affected += 1
+        return affected
+
+    @staticmethod
+    def _revoked(db, project_id: str, metadata: dict) -> bool:
+        return any(db.execute("SELECT 1 FROM source_revocations WHERE project_id=? AND source_id=? AND sha256=?",
+                              (project_id, entry.get("source_id"), entry.get("sha256"))).fetchone()
+                   for entry in metadata.get("evidence", []))
+
+    def recall(self, project_id: str, query: str, *, code_revision: str, limit: int = 5) -> list[dict]:
+        """Only verified, accepted experiences for the identical code revision."""
+        from .context import words
+        if not code_revision or not 1 <= limit <= 10:
+            raise PolicyError("Informe revisão de código e limite válido.")
+        with self.connect() as db:
+            rows = db.execute("SELECT * FROM experiences WHERE project_id=? AND accepted=1 AND verified=1 ORDER BY created_at DESC LIMIT 200",
+                              (identifier(project_id),)).fetchall()
+            rows = [row for row in rows if not self._revoked(db, project_id, json.loads(row["metadata"]))]
+        ranked = []
+        for row in rows:
+            metadata = json.loads(row["metadata"])
+            if metadata.get("code_revision") != code_revision:
+                continue
+            score = len(words(query) & words(row["prompt"] + " " + row["response"]))
+            if score:
+                ranked.append((score, {"id": row["id"], "prompt": row["prompt"], "response": row["response"],
+                                      "created_at": row["created_at"], "verification_note": row["verification_note"],
+                                      "code_revision": code_revision, "training_allowed": bool(row["training_allowed"])}))
+        return [item for _, item in sorted(ranked, key=lambda pair: -pair[0])[:limit]]
+
+    def training_rows(self, project_id: str, kind: str, split: str = "train") -> list[dict]:
         if kind not in {"text", "code", "image"}:
             raise PolicyError("Tipo de corpus inválido.")
+        if split not in {"train", "validation"}:
+            raise PolicyError("A avaliação final não é exportada para desenvolvimento.")
         with self.connect() as db:
             rows = db.execute("""SELECT * FROM experiences e WHERE project_id=? AND kind=?
                 AND accepted=1 AND training_allowed=1 AND rights_reviewed=1 AND verified=1
-                AND split='train' AND NOT EXISTS (SELECT 1 FROM experiences h
-                    WHERE h.problem_hash=e.problem_hash AND h.split IN ('validation','test'))
-                ORDER BY created_at,id""", (identifier(project_id), kind)).fetchall()
+                AND split=? AND NOT EXISTS (SELECT 1 FROM experiences h
+                    WHERE h.problem_hash=e.problem_hash AND h.split IN ('validation','test') AND h.split<>e.split)
+                ORDER BY created_at,id""", (identifier(project_id), kind, split)).fetchall()
+            rows = [row for row in rows if not self._revoked(db, project_id, json.loads(row["metadata"]))]
         seen, output = set(), []
         for row in rows:
             if row["problem_hash"] in seen:
@@ -140,7 +194,7 @@ class ExperienceStore:
             context = metadata.get("generation_context")
             if not isinstance(context, list) or not context:
                 context = [{"role": "user", "content": row["prompt"]}]
-            output.append({"id": row["id"], "kind": kind, "split": "train",
+            output.append({"id": row["id"], "kind": kind, "split": split, "project_id": project_id,
                 "messages": [*context, {"role": "assistant", "content": row["response"]}],
                 "metadata": metadata, "output_hash": row["output_hash"],
                 "reviewer": row["reviewer"], "verification_note": row["verification_note"]})

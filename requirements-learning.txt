@@ -1,0 +1,11 @@
+# CPU experiment environment; installed only in the dedicated learning image.
+# Install torch/torchvision from the official CPU index (see Dockerfile).
+# 5.3 breaks Diffusers 0.35.2 StableDiffusionSafetyChecker loading.
+transformers==4.57.6
+diffusers==0.35.2
+accelerate==1.12.0
+peft==0.18.1
+safetensors==0.7.0
+Pillow==11.3.0
+sentencepiece==0.2.1
+numpy==2.3.5

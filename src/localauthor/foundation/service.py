@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import base64
+import gc
 import hashlib
 import io
 import os
@@ -19,18 +20,26 @@ from .runtime import ImageRuntime, TextRuntime, check_cancel
 MAX_ARTIFACT_BYTES = 256_000_000
 
 
+def text_runtime(spec, diagnostics=None):
+    if spec.backend == "gguf-docker":
+        from .gguf_bridge import DockerGgufRuntime
+        return DockerGgufRuntime(spec, diagnostics=diagnostics)
+    return TextRuntime(spec)
+
+
 class FoundationService:
-    def __init__(self, home: Path, *, text_factory=TextRuntime, image_factory=ImageRuntime):
+    def __init__(self, home: Path, *, text_factory=None, image_factory=ImageRuntime):
         self.home = Path(home)
-        self.factories = {"text": text_factory, "image": image_factory}
+        self.factories = {"text": text_factory or (lambda spec: text_runtime(spec, self.home / "foundation/runtime")), "image": image_factory}
         self._cache = {}
         self._lock = threading.RLock()
         self._unload_failed = False
 
     def status(self) -> dict:
         base = local_path(self.home / "foundation")
+        cache = self._cache.copy()
         return {"capabilities": {kind: {"registered": (base / f"{kind}-model.json").is_file(),
-                "loaded": kind in self._cache} for kind in self.factories},
+                "loaded": kind in cache and not getattr(cache[kind][2], "closed", False)} for kind in self.factories},
                 "remote_fallback": False, "weights_trained_here": False,
                 "image_understanding": False, "generated_code_execution": False,
                 "residency_policy": "single_model", "unload_failed": self._unload_failed}
@@ -43,25 +52,29 @@ class FoundationService:
             raise PolicyError("Falha ao liberar o runtime; reinicie o processo antes de carregar outro modelo.") from exc
 
     def _release(self, kind: str) -> None:
-        cached = self._cache.pop(kind, None)
+        cached = self._cache.get(kind)
         if cached is not None:
             self._dispose(cached[2])
+            self._cache.pop(kind, None)
 
     def unload(self) -> None:
-        """Explicit release under the same lock used by generation."""
         with self._lock:
             for kind in list(self._cache):
                 self._release(kind)
+            self._unload_failed = False
+
+    def close(self):
+        return self.unload()
 
     def _engine(self, kind: str, cancel=None):
         check_cancel(cancel)
         if self._unload_failed:
-            raise PolicyError("Runtime bloqueado após falha de liberação; reinicie o processo.")
+            self.unload()
         if kind not in self.factories:
             raise PolicyError("Capacidade local não suportada.")
         spec = ModelSpec.load(self.home / "foundation" / f"{kind}-model.json", kind)
         cached = self._cache.get(kind)
-        if cached and cached[0].manifest_sha256 == spec.manifest_sha256:
+        if cached and not getattr(cached[2], "closed", False) and cached[0].manifest_sha256 == spec.manifest_sha256:
             if spec.signature() != cached[1]:
                 self._release(kind)
                 raise PolicyError("Arquivos de modelo mudaram durante a sessão. Reinicie após revisão.")
@@ -86,13 +99,14 @@ class FoundationService:
         return spec, engine
 
     def answer(self, project_id: str, message: str, history: list[dict], evidence: list[dict],
-               cancel=None, *, input_format: str = "text") -> dict:
+               cancel=None, *, input_format: str = "text", work_profile: str = "general", project_guidance=None) -> dict:
         project_id = identifier(project_id)
         with self._lock:
             spec, engine = self._engine("text", cancel)
             notes = markdown_evidence(self.home / "foundation" / "knowledge" / project_id, message, project_id)
             context = build_context(message, history, [*evidence, *notes], scope=project_id,
-                       count=engine.count, context_tokens=spec.context_tokens, output_tokens=spec.output_tokens)
+                       count=engine.count, context_tokens=spec.context_tokens, output_tokens=spec.output_tokens,
+                       work_profile=work_profile, project_guidance=project_guidance)
             content, truncated = engine.generate(context.messages, cancel)
             check_cancel(cancel)
             if not isinstance(content, str) or not content.strip():
@@ -103,6 +117,7 @@ class FoundationService:
                 "history_messages_used": context.history_used,
                 "omitted_history": context.omitted_history, "omitted_evidence": context.omitted_evidence,
                 "possibly_truncated": truncated,
+                "work_profile": work_profile,
                 "notice": "Modelo local de origem registrada. Código não executado nem aplicado. "
                           "Memória não é treinamento; nenhuma experiência foi autorizada para treino automaticamente."}
             if truncated:
@@ -113,21 +128,22 @@ class FoundationService:
                 "code" if input_format == "code" else "text", message, content, metadata)
             return result
 
-    def create_image(self, project_id: str, prompt: str, cancel=None) -> dict:
+    def create_image(self, project_id: str, prompt: str, cancel=None, *, options=None) -> dict:
+        from .visual import ImageOptions, verify_png
+        profile = ImageOptions.parse(options)
         project_id = identifier(project_id)
         if not isinstance(prompt, str) or not prompt.strip() or len(prompt) > 8000:
             raise PolicyError("Descrição de imagem vazia ou excessiva.")
         with self._lock:
             spec, engine = self._engine("image", cancel)
-            image = engine.generate(prompt, cancel)
+            image = engine.generate(prompt, cancel) if options is None else engine.generate(prompt, cancel, options=profile.metadata())
             check_cancel(cancel)
-            if getattr(image, "size", None) != (512, 512):
+            if getattr(image, "size", None) != (profile.width, profile.height):
                 raise PolicyError("Pipeline retornou dimensões inesperadas.")
             buffer = io.BytesIO()
             image.save(buffer, format="PNG")
             raw = buffer.getvalue()
-            if not raw.startswith(b"\x89PNG\r\n\x1a\n") or len(raw) > 8000000:
-                raise PolicyError("Artefato visual inválido ou excessivo.")
+            verify_png(raw, (profile.width, profile.height))
             base = local_path(self.home / "foundation" / "artifacts")
             used = 0
             def fail_walk(error):
@@ -145,7 +161,7 @@ class FoundationService:
             result = {"origin": "foundation_image", "content": "Imagem gerada pelo LocalAuthor com o modelo visual local registrado.",
                 "sources": [], "model": spec.provenance(), "artifact_id": run_id,
                 "artifact_sha256": hashlib.sha256(raw).hexdigest(),
-                "width": 512, "height": 512, "seed": 31, "steps": 20,
+                **profile.metadata(),
                 "notice": "Geração visual não é capacidade do Nemotron textual. Revise a imagem; não houve treinamento nem edição dos seus arquivos."}
             fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
             try:
@@ -174,5 +190,7 @@ class FoundationService:
         if (len(raw) > 8000000 or not raw.startswith(b"\x89PNG\r\n\x1a\n")
                 or hashlib.sha256(raw).hexdigest() != row["metadata"].get("artifact_sha256")):
             raise PolicyError("Integridade da imagem não confere.")
+        from .visual import verify_png
+        verify_png(raw, (row["metadata"]["width"], row["metadata"]["height"]))
         return {"data": "data:image/png;base64," + base64.b64encode(raw).decode("ascii"),
                 "sha256": row["metadata"]["artifact_sha256"]}

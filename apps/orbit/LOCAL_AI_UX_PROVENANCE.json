@@ -1,0 +1,299 @@
+{
+  "schema": 1,
+  "feature": "Replace stacked Orbit Git interface with exclusive navigable areas",
+  "date": "2026-10-06",
+  "baseline_sha": "bb2ad46e6c29fcad8dd6f36098632a30b498b8bc",
+  "model_id": "Qwen/Qwen3-8B-GGUF",
+  "model_revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+  "local_inference_only": true,
+  "weights_modified": false,
+  "autonomous_programmer_qualified": false,
+  "authorship": "LocalAuthor generated product responses, patches and the consultation lesson. Codex supplied contracts, reviewed/selectively accepted exact model edits, authored acceptance tests and operated validation/delivery. Declared mechanical whitespace formatting only; no reviewer product repair.",
+  "rejected_attempts": [
+    {
+      "attempt": 2,
+      "reason": "Decorative duplicated navigation; original stacked layout retained"
+    },
+    {
+      "attempt": 4,
+      "reason": "Truncated CSS"
+    },
+    {
+      "attempt": 5,
+      "reason": "Invalid JSX and invented GitHistory props"
+    },
+    {
+      "attempt": 6,
+      "reason": "Wrong patch contract, invented old strings and open settings"
+    },
+    {
+      "attempt": 9,
+      "reason": "Color variables used as lengths, rigid mobile width, global selectors"
+    },
+    {
+      "attempt": 14,
+      "reason": "Duplicate JSON keys and unmatched old placeholder"
+    }
+  ],
+  "selected_partial_attempts": [
+    {
+      "attempt": 7,
+      "reason": "Only exact state/reset/disclosure/files edits accepted; invalid access-token property and incomplete wrapper rejected"
+    },
+    {
+      "attempt": 13,
+      "reason": "Only closing toolbar/compact SHA/loaded empty text accepted; unmatched opening rejected"
+    }
+  ],
+  "qualification": {
+    "scope": "Supervised Orbit UX change and an oriented marketing transfer exercise; not universal UX autonomy",
+    "checks": [
+      {
+        "check": "deployment-policy",
+        "exit_code": 0
+      },
+      {
+        "check": "api-build",
+        "exit_code": 0
+      },
+      {
+        "check": "unit",
+        "exit_code": 0
+      },
+      {
+        "check": "web-build",
+        "exit_code": 0
+      },
+      {
+        "check": "functional",
+        "exit_code": 0
+      }
+    ],
+    "browser": {
+      "roles": [
+        {
+          "role": "admin",
+          "passed": true
+        },
+        {
+          "role": "manager",
+          "passed": true
+        },
+        {
+          "role": "member",
+          "passed": true
+        },
+        {
+          "role": "viewer",
+          "passed": true
+        }
+      ],
+      "passed": true,
+      "exclusive_areas": true,
+      "collapsed_settings": true,
+      "keyboard_navigation": true,
+      "token_discard_on_exit": true,
+      "project_reset": true,
+      "mobile_areas_no_overflow": true
+    },
+    "screenshots": "Reviewer acceptance browser, synthetic QA data; not screenshots independently captured by the model"
+  },
+  "files": [
+    {
+      "file": "apps/orbit/frontend/app/git.tsx",
+      "sha256_utf8_lf": "dbbc8cd277add0199c29dcda7a922cd2c6bcdf87f9e5cbe21a140e45a59f584a",
+      "local_model_attempts": [
+        {
+          "attempt": 10,
+          "response_sha256": "ca184322e1f59f53deff10335bc69550c91de53cee2192bcc8ed7e74c9d4ef9c",
+          "reviewed_indices": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "attempt": 12,
+          "response_sha256": "d3998411dc96c22b6fc6844ab2cf51779c7b012a9e854e50ebb41d21cb42eb60",
+          "reviewed_indices": [
+            0
+          ]
+        },
+        {
+          "attempt": 13,
+          "response_sha256": "9fc6e2f78a2f5307687af8cc6d87119e215412ea3773831286558473b48e06d7",
+          "reviewed_indices": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "attempt": 21,
+          "response_sha256": "aa74a655ad2e289652ec1103fa77b0647098209ac2bd36413324393746a4a117",
+          "reviewed_indices": [
+            0
+          ]
+        },
+        {
+          "attempt": 24,
+          "response_sha256": "f67340e55d8ad5dc32e5efbabb93cd09e56fc1abaf123b5b0b30d925fea03f75",
+          "reviewed_indices": [
+            0
+          ]
+        },
+        {
+          "attempt": 26,
+          "response_sha256": "2aa45ec30306efefe7a3ec729ae9a88951d9d48c2eafd2dd38b471bb3265a4e7",
+          "reviewed_indices": [
+            0
+          ]
+        },
+        {
+          "attempt": 11,
+          "response_sha256": "cecdbe946c19162d152e3ceeee16f9df46bdbd86be78182a8b1d77e69a23ef09",
+          "assembly": "exact fragment with reviewed model patches, appended with newline only"
+        },
+        {
+          "attempt": 19,
+          "response_sha256": "94efbf08c995c7d080c2b1f3ced468edf1242a2dbeca7b2e7d43ee8b5b2d45c6",
+          "reviewed_indices": [
+            0,
+            1,
+            2
+          ],
+          "target": "exact appended fragment"
+        }
+      ],
+      "formatting": {
+        "operation": "trailing line whitespace and blank EOF only",
+        "before_sha256_utf8_lf": "65489a1ada07ee9dde26cff75022adddc7e28377a4fca9a1a48e1daaa3f224d5",
+        "logic_modified": false
+      },
+      "application": "exact response/patch/fragment; declared mechanical whitespace only, no reviewer repair"
+    },
+    {
+      "file": "apps/orbit/frontend/app/hosted-repository.tsx",
+      "sha256_utf8_lf": "d46a2a48ba38c8fc0d6b5c2c71f3cd5f3f11eb76c991599bb538e8ec1b3d32ce",
+      "local_model_attempts": [
+        {
+          "attempt": 3,
+          "response_sha256": "c0d736376f715ea787c143b61badb5c66069b86312f6ae6300be1bcee672249e"
+        },
+        {
+          "attempt": 7,
+          "response_sha256": "f7964d9676543716267fdc6f6ad249411ac1fa4da5202fb91aa29f40cb237ec6",
+          "reviewed_indices": [
+            0,
+            1,
+            2,
+            5,
+            6
+          ]
+        },
+        {
+          "attempt": 15,
+          "response_sha256": "a55647a2a33022d90f556b4ce95374f5e37ab8643646fe0316e9f5b7a8794d7f",
+          "reviewed_indices": [
+            0,
+            1
+          ]
+        },
+        {
+          "attempt": 16,
+          "response_sha256": "f3ed88344a6fcce20e6a063529523af716007fdd7e97259f87c941cac4e772d8",
+          "reviewed_indices": [
+            0
+          ]
+        },
+        {
+          "attempt": 22,
+          "response_sha256": "8fe127c91104b970039c63df93fa8266607c406a2a57e861177b74fb4a57dded",
+          "reviewed_indices": [
+            0,
+            1
+          ]
+        },
+        {
+          "attempt": 30,
+          "response_sha256": "fbbb1555fbc4cf1f80ab9c2e8b027842137bf100db3c50369ad807038b5b5dd2",
+          "reviewed_indices": [
+            0
+          ]
+        },
+        {
+          "attempt": 33,
+          "response_sha256": "ceca5b71f64318bc9726043a7c3bdb5588ba8fce3d5b25f112c434893584f4be",
+          "reviewed_indices": [
+            0
+          ]
+        },
+        {
+          "attempt": 27,
+          "response_sha256": "1370ef69e797b5f76f494413cf24a70edad95c99f2eee81ead5c106dad10d1d8",
+          "assembly": "exact JSX fragment replacing reviewed original block",
+          "replaced_baseline_sha256": "7f80a11502b95086662f9e09e4e29ee343b6e1be2545ab8c398038398d7b720d"
+        }
+      ],
+      "formatting": {
+        "operation": "trailing line whitespace and blank EOF only",
+        "before_sha256_utf8_lf": "d46a2a48ba38c8fc0d6b5c2c71f3cd5f3f11eb76c991599bb538e8ec1b3d32ce",
+        "logic_modified": false
+      },
+      "application": "exact response/patch/fragment; declared mechanical whitespace only, no reviewer repair"
+    },
+    {
+      "file": "apps/orbit/frontend/app/hosted.css",
+      "sha256_utf8_lf": "021f5bc61f8c9443438dc922c3f022f3c9739aa8d0635f3d24d6e754703ca4fc",
+      "local_model_attempts": [
+        {
+          "attempt": 17,
+          "response_sha256": "d59d86f11aa2b09f9fefa2dd0c9422cb5b4111c1b255d445c63a5de8dd53873a"
+        },
+        {
+          "attempt": 23,
+          "response_sha256": "f5725e70a4c23b55ed99b90ce747059a3a0825d8334eb8777e27e0b5d3f9411c",
+          "reviewed_indices": [
+            0,
+            1
+          ]
+        },
+        {
+          "attempt": 31,
+          "response_sha256": "b033db383a4b96ca7049e6bceae11ded81942cd2fa67f2e7da7efbd784a95d7f",
+          "assembly": "exact fragment with reviewed model patches, appended with newline only"
+        }
+      ],
+      "formatting": null,
+      "application": "exact response/patch/fragment; declared mechanical whitespace only, no reviewer repair"
+    },
+    {
+      "file": "knowledge/skills/EVOLUIR_INTERFACE_SEM_ACUMULAR.md",
+      "sha256_utf8_lf": "48c9cf54876c015d3c008c8b17eef7ca5763f92d510954b642ee86f38718dc0d",
+      "local_model_attempts": [
+        {
+          "attempt": 8,
+          "response_sha256": "1ab4b7a9952dd03fef6cd874ead0f02ec7e7233b1a787bae68c3fc6c57051204"
+        },
+        {
+          "attempt": 32,
+          "response_sha256": "958caeb3f5dbaf821aafbcfa6531d9fd03bda9935ea596f0f698f7766f7c9fa4",
+          "assembly": "exact JSX fragment replacing reviewed original block",
+          "replaced_baseline_sha256": "001f011dbe64e6589720e4d0a2cb7ee66b7d2d386cc1e73ff14e57cce19b5b32"
+        }
+      ],
+      "formatting": {
+        "operation": "trailing line whitespace and blank EOF only",
+        "before_sha256_utf8_lf": "8a65541a62bebadcf59fba293c4db81ed685d6918b26c1a42fb048ba6052c1eb",
+        "logic_modified": false
+      },
+      "application": "exact response/patch/fragment; declared mechanical whitespace only, no reviewer repair"
+    }
+  ],
+  "consultation": "Durable versioned lesson, no weight training or unrestricted future execution",
+  "limitations": [
+    "Existing Git and deploy security/role contracts unchanged",
+    "Native push stores code; deployment remains the reviewed GitHub CI recipe",
+    "Baseline and prior deliveries retain their original authorship"
+  ]
+}

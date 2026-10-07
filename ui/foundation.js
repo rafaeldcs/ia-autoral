@@ -13,7 +13,8 @@
   }
   function setBusy(value) {
     busy = value;
-    for (const id of ['send', 'project', 'conversation', 'mode', 'new-conversation']) $(id).disabled = value;
+    for (const id of ['send', 'project', 'conversation', 'mode', 'new-conversation', 'marketing-use']) $(id).disabled = value;
+    for (const id of ['image-size', 'image-steps', 'image-seed']) $(id).disabled = value;
     $('cancel').hidden = !value; $('cancel').disabled = false;
   }
   function addOption(select, value, label) {
@@ -50,7 +51,7 @@
             const result = await api(`/api/foundation/image?${new URLSearchParams({project_id: project, id: meta.artifact_id})}`);
             if (version !== renderVersion) return;
             if (!/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(result.data || '')) throw new Error('Imagem inválida.');
-            const image = document.createElement('img'); image.alt = 'Imagem gerada pelo modelo visual local'; image.width = 512; image.height = 512; image.src = result.data;
+            const image = document.createElement('img'); image.alt = 'Imagem gerada pelo modelo visual local'; image.width = meta.width || 512; image.height = meta.height || 512; image.src = result.data;
             article.append(image); button.remove();
           } catch (error) { say(error.message); button.disabled = false; }
         });
@@ -127,7 +128,8 @@
     try { await newConversation(); } catch (error) { say(error.message); } finally { setBusy(false); }
   });
   $('mode').addEventListener('change', () => {
-    $('mode-help').textContent = $('mode').value === 'image' ? 'Descrição direta para o modelo visual: 512 × 512, 20 passos, seed 31. Sem leitura ou edição de imagens.' : 'Histórico e fontes do projeto entram no contexto. Código gerado não é executado.';
+    $('image-options').hidden = $('mode').value !== 'image';
+    $('mode-help').textContent = $('mode').value === 'image' ? 'Descreva a imagem desejada. O modelo visual precisa estar configurado para as opções escolhidas.' : 'Histórico e fontes do projeto entram no contexto. Código gerado não é executado.';
     $('prompt').spellcheck = $('mode').value !== 'code';
   });
   $('compose').addEventListener('submit', async event => {
@@ -139,7 +141,9 @@
       const conversation = $('conversation').value || await newConversation();
       if (!conversation) throw new Error('A seleção de projeto mudou.');
       const result = await api('/api/chat', {project_id: project, conversation_id: conversation, message: prompt,
-        mode: $('mode').value === 'image' ? 'image' : 'foundation', input_format: $('mode').value === 'code' ? 'code' : 'text'});
+        mode: $('mode').value === 'image' ? 'image' : 'foundation', input_format: $('mode').value === 'code' ? 'code' : 'text',
+        ...($('mode').value === 'image' ? {image_options: {width: Number($('image-size').value), height: Number($('image-size').value),
+          seed: Number($('image-seed').value), steps: Number($('image-steps').value)}} : {})});
       activeJob = {id: result.job.id, prompt, project}; await poll();
     } catch (error) {
       if (!activeJob) setBusy(false);
@@ -152,4 +156,46 @@
     catch (error) { say(error.message); }
   });
   $('resume').addEventListener('click', () => poll());
+  let marketingReport = null, marketingProject = null, marketingVersion = 0;
+  function clearMarketing() {
+    ++marketingVersion; marketingReport = null; marketingProject = null;
+    $('marketing-result').replaceChildren(); $('marketing-use').hidden = true;
+    $('marketing-form').reset();
+  }
+  $('project').addEventListener('change', clearMarketing);
+  $('logout').addEventListener('click', () => { if (!token) clearMarketing(); });
+  $('marketing-form').addEventListener('input', () => {
+    ++marketingVersion; marketingReport = null; marketingProject = null; $('marketing-use').hidden = true;
+    $('marketing-result').textContent = 'Os dados mudaram; recalcule a comparação.';
+  });
+  $('marketing-form').addEventListener('submit', async event => {
+    event.preventDefault(); const project = $('project').value, version = ++marketingVersion;
+    marketingReport = null; $('marketing-use').hidden = true;
+    const button = $('marketing-form').querySelector('button'); button.disabled = true;
+    try {
+      const campaigns = [...document.querySelectorAll('[data-campaign]')].map(box => {
+        const input = field => box.querySelector(`[data-field="${field}"]`).value;
+        return {name: input('name'), impressions: Number(input('impressions')), clicks: Number(input('clicks')),
+          conversions: Number(input('conversions')), spend_cents: Math.round(Number(input('spend')) * 100)};
+      });
+      const report = await api('/api/foundation/marketing-metrics', {project_id: project, campaigns});
+      if (version !== marketingVersion || project !== $('project').value || !token) return;
+      const nodes = report.campaigns.map(row => {
+        const p = document.createElement('p'), metric = value => value === null ? 'indisponível' : value;
+        p.textContent = `${row.name}: CTR ${metric(row.ctr_percent)}%; conversão por clique ${metric(row.click_conversion_percent)}%; custo por clique R$ ${metric(row.cpc_brl)}; custo por conversão R$ ${metric(row.cpa_brl)}.`;
+        return p;
+      });
+      const best = document.createElement('p'); best.textContent = report.best_ctr.length ? `Maior CTR: ${report.best_ctr.join(', ')}.` : 'CTR indisponível: não há impressões.';
+      const note = document.createElement('p'); note.textContent = report.notice;
+      $('marketing-result').replaceChildren(...nodes, best, note);
+      marketingReport = report; marketingProject = project; $('marketing-use').hidden = false;
+    } catch (error) { if (version === marketingVersion) $('marketing-result').textContent = error.message; }
+    finally { button.disabled = false; }
+  });
+  $('marketing-use').addEventListener('click', () => {
+    if (busy || !marketingReport || marketingProject !== $('project').value) return;
+    const proposal = 'Proponha próximos experimentos a partir destes cálculos locais sobre dados fornecidos, sem afirmar que houve publicação ou gasto real:\n' + JSON.stringify(marketingReport);
+    if (proposal.length > 8000) { say('Análise excede o orçamento do pedido.'); return; }
+    $('mode').value = 'text'; $('mode').dispatchEvent(new Event('change')); $('prompt').value = proposal; $('prompt').focus();
+  });
 })();
