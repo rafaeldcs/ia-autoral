@@ -115,6 +115,8 @@ class ModelSpec:
     output_tokens: int = 768
     device: str = "cpu"
     dtype: str = "float32"
+    enable_thinking: bool = False
+    generation_seconds: int = 300
 
     @classmethod
     def load(cls, manifest: Path, capability: str) -> "ModelSpec":
@@ -142,9 +144,14 @@ class ModelSpec:
             raise PolicyError("Dispositivo ou precisão não suportados.")
         if type(data.get("reviewed_local_code", False)) is not bool:
             raise PolicyError("A revisão de código local deve ser um booleano explícito.")
+        thinking, seconds = data.get("enable_thinking", False), data.get("generation_seconds", 300)
+        if type(thinking) is not bool or type(seconds) is not int or not 1 <= seconds <= 3600:
+            raise PolicyError("Perfil de raciocínio/tempo inválido.")
+        if capability != "text" and thinking:
+            raise PolicyError("enable_thinking é exclusivo do modelo textual.")
         return cls(local_path(Path(data["directory"])), data["model_id"], data["revision"],
                    data["license"], capability, files, digest(manifest),
-                   data.get("reviewed_local_code", False), context, output, device, dtype)
+                   data.get("reviewed_local_code", False), context, output, device, dtype, thinking, seconds)
 
     def verify(self) -> tuple:
         paths = inventory(self.directory)
@@ -183,6 +190,7 @@ class ModelSpec:
     def provenance(self) -> dict:
         return {"model_id": self.model_id, "revision": self.revision, "license": self.license,
                 "manifest_sha256": self.manifest_sha256, "capability": self.capability,
+                "enable_thinking": self.enable_thinking, "generation_seconds": self.generation_seconds,
                 "weights_modified_by_this_run": False}
 
 
@@ -190,7 +198,8 @@ def register_model(directory: Path, target: Path, *, model_id: str, revision: st
                    license: str, reviewed_by: str, capability: str,
                    reviewed_local_code: bool = False, device: str = "cpu",
                    dtype: str = "float32", context_tokens: int = 4096,
-                   output_tokens: int = 768) -> None:
+                   output_tokens: int = 768, enable_thinking: bool = False,
+                   generation_seconds: int = 300) -> None:
     """Operator attests origin/rights; hashes do not establish model competence."""
     directory, target = local_path(directory), local_path(target)
     if target.is_relative_to(directory):
@@ -202,7 +211,8 @@ def register_model(directory: Path, target: Path, *, model_id: str, revision: st
             "revision": revision, "license": license, "reviewed_by": reviewed_by,
             "capability": capability, "reviewed_local_code": reviewed_local_code,
             "device": device, "dtype": dtype, "context_tokens": context_tokens,
-            "output_tokens": output_tokens,
+            "output_tokens": output_tokens, "enable_thinking": enable_thinking,
+            "generation_seconds": generation_seconds,
             "files": {p.relative_to(directory).as_posix(): digest(p) for p in paths}}
     import tempfile
     with tempfile.TemporaryDirectory() as temp:

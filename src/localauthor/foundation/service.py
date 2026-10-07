@@ -10,6 +10,7 @@ import threading
 import uuid
 
 from ..errors import PolicyError
+from ..efficiency.residency import dispose_runtime
 from .context import build_context, markdown_evidence
 from .experience import ExperienceStore
 from .models import ModelSpec, child, identifier, local_path
@@ -24,30 +25,63 @@ class FoundationService:
         self.factories = {"text": text_factory, "image": image_factory}
         self._cache = {}
         self._lock = threading.RLock()
+        self._unload_failed = False
 
     def status(self) -> dict:
         base = local_path(self.home / "foundation")
         return {"capabilities": {kind: {"registered": (base / f"{kind}-model.json").is_file(),
                 "loaded": kind in self._cache} for kind in self.factories},
                 "remote_fallback": False, "weights_trained_here": False,
-                "image_understanding": False, "generated_code_execution": False}
+                "image_understanding": False, "generated_code_execution": False,
+                "residency_policy": "single_model", "unload_failed": self._unload_failed}
+
+    def _dispose(self, engine) -> None:
+        try:
+            dispose_runtime(engine)
+        except Exception as exc:
+            self._unload_failed = True
+            raise PolicyError("Falha ao liberar o runtime; reinicie o processo antes de carregar outro modelo.") from exc
+
+    def _release(self, kind: str) -> None:
+        cached = self._cache.pop(kind, None)
+        if cached is not None:
+            self._dispose(cached[2])
+
+    def unload(self) -> None:
+        """Explicit release under the same lock used by generation."""
+        with self._lock:
+            for kind in list(self._cache):
+                self._release(kind)
 
     def _engine(self, kind: str, cancel=None):
         check_cancel(cancel)
+        if self._unload_failed:
+            raise PolicyError("Runtime bloqueado após falha de liberação; reinicie o processo.")
+        if kind not in self.factories:
+            raise PolicyError("Capacidade local não suportada.")
         spec = ModelSpec.load(self.home / "foundation" / f"{kind}-model.json", kind)
         cached = self._cache.get(kind)
         if cached and cached[0].manifest_sha256 == spec.manifest_sha256:
             if spec.signature() != cached[1]:
-                self._cache.pop(kind, None)
+                self._release(kind)
                 raise PolicyError("Arquivos de modelo mudaram durante a sessão. Reinicie após revisão.")
             return cached[0], cached[2]
-        self._cache.pop(kind, None)
+        # Verify the candidate before eviction, but unload the previous model
+        # BEFORE allocating the new one. Serialization alone does not free VRAM.
         signature = spec.verify()
         check_cancel(cancel)
-        engine = self.factories[kind](spec)
+        self.unload()
         check_cancel(cancel)
-        if spec.signature() != signature:
-            raise PolicyError("O modelo mudou durante o carregamento.")
+        engine = None
+        try:
+            engine = self.factories[kind](spec)
+            check_cancel(cancel)
+            if spec.signature() != signature:
+                raise PolicyError("O modelo mudou durante o carregamento.")
+        except BaseException:
+            if engine is not None:
+                self._dispose(engine)
+            raise
         self._cache[kind] = (spec, signature, engine)
         return spec, engine
 

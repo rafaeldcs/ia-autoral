@@ -30,6 +30,8 @@ def main(argv=None) -> int:
     register.add_argument("--dtype", choices=["float32", "float16", "bfloat16"], default="float32")
     register.add_argument("--context-tokens", type=int, default=4096)
     register.add_argument("--output-tokens", type=int, default=768)
+    register.add_argument("--enable-thinking", action="store_true", help="Exige template/modelo textual homologado; não altera os pesos.")
+    register.add_argument("--generation-seconds", type=int, default=300, help="Orçamento cooperativo de geração, entre 1 e 3600 segundos; não limita carregamento.")
     knowledge = commands.add_parser("import-md")
     knowledge.add_argument("project_id")
     knowledge.add_argument("file", type=Path)
@@ -60,7 +62,8 @@ def main(argv=None) -> int:
                 revision=args.revision, license=args.license, reviewed_by=args.reviewed_by,
                 capability=args.kind, reviewed_local_code=args.reviewed_local_code,
                 device=args.device, dtype=args.dtype, context_tokens=args.context_tokens,
-                output_tokens=args.output_tokens)
+                output_tokens=args.output_tokens, enable_thinking=args.enable_thinking,
+                generation_seconds=args.generation_seconds)
             result = {"manifest": str(target), "registered": True, "inference_tested": False}
         elif args.command == "import-md":
             identifier(args.project_id)

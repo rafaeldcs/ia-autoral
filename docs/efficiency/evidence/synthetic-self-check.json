@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "classification": "synthetic_cpu_contract",
+  "equal_outputs": true,
+  "tasks": 32,
+  "seed": 31,
+  "results": {
+    "uncached": {
+      "hits": 0,
+      "misses": 64,
+      "read_bytes": 393216,
+      "write_bytes": 0,
+      "evictions": 0,
+      "resident_bytes": 0,
+      "peak_resident_bytes": 0,
+      "cache_capacity_bytes": 0,
+      "max_read_buffer_bytes": 6144,
+      "physical_disk_io_measured": false,
+      "gpu_implemented": false,
+      "elapsed_seconds": 0.0059479149999788206
+    },
+    "cached": {
+      "hits": 60,
+      "misses": 4,
+      "read_bytes": 24576,
+      "write_bytes": 0,
+      "evictions": 2,
+      "resident_bytes": 12288,
+      "peak_resident_bytes": 12288,
+      "cache_capacity_bytes": 12288,
+      "max_read_buffer_bytes": 6144,
+      "physical_disk_io_measured": false,
+      "gpu_implemented": false,
+      "elapsed_seconds": 0.003501611000046978
+    }
+  },
+  "nemotron_executed": false,
+  "weights_trained": false,
+  "network_required": false,
+  "limitations": [
+    "Tiny generated SwiGLU experts, not a language model.",
+    "File reads are logical bytes; OS page cache and physical NVMe I/O are not measured.",
+    "Fixture creation writes temporary data; write_bytes counts only the read-only store.",
+    "No GPU, energy, SSD endurance, training or coding-quality measurement."
+  ]
+}
