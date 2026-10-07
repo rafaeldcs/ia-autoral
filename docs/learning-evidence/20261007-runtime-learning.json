@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "date": "2026-10-07",
-  "parent_commit": "ba1cd8aa48b3097e4ed2ed039d0a23b936073831",
+  "parent_commit": "841ef3a6a2688c6229c5d5db54ed948158a42d05",
   "kind": "supervised_local_code_and_real_matrix_increment",
   "authorship": {
     "adapter": "LocalAuthor using Qwen/Qwen3-8B-GGUF, 7c41481f57cb95916b40956ab2f0b139b296d974, Apache-2.0",
@@ -19,14 +19,14 @@
     "skipped": 0,
     "complete": true,
     "platform": "linux",
-    "elapsed_seconds": 21.1866603819999
+    "elapsed_seconds": 21.20488457099964
   },
   "tested_worktree_sha256": {
-    "src/localauthor/efficiency/safetensor_store.py": "fcba9adfe2fa9c81c621450b2d5e606aa2a160bcf639fb377e386edef0aa3668",
+    "src/localauthor/efficiency/safetensor_store.py": "87126d8a8a7b2a08f2c0bf2cebe816cd3a55067402c42eaee8a72ed3fef40bc6",
     "tests/test_matrix_store.py": "096d2773dfeeaaa9c0f0ddd9a1c1be1ca16070208149766dcbb28325e0594fce"
   },
   "portable_git_blob_ids": {
-    "src/localauthor/efficiency/safetensor_store.py": "e0dbbbde6cf0cbf2a94283ebad51657792928a25",
+    "src/localauthor/efficiency/safetensor_store.py": "2540500300a912f55bb4092f62b02690bb4a47f9",
     "tests/test_matrix_store.py": "f305c66b8605f1f563c7de5c788740e8dd217c5b"
   },
   "real_pretrained_matrix_parity": {
@@ -111,6 +111,13 @@
       "Decoded tensors and QA reference tensors are outside raw cache accounting.",
       "Cold/warm timings do not establish global model generation speedup."
     ]
+  },
+  "format_only_followup": {
+    "ast_identical": true,
+    "original_sha256": "b364425e739d734bdcbc578b7e6ecc12727488793506367c667c8ac9dac63a01",
+    "new_sha256": "558aa0efdf7ee346068bff19f7235aa962da9d31a13b6f962c8f7c8ead0509b7",
+    "numerical_parity_repeated": false,
+    "reason": "Only trailing whitespace removed, exact Python AST unchanged."
   },
   "matrix_checkpoint": {
     "model_id": "Qwen/Qwen3-0.6B",

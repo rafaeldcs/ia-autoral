@@ -27,7 +27,7 @@ def selected_blocks(path, header, offset, names, max_block_bytes):
         raise PolicyError("Invalid names: must be a non-empty list of unique non-empty strings")
     if not isinstance(max_block_bytes, int) or isinstance(max_block_bytes, bool) or max_block_bytes <= 0:
         raise PolicyError("max_block_bytes must be a positive integer")
-    
+
     blocks = {}
     metadata = {}
     intervals = []
@@ -49,7 +49,7 @@ def selected_blocks(path, header, offset, names, max_block_bytes):
                 start, end = data_offsets
                 if start >= end or start < 0:
                     raise PolicyError(f"Invalid data_offsets range: {data_offsets} for name: {name}")
-                
+
                 length = math.prod(shape) * (4 if dtype == 'F32' else 2)
                 if length != (end - start):
                     raise PolicyError(f"Length mismatch for {name}: expected {length}, got {end - start}")
@@ -58,16 +58,16 @@ def selected_blocks(path, header, offset, names, max_block_bytes):
                 file_size = path.stat().st_size
                 if offset + end > file_size:
                     raise PolicyError(f"Data offset exceeds file size for {name}")
-                
+
                 for a, b in intervals:
                     if start < b and a < end:
                         raise PolicyError(f"Overlap detected with existing interval for {name}")
-                
+
                 stream.seek(offset + start)
                 raw = stream.read(length)
                 if len(raw) != length:
                     raise PolicyError(f"Failed to read full block for {name}")
-                
+
                 blocks[name] = WeightBlock('model.safetensors', offset + start, length, hashlib.sha256(raw).hexdigest())
                 metadata[name] = {'dtype': dtype, 'shape': shape}
                 intervals.append((start, end))
