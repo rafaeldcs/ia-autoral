@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Campanhas ShopAir e Orbit</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; padding: 16px; background: #f9f9f9; }
+    header { font-size: 1.5em; margin-bottom: 10px; }
+    #feedback { margin-bottom: 10px; color: red; }
+    #cards { display: flex; flex-wrap: wrap; gap: 16px; }
+    .card { background: white; padding: 16px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); box-sizing: border-box; width: 100%; max-width: 400px; }
+    .card input, .card textarea { width: 100%; margin: 8px 0; padding: 8px; }
+    .card button { margin-top: 10px; padding: 8px; }
+    .status { font-size: 0.9em; color: #666; }
+  </style>
+</head>
+<body>
+  <header>Campanhas ShopAir e Orbit</header>
+  <p>Rascunhos — publicação depende de revisão e conexão das contas</p><p>Notas e datas são salvas apenas neste navegador; não são compartilhadas com outros computadores.</p>
+  <select id="brand">
+    <option value="Todas">Todas</option>
+    <option value="ShopAir">ShopAir</option>
+    <option value="Orbit">Orbit</option>
+  </select>
+  <div id="feedback"></div>
+  <div id="cards"></div>
+  <script>
+    const feedback = document.getElementById('feedback');
+    const cards = document.getElementById('cards');
+    const brandSelect = document.getElementById('brand');
+
+    async function loadPosts() {
+      try {
+        const response = await fetch('posts.json');
+        if (!response.ok) throw new Error('Arquivo posts.json não encontrado');
+        const data = await response.json();
+        return data.posts;
+      } catch (err) {
+        feedback.textContent = 'Erro ao carregar posts.json: ' + err.message;
+        return [];
+      }
+    }
+
+    function savePost(id, date, note) {
+      try {
+        localStorage.setItem(id, JSON.stringify({ date, note }));
+        feedback.textContent = 'Salvo com sucesso!';
+        setTimeout(() => feedback.textContent = '', 2000);
+      } catch (err) {
+        feedback.textContent = 'Erro no armazenamento local: ' + err.message;
+      }
+    }
+
+let allPosts = [];
+function renderCards(posts) {
+  cards.replaceChildren();
+  posts.forEach(post => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    
+    const brandChannelDay = document.createElement('div');
+    brandChannelDay.textContent = `${post.brand}/${post.channel}/${post.day}`;
+    card.appendChild(brandChannelDay);
+
+    const headline = document.createElement('div');
+    headline.textContent = `Cabeçalho: ${post.headline}`;
+    card.appendChild(headline);
+
+    const caption = document.createElement('div');
+    caption.textContent = `Legenda: ${post.caption}`;
+    card.appendChild(caption);
+
+    const imageLink = document.createElement('a');
+    imageLink.href = `assets/${encodeURIComponent(post.id)}.png`;
+    imageLink.textContent = 'Ver imagem';
+    imageLink.target = '_blank';
+    imageLink.rel = 'noopener';
+    card.appendChild(imageLink);
+
+    const status = document.createElement('div');
+    status.className = 'status';
+    status.textContent = 'Rascunho';
+    card.appendChild(status);
+
+    const dateLabel = document.createElement('label');
+    dateLabel.htmlFor = `date-${post.id}`;
+    dateLabel.textContent = 'Data:';
+    card.appendChild(dateLabel);
+
+    const dateInput = document.createElement('input');
+    dateInput.type = 'date';
+    dateInput.id = `date-${post.id}`;
+    dateInput.style.boxSizing = 'border-box';
+    card.appendChild(dateInput);
+
+    const noteLabel = document.createElement('label');
+    noteLabel.htmlFor = `note-${post.id}`;
+    noteLabel.textContent = 'Nota:';
+    card.appendChild(noteLabel);
+
+    const noteArea = document.createElement('textarea');
+  try {
+    const saved = JSON.parse(localStorage.getItem(post.id) || '{}');
+    dateInput.value = saved.date || '';
+    noteArea.value = saved.note || '';
+  } catch (err) {
+    feedback.textContent = 'Erro ao carregar dados: ' + err.message;
+  }
+    noteArea.id = `note-${post.id}`;
+    noteArea.placeholder = 'Nota';
+    noteArea.style.boxSizing = 'border-box';
+    card.appendChild(noteArea);
+
+    const saveBtn = document.createElement('button');
+    saveBtn.textContent = 'Salvar';
+    saveBtn.style.boxSizing = 'border-box';
+    saveBtn.addEventListener('click', () => {
+      try {
+        savePost(post.id, dateInput.value, noteArea.value);
+      } catch (err) {
+        feedback.textContent = 'Erro ao salvar: ' + err.message;
+      }
+    });
+    card.appendChild(saveBtn);
+
+    card.appendChild(document.createElement('br'));
+    
+    card.addEventListener('click', (e) => {
+      if (e.target.tagName === 'A') {
+        e.preventDefault();
+        const img = new Image();
+        img.src = `assets/${encodeURIComponent(post.id)}.png`;
+        img.onload = () => {
+          window.open(`assets/${encodeURIComponent(post.id)}.png`, '_blank');
+        };
+        img.onerror = () => {
+          feedback.textContent = 'Imagem não encontrada';
+        };
+      }
+    });
+
+    cards.appendChild(card);
+  });
+}
+
+function filterPosts() {
+  const brand = brandSelect.value;
+  const filtered = brand === 'Todas' ? allPosts : allPosts.filter(p => p.brand === brand);
+  renderCards(filtered);
+}
+
+window.onload = async () => {
+  try {
+    const posts = await loadPosts();
+    allPosts = posts;
+    
+    filterPosts();
+  } catch (err) {
+    feedback.textContent = 'Erro inesperado: ' + err.message;
+  }
+};
+    brandSelect.addEventListener('change', filterPosts);
+  </script>
+</body>
+</html>

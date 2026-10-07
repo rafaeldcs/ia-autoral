@@ -21,6 +21,8 @@ ROLES = {'product', 'audience', 'reference', 'channel', 'measurement', 'competit
 CHANNELS = {'instagram', 'facebook', 'youtube', 'linkedin', 'website', 'email', 'whatsapp'}
 RISKY_COPY = re.compile(r'\b(gr[áa]tis|gratuit\w*|garant\w*|aument\w*|econom\w*|reduz\w*|melhor\w*|agend\w*|otimiz\w*|simplific\w*|efici[êe]n\w*|real time)\b|tempo real|mais vendas|\d+\s*(%|minutos?|reais)',re.I)
 
+PRODUCT_TERMS = re.compile('(?i)\\b(?:catálogo|catálogos|estoque|estoques|pedido|pedidos|loja|lojas|produto|produtos|restaurante|restaurantes|plataforma|plataformas|projeto|projetos|tarefa|tarefas|sprint|sprints|repositório|repositórios|papéis|permissões|Kanban|Scrum|Git|pull|push|project|projects|task|tasks|repository|repositories)\\b', re.I)
+
 
 def canonical(value):
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
@@ -218,8 +220,8 @@ class MarketingWorkflow:
                     eligible=[]
                     for index,line in enumerate(lines):
                         line=line.strip()
-                        if 12<=len(line)<=240 and re.search(r'catálogo|estoque|pedido|loja|produto|restaurante|plataforma',line,re.I) and not RISKY_COPY.search(line) and not re.search(r'R\$|^\d|\[|\]',line):
-                            score=len(re.findall(r'catálogo|estoque|pedido|produto|restaurante',line,re.I))
+                        if 12<=len(line)<=240 and PRODUCT_TERMS.search(line) and not RISKY_COPY.search(line) and not re.search(r'R\$|^\d|\[|\]',line):
+                            score=len(PRODUCT_TERMS.findall(line))
                             eligible.append((score,index,line))
                     for _,index,line in sorted(eligible,key=lambda row:(-row[0],row[1]))[:8]:
                         facts.append({'text':line,'source_id':source['id'],'start_line':index+1,'end_line':index+1})

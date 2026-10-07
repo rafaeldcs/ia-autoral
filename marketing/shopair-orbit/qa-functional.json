@@ -1,0 +1,72 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "post": "shopair-01",
+      "format": "feed",
+      "width": 1080,
+      "height": 1350,
+      "overflow": []
+    },
+    {
+      "post": "shopair-01",
+      "format": "story",
+      "width": 1080,
+      "height": 1920,
+      "overflow": []
+    },
+    {
+      "post": "shopair-02",
+      "format": "feed",
+      "width": 1080,
+      "height": 1350,
+      "overflow": []
+    },
+    {
+      "post": "shopair-02",
+      "format": "story",
+      "width": 1080,
+      "height": 1920,
+      "overflow": []
+    },
+    {
+      "post": "orbit-01",
+      "format": "feed",
+      "width": 1080,
+      "height": 1350,
+      "overflow": []
+    },
+    {
+      "post": "orbit-01",
+      "format": "story",
+      "width": 1080,
+      "height": 1920,
+      "overflow": []
+    },
+    {
+      "post": "orbit-02",
+      "format": "feed",
+      "width": 1080,
+      "height": 1350,
+      "overflow": []
+    },
+    {
+      "post": "orbit-02",
+      "format": "story",
+      "width": 1080,
+      "height": 1920,
+      "overflow": []
+    },
+    {
+      "management": true,
+      "filter": true,
+      "persistence": true,
+      "mobile": true,
+      "malformed_storage": true,
+      "blocked_storage": true,
+      "missing_source": true,
+      "xss_literal": true,
+      "publication_simulated": false
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "posts": [
+    {
+      "id": "shopair-01",
+      "brand": "ShopAir",
+      "channel": "instagram",
+      "headline": "Crie lojas virtuais e gerencie estoque com o ShopAir",
+      "subheadline": "Gerencie estoque, vendas e relatórios em um só lugar",
+      "caption": "ShopAir oferece soluções para lojas físicas e restaurantes. Gerencie estoque, controle financeiro e gere relatórios. Solicite uma demonstração",
+      "cta": "Solicite uma demonstração",
+      "alt_text": "Proposta: Ícone de loja, produto, estoque e relatório.",
+      "fact_ids": [
+        "SA1",
+        "SA2",
+        "SA3"
+      ],
+      "day": 1,
+      "hypothesis": "Testar engajamento com conteúdo sobre gestão de lojas virtuais"
+    },
+    {
+      "id": "shopair-02",
+      "brand": "ShopAir",
+      "channel": "facebook",
+      "headline": "Ecommerce e restaurantes em um só lugar",
+      "subheadline": "Gerencie estoque, vendas e relatórios com o ShopAir",
+      "caption": "ShopAir oferece soluções integradas para lojas físicas e restaurantes. Gerencie estoque, controle financeiro e gere relatórios. Solicite uma demonstração",
+      "cta": "Solicite uma demonstração",
+      "alt_text": "Proposta: Ícone de ecommerce e restaurantes integrados com relatórios de estoque",
+      "fact_ids": [
+        "SA1",
+        "SA2",
+        "SA3"
+      ],
+      "day": 3,
+      "hypothesis": "Avaliar conversão com foco em benefícios para pequenos negócios"
+    },
+    {
+      "id": "orbit-01",
+      "brand": "Orbit",
+      "channel": "instagram",
+      "headline": "Gerencie projetos com Scrum e Kanban",
+      "subheadline": "Crie tarefas, repositórios e organize equipes em um só lugar",
+      "caption": "Orbit é a solução para equipes de desenvolvimento. Crie projetos, organize tarefas com Scrum ou Kanban e gerencie repositórios HTTPS. Solicite uma demonstração",
+      "cta": "Solicite uma demonstração",
+      "alt_text": "Proposta: Ícone de gestão de projetos com Scrum e Kanban",
+      "fact_ids": [
+        "OR1",
+        "OR2"
+      ],
+      "day": 2,
+      "hypothesis": "Testar engajamento com conteúdo sobre gestão de projetos ágeis"
+    },
+    {
+      "id": "orbit-02",
+      "brand": "Orbit",
+      "channel": "linkedin",
+      "headline": "Gestão de equipes com repositórios HTTPS",
+      "subheadline": "Projetos, tarefas e permissões em um só lugar",
+      "caption": "Orbit oferece gestão de projetos com Scrum e Kanban, repositórios HTTPS e controle de permissões. Crie tarefas e organize equipes. Solicite uma demonstração",
+      "cta": "Solicite uma demonstração",
+      "alt_text": "Proposta: Ícone de gestão de equipes com permissões e repositórios HTTPS",
+      "fact_ids": [
+        "OR1",
+        "OR2",
+        "OR3"
+      ],
+      "day": 4,
+      "hypothesis": "Avaliar conversão com foco em benefícios para equipes de desenvolvimento"
+    }
+  ],
+  "management": {
+    "approval_required": true,
+    "measurement_pending": true,
+    "experiment": "Teste de engajamento com conteúdo direcionado a públicos específicos",
+    "primary_event": "qualified_demo_request",
+    "schedule_note": "Proposta pendente de aprovação. Data de publicação ainda não definida",
+    "reference_choice": "provisional_original_pending_user",
+    "published": false,
+    "model": "Qwen/Qwen3-8B-GGUF",
+    "model_revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+    "training_allowed": false
+  }
+}

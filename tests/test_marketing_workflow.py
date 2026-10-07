@@ -110,6 +110,34 @@ class MarketingWorkflowTests(unittest.TestCase):
     def test_cross_project_access_is_denied(self):
         c=self.prepared()
         with self.assertRaises(NotFoundError):self.service.get(self.other,c['id'])
+    def test_software_product_facts_are_ranked_and_keep_original_line_numbers(self):
+        content='Texto introdutório.\nProjetos, tarefas, sprints e quadros Kanban.\nRepositórios Git com pull e push por HTTPS.\nPapéis e permissões para usuários.'
+        self.service.research_service.fetch=lambda url,scope,cancel=None:self.store.ingest(scope,url,'Produto sintético',content,kind='web')
+        c=self.prepared()
+        reply=json.dumps({'caption':'Orbit: projetos e repositórios Git. Conheça a proposta.','alt_text':'Proposta: ícones de tarefas e código.','fact_indices':[1,2]})
+        self.model.responses=[reply,reply]
+        result=self.service.generate(self.project,c['id'],c['digest'])
+        self.assertEqual(result['stage'],'review')
+        claims=result['draft']['assets'][0]['claims']
+        self.assertEqual([c['start_line'] for c in claims],[2,3])
+        self.assertEqual([c['text'] for c in claims],content.splitlines()[1:3])
+        self.assertFalse(result['published']);self.assertFalse(result['training_allowed'])
+    def test_product_fact_filter_keeps_security_guards_and_word_boundaries(self):
+        content='Usuário despedido ontem.\nHTTPS admin manager member viewer.\n[Projetos e tarefas seguros]\nProjetos disponíveis por R$ 20.\n20 projetos e tarefas.\nProjetos aumentam as vendas em 50%.\nProjetos e tarefas com Git.\n'+'Projetos '+('x'*241)
+        self.service.research_service.fetch=lambda url,scope,cancel=None:self.store.ingest(scope,url,'Produto sintético',content,kind='web')
+        c=self.prepared()
+        reply=json.dumps({'caption':'Conheça projetos e tarefas.','alt_text':'Proposta: ícones de projetos.','fact_indices':[1]})
+        self.model.responses=[reply,reply]
+        result=self.service.generate(self.project,c['id'],c['digest'])
+        self.assertEqual(result['stage'],'review')
+        self.assertEqual(result['draft']['assets'][0]['claims'][0]['text'],'Projetos e tarefas com Git.')
+        self.assertEqual(result['draft']['assets'][0]['claims'][0]['start_line'],7)
+    def test_commerce_plural_facts_remain_supported(self):
+        content='Catálogos, estoques, pedidos e produtos para lojas.\nRestaurantes e plataformas de produtos.'
+        self.service.research_service.fetch=lambda url,scope,cancel=None:self.store.ingest(scope,url,'Produto sintético',content,kind='web')
+        c=self.prepared();result=self.service.generate(self.project,c['id'],c['digest'])
+        self.assertEqual(result['stage'],'review')
+        self.assertEqual(result['draft']['assets'][0]['claims'][0]['text'],content.splitlines()[0])
     def test_invalid_citation_is_rejected_and_originals_preserved(self):
         bad=json.dumps({'caption':'Conheça a marca.','alt_text':'Proposta.','fact_indices':[99]})
         self.model.responses=[bad]*3;c=self.generated()

@@ -16,12 +16,13 @@ function safeLink(href, name, origin) {
   } catch { return false; }
 }
 
-function allowedRequest(url, method, navigation, job, origin, loginWindow) {
+function allowedRequest(url, method, navigation, job, origin, loginWindow, requestedMethod) {
   const allowed = url.protocol==='https:' && (!url.port || url.port==='443') && !url.username && !url.password && job.hosts.includes(url.hostname);
   const read = ['GET','HEAD'].includes(method) && !risky.test(plain(url.pathname));
   const login = loginWindow && ['POST','OPTIONS'].includes(method) &&
     (job.authHosts || [new URL(origin).hostname]).includes(url.hostname) && /\/(login|signin|sign-in|session|token)\/?$/i.test(url.pathname);
-  return allowed && (read || login) && (!navigation || url.origin===origin);
+  const preflightRead = method==="OPTIONS" && ["GET","HEAD"].includes(requestedMethod) && !risky.test(plain(url.pathname));
+  return allowed && (read || login || preflightRead) && (!navigation || url.origin===origin);
 }
 
 function safeButton(control) {
@@ -47,7 +48,7 @@ class LiveBrowser {
       try { url = new URL(request.url()); } catch { return route.abort(); }
       // Authentication is a separate, explicit operation; its POST window closes
       // before screenshots/exploration. Only the current site's origin may POST.
-      if (!allowedRequest(url,request.method(),request.isNavigationRequest(),this.job,this.origin,this.loginWindow)) {
+      if (!allowedRequest(url,request.method(),request.isNavigationRequest(),this.job,this.origin,this.loginWindow, request.headers()["access-control-request-method"] || "")) {
         this.blocked.add(url.hostname+' ('+request.method()+')'); return route.abort();
       }
       return route.continue();
@@ -68,7 +69,22 @@ class LiveBrowser {
     const location = new URL(this.page.url());
     if (/(token|password|secret|code|key)=/i.test(location.search+' '+location.hash)) throw Error('sensitive_url');
     const raw = await this.page.evaluate(()=>{
-      const visible = node => node.getClientRects().length>0 && getComputedStyle(node).visibility!=='hidden';
+      document.querySelectorAll('*').forEach(el => el.removeAttribute('data-localauthor-control'));
+      const visible = node => {
+        const rects = node.getClientRects();
+        if (!rects.length) return false;
+        let current = node;
+        while (current) {
+          const style = window.getComputedStyle(current);
+          if (style.display === 'none' || style.visibility === 'hidden' || parseFloat(style.opacity) === 0) return false;
+          const rect = current.getBoundingClientRect();
+          if (style.overflowY === 'hidden' || style.overflowY === 'clip') {
+            if (rect.height === 0 || !rects[0].height || rects[0].top > rect.bottom || rects[0].bottom < rect.top) return false;
+          } if (style.overflowX === 'hidden' || style.overflowX === 'clip') {
+            if (rect.width === 0 || !rects[0].width || rects[0].left > rect.right || rects[0].right < rect.left) return false;
+          } current = current.parentElement;
+        } return true;
+      };
       const headings = [...document.querySelectorAll('h1,h2,h3,[role="heading"]')].filter(visible).map(n=>n.textContent.trim()).filter(Boolean);
       const links = [...document.querySelectorAll('a[href],button,[role="tab"]')].filter(visible);
       const controls = links.slice(0,80).map((node,index)=>{
