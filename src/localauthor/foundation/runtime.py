@@ -6,6 +6,7 @@ import os
 import time
 
 from ..errors import PolicyError
+from ..efficiency.residency import release_tensors
 from .models import ModelSpec
 
 
@@ -26,6 +27,7 @@ class TextRuntime:
     def __init__(self, spec: ModelSpec):
         offline_environment()
         self.spec = spec
+        self.model = self.tokenizer = None
         try:
             import torch
             from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -40,23 +42,33 @@ class TextRuntime:
                 torch_dtype=getattr(torch, spec.dtype), device_map=spec.device)
             self.model.eval()
         except (OSError, ValueError, ImportError, RuntimeError) as exc:
+            self.close()
             raise PolicyError("Checkpoint incompatível ou dependência ausente. Homologue arquitetura/runtime; não houve fallback remoto.") from exc
 
+    def close(self) -> None:
+        release_tensors(self, ("model", "tokenizer"))
+
+    def _template(self, messages, **kwargs):
+        if self.model is None or self.tokenizer is None:
+            raise PolicyError("Modelo textual descarregado.")
+        # Identical profile for counting and generation; template support must
+        # still be qualified against the checkpoint, not inferred from this flag.
+        return self.tokenizer.apply_chat_template(messages, tokenize=True,
+            add_generation_prompt=True, enable_thinking=self.spec.enable_thinking, **kwargs)
+
     def count(self, messages: list[dict]) -> int:
-        return len(self.tokenizer.apply_chat_template(messages, tokenize=True,
-                   add_generation_prompt=True, enable_thinking=False))
+        return len(self._template(messages))
 
     def generate(self, messages: list[dict], cancel=None) -> tuple[str, bool]:
         from transformers import StoppingCriteria, StoppingCriteriaList
         check_cancel(cancel)
-        deadline = time.monotonic() + 300
+        deadline = time.monotonic() + self.spec.generation_seconds
 
         class Stop(StoppingCriteria):
             def __call__(self, input_ids, scores, **kwargs):
                 return (cancel is not None and cancel.is_set()) or time.monotonic() >= deadline
 
-        inputs = self.tokenizer.apply_chat_template(messages, tokenize=True,
-                 add_generation_prompt=True, enable_thinking=False, return_tensors="pt", return_dict=True)
+        inputs = self._template(messages, return_tensors="pt", return_dict=True)
         if inputs["input_ids"].shape[-1] + self.spec.output_tokens > self.spec.context_tokens:
             raise PolicyError("Contexto real excede o orçamento do modelo.")
         inputs = inputs.to(self.model.device)
@@ -75,6 +87,7 @@ class ImageRuntime:
     def __init__(self, spec: ModelSpec):
         offline_environment()
         self.spec = spec
+        self.pipeline = None
         if spec.device == "auto":
             raise PolicyError("Imagens exigem dispositivo cpu ou cuda explícito nesta versão.")
         try:
@@ -88,12 +101,19 @@ class ImageRuntime:
                 str(spec.directory), local_files_only=True, use_safetensors=True,
                 torch_dtype=getattr(torch, spec.dtype)).to(spec.device)
         except (OSError, ValueError, ImportError, RuntimeError) as exc:
+            self.close()
             raise PolicyError("Pipeline visual local incompatível; nenhum serviço externo foi utilizado.") from exc
         if "callback_on_step_end" not in inspect.signature(self.pipeline.__call__).parameters:
+            self.close()
             raise PolicyError("Pipeline sem callback de cancelamento; homologue uma implementação suportada.")
+
+    def close(self) -> None:
+        release_tensors(self, ("pipeline",))
 
     def generate(self, prompt: str, cancel=None):
         check_cancel(cancel)
+        if self.pipeline is None:
+            raise PolicyError("Modelo visual descarregado.")
         for name in ("tokenizer", "tokenizer_2", "tokenizer_3"):
             tokenizer = getattr(self.pipeline, name, None)
             if tokenizer is not None:
@@ -101,7 +121,7 @@ class ImageRuntime:
                 count = len(tokenizer(prompt, truncation=False)["input_ids"])
                 if isinstance(limit, int) and 0 < limit < 1000000 and count > limit:
                     raise PolicyError("Descrição excede o tokenizador visual; reduza o briefing. Nada foi truncado silenciosamente.")
-        deadline = time.monotonic() + 300
+        deadline = time.monotonic() + self.spec.generation_seconds
 
         def callback(pipe, step, timestep, kwargs):
             check_cancel(cancel, deadline)
