@@ -1,8 +1,22 @@
-# Orbit — kit de campanha para demonstração e piloto
+# Orbit — anúncio para demonstração e piloto
 
-Abra [index.html](index.html) para visualizar o material. As artes exportadas ficam
-em [exports](exports/); os modelos de foto em [images](images/). O kit é uma
-proposta comercial revisável para o produto em homologação.
+A peça principal é o novo anúncio de venda: [PNG](exports/orbit-venda.png),
+[JPEG](exports/orbit-venda.jpg) e [layout editável](anuncios/orbit-venda.html).
+Abra [index.html](index.html) para visualizar e baixar a imagem. A mensagem aprovada
+na revisão é “Projetos e código em um lugar”, com a chamada “Solicite uma demonstração”.
+A [legenda](anuncios/copy-venda.json) acompanha a proposta.
+
+Esta revisão responde à rejeição do proprietário em 7 de outubro: o kit anterior
+parecia uma apresentação técnica. As peças anteriores em [exports](exports/) e as
+fotos em [images](images/) ficam como protótipos de apoio, não como anúncios aprovados
+pelo proprietário. O novo anúncio usa uma captura real do produto com dados de QA;
+não foi gerada uma nova foto nesta revisão. A autoria textual e do layout é da
+LocalAuthor, com seleção e validação supervisionadas, registradas na
+[proveniência desta revisão](anuncios/LOCAL_AI_SALES_AD_PROVENANCE.json).
+
+A oferta é uma demonstração do produto em homologação, com condições do piloto a
+combinar. O destino de contato ainda precisa ser definido antes de publicar.
+Não houve publicação social nem teste de conversão com público real.
 
 ## Material e uso
 

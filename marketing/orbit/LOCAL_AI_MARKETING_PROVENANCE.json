@@ -393,5 +393,11 @@
     "backup_crc_verified": true,
     "server_health": "ok",
     "training_allowed": false
+  },
+  "owner_feedback": {
+    "date": "2026-10-07",
+    "status": "rejected_as_sales_ad",
+    "reason": "Good conceptual photo, but resource presentation did not communicate a sales ad",
+    "superseded_by": "anuncios/LOCAL_AI_SALES_AD_PROVENANCE.json"
   }
 }

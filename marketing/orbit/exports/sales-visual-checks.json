@@ -1,0 +1,31 @@
+{
+  "cases": [
+    {
+      "sales_ad": {
+        "width": 1080,
+        "height": 1350,
+        "scroll": 1350,
+        "overflow": [],
+        "overlap": [],
+        "headline": "Projetos e código em um lugar",
+        "cta": "Solicite uma demonstração",
+        "product": 1440
+      }
+    },
+    {
+      "gallery": {
+        "width": 360,
+        "scroll": 360,
+        "broken": []
+      }
+    },
+    {
+      "gallery": {
+        "width": 1280,
+        "scroll": 1280,
+        "broken": []
+      }
+    }
+  ],
+  "issues": []
+}

@@ -1,0 +1,161 @@
+{
+  "schema": 1,
+  "date": "2026-10-07",
+  "text_layout_author": "LocalAuthor",
+  "model": "Qwen/Qwen3-8B-GGUF",
+  "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+  "weights_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+  "license": "Apache-2.0",
+  "inputs": "Owner rejection, factual Orbit bundle, supervised design specification, reviewer summary of collected official LinkedIn guide",
+  "sources": [
+    {
+      "request": "05",
+      "task": "copy-anuncio-final.json",
+      "content_sha256": "feacbc52ec756f83c7456d29f98a0a5a2637fae1d34ad4972d9e7885f3a2fea7",
+      "batch": "orbit-sales-ad-20261007"
+    },
+    {
+      "request": "04",
+      "task": "template-venda.html",
+      "content_sha256": "137a5b41f1884c8be93426ba1195efefdb00b17fd369dd61d659960e89bee715",
+      "batch": "orbit-sales-ad-20261007"
+    },
+    {
+      "request": "09",
+      "task": "major-layout-edits.json",
+      "content_sha256": "94dd1087125ba93c493b3bafcd0294bdd5d9a5337437a85c1b4d9954a0d27b61",
+      "batch": "orbit-sales-ad-20261007"
+    },
+    {
+      "request": "10",
+      "task": "spacing-layout-edits.json",
+      "content_sha256": "d46c32dc59b23d48a907fe7deae7f2e457821036c48d8cd49c8f8284e587f7b4",
+      "batch": "orbit-sales-ad-20261007"
+    },
+    {
+      "request": "12",
+      "task": "palette-final-edits.json",
+      "content_sha256": "a6dd9cd700b6afd3dc70ec2112a8a8ac6e21d98f29fdefc2c73f0594567838b5",
+      "batch": "orbit-sales-ad-20261007"
+    },
+    {
+      "request": "08",
+      "task": "index-venda.html",
+      "content_sha256": "5c7d117f290a0f53d6549e302c7762b6779deaf1b0f70fbbe9d800e7b1beee9c",
+      "batch": "orbit-sales-ad-20261007"
+    },
+    {
+      "request": "11",
+      "task": "gallery-accessibility-edits.json",
+      "content_sha256": "68fbca55ca8be20d16892e68786899bd4a7441d7f6651e088675cacfe4d93e30",
+      "batch": "orbit-sales-ad-20261007"
+    },
+    {
+      "request": "06",
+      "task": "licao-venda-verificada.json",
+      "content_sha256": "9dba33e73f97343d9ac6fc8381ff230f383ca4f645991e792f907fde311e6708",
+      "batch": "orbit-sales-ad-20261007"
+    },
+    {
+      "request": "03",
+      "task": "ANUNCIO_NAO_E_FICHA_TECNICA.md",
+      "content_sha256": "34ff68fffc6fa2877aed4a35034e729e550a2e95f514b827dd6649bacfb04e85",
+      "batch": "orbit-sales-ad-20261007"
+    },
+    {
+      "request": "45",
+      "task": "lesson-edits.json",
+      "content_sha256": "5b19b466ab49955eee1177cc6f13fe3ad0871b0453a999102503cd43f0c7e379",
+      "batch": "orbit-marketing-20261006"
+    },
+    {
+      "request": "31",
+      "task": "ORBIT_MARKETING_RESPONSAVEL.md",
+      "content_sha256": "ce4d44c3f9bb9150068f727bc564419328e58c87cc1f6ac8c94f1bcb9ddafce8",
+      "batch": "orbit-marketing-20261006"
+    },
+    {
+      "request": "13",
+      "task": "headline-legibility-edits.json",
+      "content_sha256": "2f866c603aa2b90d509865e7fab8f02fec5528c72155a917c2701bcedc99f021",
+      "batch": "orbit-sales-ad-20261007"
+    }
+  ],
+  "selected": [
+    "05 headline/supporting/CTA/caption; redundant value_line excluded",
+    "04 layout with local corrections09/10/12; copied slots filled by escaped student text",
+    "08 new gallery with correction11 replacing old default, original retained in Git/private evidence",
+    "Lesson: selected 06 first three fields + first visual sentence; 03 mobile review sentence; previous approved 45 QA statement and31 consultation limit",
+    "13 headline line-height correction after isolated browser rejection"
+  ],
+  "rejected": [
+    "00/01 Docker unavailable, original failures retained; temporary Docker socket directories preserved to recover local environment without reset",
+    "02: continuous sync/control-total suggestions excluded",
+    "03: invented metrics, free offer, fictitious proof; whole lesson rejected, not imported",
+    "07: truncated layout response excluded; corrections regenerated in smaller requests09/10/12",
+    "06: false no-QA instruction and ambiguous training limit excluded",
+    "Initial browser render rejected headline ink overflow; local correction13 retained original"
+  ],
+  "research": {
+    "collector": "LocalAuthor ResearchService",
+    "url_discovery": "Codex official-source search; no general search engine in LocalAuthor",
+    "training_allowed": false,
+    "sources": [
+      {
+        "role": "channel",
+        "url": "https://business.linkedin.com/advertise/ads/best-practices/sponsored-content-tips",
+        "collected": true,
+        "sha256": "225a4f46bcdae89dba690ff536665fe708221f6456257f03009774aaeffce353",
+        "title": "https://business.linkedin.com/advertise/ads/best-practices/sponsored-content-tips",
+        "checked_at": "2026-10-07T14:16:21.126586+00:00"
+      }
+    ]
+  },
+  "product_image": "Existing unchanged reviewer QA screenshot with synthetic data, not LocalAuthor capture; CSS crops top of real image, no invented interface",
+  "image_ai_used_this_revision": false,
+  "external_ai_used": false,
+  "training_allowed": false,
+  "weights_modified": false,
+  "owner_approval": "pending; predecessor owner-rejected as sales ad",
+  "commercial_effectiveness_verified": false,
+  "social_published": false,
+  "supervisor_role": "Contract, facts, reviewed fragment selection, escaped template binding, operator execution and visual verification",
+  "validation": {
+    "isolated_linux_docker": true,
+    "network_disabled": true,
+    "visual_cases": 3,
+    "issues": [],
+    "canvas": [
+      1080,
+      1350
+    ],
+    "gallery_widths": [
+      360,
+      1280
+    ],
+    "checks": [
+      "Real image loads",
+      "No element overlap or content overflow",
+      "Exact selected headline and CTA",
+      "Gallery links resolve",
+      "No broken gallery images or horizontal overflow"
+    ],
+    "pixel_review": "Supervisor inspected full advertisement and mobile gallery; not LocalAuthor vision or proof of commercial results",
+    "platform_tests": {
+      "run": 418,
+      "passed": 415,
+      "failed": 0,
+      "errors": 0,
+      "allowed_windows_symlink_skips": 3
+    }
+  },
+  "consultation": {
+    "identity": "ANUNCIO_NAO_E_FICHA_TECNICA",
+    "sha256": "ab4969c3564bf0dc0f09c5c950cdc9c79b226bd16242a94b1d7fcce759064245",
+    "version": 1,
+    "retrieval_verified": true,
+    "backup_crc_verified": true,
+    "server_health": "ok",
+    "training_allowed": false
+  }
+}

@@ -1,145 +1,33 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Orbit · kit de campanha</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Orbit — Anúncio Comercial</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #101325;
-      color: #fff;
-    }
-    header {
-      background-color: #6B4EFF;
-      padding: 20px;
-      text-align: center;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 2em;
-    }
-    .notice {
-      text-align: center;
-      font-size: 0.9em;
-      color: white;
-      margin: 10px 0;
-    }
-    nav {
-      background-color: #101325;
-      padding: 10px;
-      text-align: center;
-    }
-    nav a {
-      color: #DCD4FF;
-      margin: 0 15px;
-      text-decoration: underline;
-      font-weight: bold;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      padding: 20px;
-    }
-    .card {
-      background-color: #101325;
-      border: 2px solid #6B4EFF;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      transition: transform 0.2s;
-    }
-    .card:hover {
-      transform: scale(1.05);
-    }
-    .card img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-    .card-content {
-      padding: 15px;
-    }
-    .card-content a {
-      color: #DCD4FF;
-      text-decoration: underline;
-      font-weight: bold;
-    }
-    .extras {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      padding: 20px;
-      justify-content: center;
-    }
-    .extras img {
-      max-width: 100%;
-      height: auto;
-      border: 2px solid #6B4EFF;
-      border-radius: 8px;
-    }
-    .links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      justify-content: center;
-      padding: 20px;
-    }
-    .links a, footer a {
-      color: #DCD4FF;
-      text-decoration: underline;
-      font-weight: bold;
-    }
-    footer {
-      background-color: #101325;
-      color: white;
-      text-align: center;
-      padding: 20px;
-      font-size: 0.9em;
-    }
-    @media (max-width: 600px) {
-      header h1 {
-        font-size: 1.5em;
-      }
-    }
+    body { background:#101325; color:#fff; font-family:Arial, sans-serif; max-width:1000px; padding:24px; margin:0 auto; }
+    h1 { font-size:2em; margin-bottom:8px; }
+    p { font-size:1.2em; margin-bottom:24px; }
+    a { color:#E6E6FA; text-decoration:underline; }
+    img { width:100%; height:auto; display:block; margin:0 auto 16px; }
+    .links { margin-bottom:24px; }
+    .links a { display:inline-block; margin:4px 0; }
+    .nota { font-size:0.9em; color:#ccc; margin-bottom:16px; }
+    .anterior { font-size:0.9em; color:#aaa; margin-top:24px; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Orbit · kit de campanha</h1>
-    <div class="notice">Proposta para demonstração e piloto · condições comerciais a definir</div>
-  </header>
-  <nav>
-    <a href="ESTRATEGIA_COMERCIAL.md">Estratégia Comercial</a>
-    <a href="PESQUISA_E_DIRECAO.md">Pesquisa e Direção</a>
-    <a href="CALENDARIO_E_MEDICAO.md">Calendário e Medição</a>
-    <a href="VENDAS_E_LANDING.md">Vendas e Landing</a>
-    <a href="README.md">README</a>
-  </nav>
-  <main><div class="grid">
-    <div class="card"><img src="exports/p01-feed.png" alt="Arte 01"><div class="card-content"><a href="exports/p01-feed.png">Arte 01</a></div></div>
-    <div class="card"><img src="exports/p02-feed.png" alt="Arte 02"><div class="card-content"><a href="exports/p02-feed.png">Arte 02</a></div></div>
-    <div class="card"><img src="exports/p03-feed.png" alt="Arte 03"><div class="card-content"><a href="exports/p03-feed.png">Arte 03</a></div></div>
-    <div class="card"><img src="exports/p04-feed.png" alt="Arte 04"><div class="card-content"><a href="exports/p04-feed.png">Arte 04</a></div></div>
-    <div class="card"><img src="exports/p05-feed.png" alt="Arte 05"><div class="card-content"><a href="exports/p05-feed.png">Arte 05</a></div></div>
-    <div class="card"><img src="exports/p06-feed.png" alt="Arte 06"><div class="card-content"><a href="exports/p06-feed.png">Arte 06</a></div></div>
-  </div>
-  <div class="extras">
-    <img src="images/planning.png" alt="Conceito gerado">
-    <img src="images/workstation.png" alt="Conceito gerado">
-    <img src="images/abstract.png" alt="Conceito gerado">
-  </div>
+  <h1>Orbit — Anúncio Comercial</h1>
+  <p>Projetos e código em um lugar</p>
+  <a href="exports/orbit-venda.png" target="_blank"><img src="exports/orbit-venda.png" alt="Anúncio do Orbit: projetos e código em um lugar; solicite uma demonstração" /></a>
   <div class="links">
-    <a href="posts-01.json">posts-01.json</a>
-    <a href="posts-07.json">posts-07.json</a>
-    <a href="carrossel.json">carrossel.json</a>
-    <a href="FOTOS_E_ARTES.json">FOTOS_E_ARTES.json</a>
-    <a href="template.html">template.html</a>
+    <a href="exports/orbit-venda.jpg">Baixar JPEG</a>
+    <a href="anuncios/orbit-venda.html">Layout</a>
+    <a href="anuncios/copy-venda.json">Legenda</a>
+    <a href="README.md">Instruções</a>
+    <a href="PESQUISA_E_DIRECAO.md">Referências</a>
   </div>
-</main><footer><a href='exports/'>Exports</a> | <a href='template.html'>Template</a>
-    Conteúdo e layout propostos pelo LocalAuthor. Pesquisa coletada pelo LocalAuthor com URLs encontradas pelo supervisor. Revisão e renderização supervisionadas. Fotos conceituais geradas localmente; capturas QA com dados fictícios. Sem publicação, métricas comerciais ou treinamento de pesos neste lote.
-  </footer>
+  <div class="nota">Proposta para demonstração e piloto. Contato e condições comerciais precisam ser definidos antes da publicação.</div>
+  <div class="anterior">Material de apoio anterior: <a href="posts-01.json">posts-01.json</a>, <a href="posts-07.json">posts-07.json</a>, <a href="exports/">exports/</a>. Os modelos anteriores são protótipos e não anúncios aprovados pelo proprietário.</div>
 </body>
 </html>
