@@ -101,7 +101,7 @@ dos pesos decorre da presença do Markdown no Git.
 
 ### Laboratório GGUF opcional
 
-`qa/foundation/Dockerfile.gguf` usa o arquivo oficial CPU do llama.cpp b11429,
+`qa/foundation/Dockerfile.gguf-cpu` usa o arquivo oficial CPU do llama.cpp b11429,
 com SHA-256 conferido e extração limitada. `Dockerfile.cuda118-builder` prepara
 uma compilação separada CUDA 11.8 para Turing/sm75, sem alterar o driver Windows.
 Essas imagens não contêm pesos. O aplicativo só as utiliza se um operador

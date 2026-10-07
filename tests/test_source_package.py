@@ -20,6 +20,14 @@ class SourcePackageTests(unittest.TestCase):
             with self.subTest(path=path), self.assertRaises(ValueError):
                 packager.check_inventory(("100644 blob " + "a" * 40 + "\t" + path + "\0").encode())
 
+    def test_weight_deny_policy_regression(self):
+        raw = b"100644 blob aaa\tqa/foundation/Dockerfile.gguf-cpu\0"
+        self.assertIsNone(packager.check_inventory(raw))
+        with self.assertRaises(ValueError):
+            packager.check_inventory(b"100644 blob bbb\tmodels/model.gguf\0")
+        with self.assertRaises(ValueError):
+            packager.check_inventory(b"100644 blob ccc\tqa/foundation/Dockerfile.gguf\0")
+
     def test_inventory_rejects_links_and_empty_tree(self):
         with self.assertRaises(ValueError): packager.check_inventory(b"")
         with self.assertRaises(ValueError): packager.check_inventory(b"120000 blob aaa\tlink\0")
