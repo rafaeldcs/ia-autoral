@@ -58,7 +58,7 @@ function renderCards(posts) {
   posts.forEach(post => {
     const card = document.createElement('div');
     card.className = 'card';
-    
+
     const brandChannelDay = document.createElement('div');
     brandChannelDay.textContent = `${post.brand}/${post.channel}/${post.day}`;
     card.appendChild(brandChannelDay);
@@ -125,7 +125,7 @@ function renderCards(posts) {
     card.appendChild(saveBtn);
 
     card.appendChild(document.createElement('br'));
-    
+
     card.addEventListener('click', (e) => {
       if (e.target.tagName === 'A') {
         e.preventDefault();
@@ -154,7 +154,7 @@ window.onload = async () => {
   try {
     const posts = await loadPosts();
     allPosts = posts;
-    
+
     filterPosts();
   } catch (err) {
     feedback.textContent = 'Erro inesperado: ' + err.message;

@@ -79,18 +79,21 @@
     ]
   },
   "artifact_hashes": {
-    "gestao.html": "35f01447eb858489286b56c729fc4cdf1a40d2dbbb4761a7c79945650eceed97",
+    ".gitattributes": "06f6b77de4b7d8e36914471c3ba7d3d566689cd391eb1a762d037474d36ac29d",
+    "assets/orbit-01-story.png": "cffb6af847a2b9d233bbdce5f0f69ab900e9e60dbbae208cd050474c3592d5f7",
+    "assets/orbit-01.png": "6cfbf65f6f184dd466ae47f269c5e249be937c6066e4533565af17178c74b678",
+    "assets/orbit-02-story.png": "5f86a466b944e30b71b0ab769740fd375e59f344d2ca36940d04370057cb022a",
+    "assets/orbit-02.png": "5ec68fc0b8cd75f9f36afa17247a3d9108747a2a7c5148094630a1b7e3526a4a",
+    "assets/shopair-01-story.png": "f9dab344c45162063b56c52753273395b6b6f17ce3bb3151bc6b9392508605cd",
+    "assets/shopair-01.png": "6eb06a883ad85926c60d46f5f50d9484b4516be71078c74991cff140d9164735",
+    "assets/shopair-02-story.png": "11521c0f601d8874f5d1b7edac4dfd14b1925854338b1d62662b622a858d8084",
+    "assets/shopair-02.png": "114e6f3a6013133cb05bbb19e549001ac9da7f0b35f71e6c208f2e5c58e3d826",
+    "gestao.html": "5b84c9727727637787f2213569b1f68a395462c8d2df3738ab835d0d42e726b9",
     "orbit-art.html": "338f89ae3d657e84c3fe05e7932f1c2e825815895f00cf853d33d0605b55b318",
-    "posts.json": "cb6d4683a7f06a2168207e43e708902c3fe2ef473e3ed593d0c2188b01914af1",
+    "posts.json": "42197ccd40d3a41c62512979ecae65e15913906a1996ac3b798b2cf9f8c2bda4",
     "qa-functional.json": "61882c64325a0364f1c8847688b3b8e4665a83429a9193d56538f833d5f37b2e",
-    "shopair-art.html": "ead1e2c96fce2487ff21cf00864dd467f02940cd898038102ea31c751d505dc2",
-    "assets\\orbit-01-story.png": "cffb6af847a2b9d233bbdce5f0f69ab900e9e60dbbae208cd050474c3592d5f7",
-    "assets\\orbit-01.png": "6cfbf65f6f184dd466ae47f269c5e249be937c6066e4533565af17178c74b678",
-    "assets\\orbit-02-story.png": "5f86a466b944e30b71b0ab769740fd375e59f344d2ca36940d04370057cb022a",
-    "assets\\orbit-02.png": "5ec68fc0b8cd75f9f36afa17247a3d9108747a2a7c5148094630a1b7e3526a4a",
-    "assets\\shopair-01-story.png": "f9dab344c45162063b56c52753273395b6b6f17ce3bb3151bc6b9392508605cd",
-    "assets\\shopair-01.png": "6eb06a883ad85926c60d46f5f50d9484b4516be71078c74991cff140d9164735",
-    "assets\\shopair-02-story.png": "11521c0f601d8874f5d1b7edac4dfd14b1925854338b1d62662b622a858d8084",
-    "assets\\shopair-02.png": "114e6f3a6013133cb05bbb19e549001ac9da7f0b35f71e6c208f2e5c58e3d826"
-  }
+    "README.md": "07623f508930856f9ea9b3ce2d44c44e2dfa66acacbce68a6d03e7076076ac6c",
+    "shopair-art.html": "ead1e2c96fce2487ff21cf00864dd467f02940cd898038102ea31c751d505dc2"
+  },
+  "artifact_encoding": "UTF-8 with LF for text; PNG bytes unchanged"
 }
