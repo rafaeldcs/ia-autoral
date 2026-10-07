@@ -7,6 +7,7 @@ Estudo e implementação iniciados em 7 de outubro de 2026 e incorporados à bra
 | Componente | Estado nesta entrega |
 |---|---|
 | Cache original de blocos em RAM, leitura sob demanda, SHA-256 e orçamento de leitura | Implementado; testes CPU sintéticos |
+| Leitura F32/BF16 conectada a um checkpoint real | Implementada para matrizes selecionadas; paridade CPU de uma MLP, não inferência completa |
 | Planejamento de RAM/VRAM, reservas e staging | Implementado como cálculo; não aplica limites ao sistema operacional |
 | Execução SwiGLU de especialistas pequenos | Oráculo sintético; não é um forward Nemotron |
 | Alternância entre modelo textual e visual | Integrada ao FoundationService: libera o anterior antes de carregar o seguinte |
@@ -16,7 +17,8 @@ Estudo e implementação iniciados em 7 de outubro de 2026 e incorporados à bra
 | Critério de aceitação de candidatos de aprendizado | Implementado para relatórios de avaliador confiável; não treina nem promove pesos |
 | Distribuição do código da main | Pacote com revisão e hash; job dependente dos testes de software |
 | Streaming real de Nemotron em CUDA/CPU | Pendente: decodificador, layouts, forward e estados específicos |
-| Treinamento/distilação de pesos, embeddings semânticos, agente com ferramentas e multimodalidade nova | Especificados, não executados por esta entrega |
+| Treinamento textual LoRA CPU Qwen3 | Pipeline integrado; piloto sobre a base adquirida aguarda aprovação real dos exemplos; nenhum peso treinado nesta integração |
+| Distilação, embeddings semânticos, agente com ferramentas e multimodalidade nova | Não concluídos por esta entrega |
 
 As bibliotecas locais de referência existentes permanecem. O laboratório neural autoral continua separado. Nenhum cliente de serviço externo de IA, peso ou dataset foi adicionado ao Git.
 
@@ -26,6 +28,7 @@ As bibliotecas locais de referência existentes permanecem. O laboratório neura
 - [Estudo e arquitetura](ESTUDO.md): decisões, matemática de memória, hipóteses, riscos e sequência de evolução.
 - [Procedimento local e critérios de aceitação](EXECUCAO_LOCAL.md): comandos e evidências exigidas.
 - [Fontes e procedência](FONTES.md): referências primárias e limites de reutilização.
+- [Matrizes reais](MATRIZES_REAIS.md): API, paridade do primeiro incremento e limites medidos.
 - [Conhecimento: memória e fidelidade](../../knowledge/efficiency/01_memoria_fidelidade.md).
 - [Conhecimento: aprendizado verificável](../../knowledge/efficiency/02_aprendizado_verificavel.md).
 - [Conhecimento: programação e multimodalidade](../../knowledge/efficiency/03_programacao_multimodalidade.md).

@@ -1,0 +1,176 @@
+{
+  "schema": 1,
+  "date": "2026-10-07",
+  "parent_commit": "ba1cd8aa48b3097e4ed2ed039d0a23b936073831",
+  "kind": "supervised_local_code_and_real_matrix_increment",
+  "authorship": {
+    "adapter": "LocalAuthor using Qwen/Qwen3-8B-GGUF, 7c41481f57cb95916b40956ab2f0b139b296d974, Apache-2.0",
+    "weight_hash": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+    "supervisor": "Codex technical review and independent QA, not human approval",
+    "strict_type_fixes": "Supervisor provided rejection predicates; local model selected them after failed proposals",
+    "test_authorship": "Independent supervisor oracle; rejected LocalAuthor drafts preserved privately",
+    "autonomous_test_design_qualified": false
+  },
+  "software_suite": {
+    "tests_run": 516,
+    "passed": 516,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "complete": true,
+    "platform": "linux",
+    "elapsed_seconds": 21.1866603819999
+  },
+  "tested_worktree_sha256": {
+    "src/localauthor/efficiency/safetensor_store.py": "fcba9adfe2fa9c81c621450b2d5e606aa2a160bcf639fb377e386edef0aa3668",
+    "tests/test_matrix_store.py": "096d2773dfeeaaa9c0f0ddd9a1c1be1ca16070208149766dcbb28325e0594fce"
+  },
+  "portable_git_blob_ids": {
+    "src/localauthor/efficiency/safetensor_store.py": "e0dbbbde6cf0cbf2a94283ebad51657792928a25",
+    "tests/test_matrix_store.py": "f305c66b8605f1f563c7de5c788740e8dd217c5b"
+  },
+  "real_pretrained_matrix_parity": {
+    "weights_sha256": "f47f71177f32bcd101b7573ec9171e6a57f4f4d31148d38e382306f42996874b",
+    "selected_tensors": [
+      "model.layers.0.mlp.gate_proj.weight",
+      "model.layers.0.mlp.up_proj.weight",
+      "model.layers.0.mlp.down_proj.weight"
+    ],
+    "dtypes": {
+      "model.layers.0.mlp.gate_proj.weight": "BF16",
+      "model.layers.0.mlp.up_proj.weight": "BF16",
+      "model.layers.0.mlp.down_proj.weight": "BF16"
+    },
+    "matrix_values_exact": true,
+    "intermediate_values_exact": true,
+    "output_values_exact": true,
+    "absolute_tolerance": 0,
+    "seed": 71007,
+    "input_shape": [
+      2,
+      1024
+    ],
+    "full_model_forward": false,
+    "nemotron_forward": false,
+    "trained": false,
+    "base_unchanged": true,
+    "cancelled_without_reads": true,
+    "initialization_including_full_manifest_hash_seconds": 4.064793253999596,
+    "cold_decode_seconds": 0.18575509899892495,
+    "warm_decode_seconds": 0.07138366599974688,
+    "reference_mlp_seconds": 0.016080480998425628,
+    "store_decoded_mlp_seconds": 0.008377450998523273,
+    "cold_logical_stats": {
+      "hits": 0,
+      "misses": 3,
+      "read_bytes": 18874368,
+      "write_bytes": 0,
+      "evictions": 0,
+      "resident_bytes": 18874368,
+      "peak_resident_bytes": 18874368,
+      "cache_capacity_bytes": 18874368,
+      "max_read_buffer_bytes": 6291456,
+      "physical_disk_io_measured": false,
+      "gpu_implemented": false
+    },
+    "warm_logical_stats": {
+      "hits": 3,
+      "misses": 3,
+      "read_bytes": 18874368,
+      "write_bytes": 0,
+      "evictions": 0,
+      "resident_bytes": 18874368,
+      "peak_resident_bytes": 18874368,
+      "cache_capacity_bytes": 18874368,
+      "max_read_buffer_bytes": 6291456,
+      "physical_disk_io_measured": false,
+      "gpu_implemented": false
+    },
+    "decoded_cpu_bytes_per_matrix_set": 37748736,
+    "decoded_sets_retained_by_qa": 2,
+    "reference_tensor_bytes": 37748736,
+    "process_peak_rss_bytes": 370667520,
+    "cache_after_clear": {
+      "hits": 3,
+      "misses": 3,
+      "read_bytes": 18874368,
+      "write_bytes": 0,
+      "evictions": 0,
+      "resident_bytes": 0,
+      "peak_resident_bytes": 18874368,
+      "cache_capacity_bytes": 18874368,
+      "max_read_buffer_bytes": 6291456,
+      "physical_disk_io_measured": false,
+      "gpu_implemented": false
+    },
+    "limits": [
+      "Only three real pretrained matrices and one dense MLP with two synthetic input rows.",
+      "Not final independent neural qualification, generation runtime, MoE routing, or learning.",
+      "Initialization hashes the full 1.5GB checkpoint and reads each selected block once; not included in WeightStore read counters.",
+      "Logical payload reads do not measure physical SSD I/O, energy, temperature, or wear.",
+      "Decoded tensors and QA reference tensors are outside raw cache accounting.",
+      "Cold/warm timings do not establish global model generation speedup."
+    ]
+  },
+  "matrix_checkpoint": {
+    "model_id": "Qwen/Qwen3-0.6B",
+    "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+    "license": "Apache-2.0"
+  },
+  "isolation": {
+    "qa_image": "sha256:f4f7a0cb6d853da0e73708d654a8a5c573cf203ce7abceb8bb6705938f3fc705",
+    "matrix_image": "sha256:3cb997f054a3b73117841ca7f15cb3b136be827d28682e67ef1a2ee0069c7474",
+    "network": "none",
+    "user": "10001:10001",
+    "readonly_root": true,
+    "capabilities": "none",
+    "no_new_privileges": true,
+    "weights_read_only": true
+  },
+  "local_teacher": {
+    "model_id": "nvidia/NVIDIA-Nemotron-3-Nano-4B-GGUF",
+    "revision": "ba223d14e45525f7fae81db77ea8cabeb2fc6c25",
+    "license": "NVIDIA Nemotron Open Model License",
+    "weights_sha256": "be5d9a656a51922f24f1f09a759cebb694e1f5d9728bf0ef9f8c972c5a0b5ef2",
+    "compute": {
+      "device": "CUDA0",
+      "offloaded_layers": 43,
+      "total_layers": 43
+    },
+    "original_synthetic_candidates": 1,
+    "actual_dotnet_checks": 78,
+    "passed": 78,
+    "development_check_only": true,
+    "independent_final_qualification": false,
+    "candidate_code_published": false,
+    "human_accepted": false,
+    "training_allowed": false
+  },
+  "consultation": {
+    "old_notes_reused": 7,
+    "new_efficiency_sources": 3,
+    "query_checks_passed": 9,
+    "source_hash_and_lines_verified": true,
+    "project_isolation_verified": true,
+    "idempotency_verified": true,
+    "training_rights_granted": false
+  },
+  "weights_training": {
+    "status": "BLOCKED_PENDING_EXACT_HUMAN_DATA_APPROVAL",
+    "pretrained_pilot_executed_this_session": false,
+    "pending_examples": 8,
+    "expected_dataset_gate_exit": 2,
+    "activation": false,
+    "weight_updates_this_session": false
+  },
+  "capability": {
+    "global_neural_improvement_measured": false,
+    "real_dense_matrix_primitive_tested": true,
+    "new_teaching_candidate_externally_verified": true,
+    "universal_developer_qualified": false,
+    "nemotron_ultra_equivalence": false
+  },
+  "cleanup_performed": false,
+  "cleanup_blocked_by_pending_criteria": true,
+  "ci_notice": "This receipt describes the tested worktree. Check CI of the published commit separately; previous CI is not substituted for the new revision."
+}
