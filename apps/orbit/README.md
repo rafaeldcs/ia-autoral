@@ -4,6 +4,12 @@ C#/.NET 10, Next.js 16 e PostgreSQL. Quadros Scrum/Kanban, backlog, sprints,
 gráficos de fluxo, equipe e auditoria. **Código e entregas** hospeda um repositório
 Git privado por projeto e também pode associar GitHub para pull, push e publicação.
 
+## Identidade visual
+
+Login e barra lateral usam o mesmo componente `OrbitBrand`; o ícone da aba
+compartilha o símbolo. A proposta, versões e processo da LocalAuthor estão em
+[marketing/orbit/brand](../../marketing/orbit/brand/README.md).
+
 ## Repositório do próprio Orbit
 
 Abra Código e entregas → **Repositório** e use **Criar repositório** como administrador

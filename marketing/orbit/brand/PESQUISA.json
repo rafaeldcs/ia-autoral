@@ -1,0 +1,34 @@
+{
+  "research": [
+    {
+      "brand": "Atlassian",
+      "url": "https://atlassian.design/foundations/logos",
+      "observations": "Separa símbolo e wordmark; variantes de cor (brand/inverse/neutral); espaçamento claro; texto alternativo significativo; sem distorções.",
+      "takeaway_for_orbit": "Priorize estrutura clara e variantes de cor, mantendo espaçamento e integridade visual.",
+      "avoid_copying": "Não remixar gráficos proprietários ou sugerir afiliação."
+    },
+    {
+      "brand": "Linear",
+      "url": "https://linear.app/brand",
+      "observations": "Nomenclatura consistente; espaçamento; preferência por monocromático; não alterar ou remixar gráficos proprietários.",
+      "takeaway_for_orbit": "Simplifique identidade com espaçamento e monocromático, evitando alterações em elementos proprietários.",
+      "avoid_copying": "Não implique afiliação ou use elementos de propriedade exclusiva."
+    },
+    {
+      "brand": "GitHub",
+      "url": "https://brand.github.com/foundations/logo",
+      "observations": "Pictograma + wordmark; marca isolada quando contexto já estabelecido; contraste alto; sem efeitos ou fundos ocupados.",
+      "takeaway_for_orbit": "Use contraste e clareza, evitando distorções ou elementos distraídos.",
+      "avoid_copying": "Não remixar ou alterar elementos visuais da marca."
+    },
+    {
+      "brand": "ClickUp",
+      "url": "https://clickup.com/brand",
+      "observations": "Lockup completo e símbolo; variantes preto/branco; preserva cores, proporções e espaçamento; gradientes são escolha da marca.",
+      "takeaway_for_orbit": "Mantenha proporções e espaçamento, evitando gradientes não solicitados.",
+      "avoid_copying": "Não altere cores ou proporções, respeitando variantes oficiais."
+    }
+  ],
+  "method": "Revisão de páginas públicas de marcas (Atlassian, Linear, GitHub, ClickUp) em 07/10/2026, com coleta de dados fáticos e análise de diretrizes visuais. Não foram utilizados pixels de concorrentes ou buscas web autônomas.",
+  "reviewer_method": "Reviewer discovered URLs; LocalAuthor ResearchService collected them on2026-10-07; text model received reviewed summaries, no autonomous search or competitor pixel analysis."
+}

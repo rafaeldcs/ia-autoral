@@ -18,6 +18,11 @@ A oferta é uma demonstração do produto em homologação, com condições do p
 combinar. O destino de contato ainda precisa ser definido antes de publicar.
 Não houve publicação social nem teste de conversão com público real.
 
+## Identidade visual
+
+A marca atual está em [brand/README.md](brand/README.md), com SVGs, PNGs
+transparentes, versões de cor, ícone e guia. O anúncio principal usa essa identidade.
+
 ## Material e uso
 
 - [Estratégia comercial](ESTRATEGIA_COMERCIAL.md): público, posicionamento, oferta e funil.

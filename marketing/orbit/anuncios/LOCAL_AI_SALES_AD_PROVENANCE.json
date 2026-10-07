@@ -157,5 +157,14 @@
     "backup_crc_verified": true,
     "server_health": "ok",
     "training_allowed": false
+  },
+  "brand_revision": {
+    "date": "2026-10-07",
+    "provenance": "../brand/LOCAL_AI_BRAND_PROVENANCE.json",
+    "logo_and_product_capture_updated": true,
+    "real_synthetic_qa_capture": true,
+    "local_author_capture": false,
+    "new_render_checks": 3,
+    "pixel_review": "Supervisor inspected updated advertisement"
   }
 }
