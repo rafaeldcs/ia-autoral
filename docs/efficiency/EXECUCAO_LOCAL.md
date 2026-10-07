@@ -2,22 +2,24 @@
 
 Este procedimento não baixa pesos, não treina modelos e não altera o computador remotamente. Use no checkout do repositório. As instalações iniciais de dependências podem exigir internet; a execução de IA não deve depender de APIs externas. Para ambiente isolado, prepare antes os pacotes e pesos aprovados.
 
-## 1. Obter a branch sem perder alterações
+## 1. Atualizar a main sem perder alterações
 
 No PowerShell, dentro do repositório existente:
 
 ```powershell
 $ErrorActionPreference = 'Stop'
-if (git status --porcelain) { throw 'Há alterações locais. Preserve-as antes de trocar de branch.' }
+$Alteracoes = git status --porcelain
+if ($LASTEXITCODE -ne 0) { throw 'Não foi possível consultar o checkout Git.' }
+if ($Alteracoes) { throw 'Há alterações locais. Preserve-as antes de atualizar.' }
 git fetch origin
 if ($LASTEXITCODE -ne 0) { throw 'Falha no fetch.' }
-git switch feat/localauthor-efficient-core
-if ($LASTEXITCODE -ne 0) { throw 'Falha ao selecionar a branch do upgrade.' }
-git pull --ff-only origin feat/localauthor-efficient-core
+git switch main
+if ($LASTEXITCODE -ne 0) { throw 'Falha ao selecionar a main.' }
+git pull --ff-only origin main
 if ($LASTEXITCODE -ne 0) { throw 'Atualização não aplicada; não usar reset --hard.' }
 ```
 
-A branch não é a `main`. Não executar merge automático antes de conferir a revisão e a suíte. Não apagar o trabalho local para contornar conflito.
+O upgrade foi incorporado à `main`. O PR #3 está encerrado por merge; a antiga branch não é necessária. Não apagar trabalho local para contornar conflitos. A política de entrega está registrada em `AGENTS.md`.
 
 ## 2. Testar o checkout real
 
@@ -37,7 +39,7 @@ if ($LASTEXITCODE -ne 0) { throw 'O ensaio de equivalência sintética falhou.' 
 
 O segundo comando cria apenas pesos sintéticos temporários. Resultado esperado: `equal_outputs=true`, `nemotron_executed=false`, `weights_trained=false`. Não comparar seu tempo de milissegundos com inferência de um modelo real.
 
-O runner possui política explícita para testes de links no Windows. Uma ausência de privilégio deve ser registrada como cobertura incompleta, não removida do relatório. Não diminuir a contagem mínima de testes para obter verde.
+O runner possui política explícita para testes de links no Windows. Uma ausência de privilégio deve ser registrada como cobertura incompleta, não removida do relatório. Não diminuir a contagem mínima de testes para obter verde. Para empacotamento e o teste opcional de checkpoint em processo descartável, consulte [PUBLICACAO_MAIN.md](../PUBLICACAO_MAIN.md).
 
 ## 3. Tornar os textos consultáveis pelo LocalAuthor
 
@@ -63,9 +65,9 @@ Cada importação cria uma cópia com hash e `training_allowed=false`. Não repe
 
 O manifesto continua exigindo pasta local imutável, licença, revisão, revisor e inventário de hashes. O registro não é teste de compatibilidade. Use `python -m localauthor.foundation --home PASTA status` e `register-model --help` para conferir os argumentos no seu checkout.
 
-Novos argumentos do registro textual: `--enable-thinking` e `--generation-seconds 120`. O primeiro apenas passa o perfil ao template; precisa de homologação. O segundo é cooperativo durante geração, não encerra um carregamento travado. Os padrões antigos são preservados: raciocínio desabilitado, 300 segundos.
+Novos argumentos do registro textual: `--enable-thinking` e `--generation-seconds 120`. O primeiro apenas passa o perfil ao template; precisa de homologação. O segundo é cooperativo durante geração normal, não encerra um carregamento travado. Os padrões antigos são preservados: raciocínio desabilitado, 300 segundos. O CLI separado `localauthor.foundation.smoke` cobre o ciclo de verificação em processo descartável, sem mudar essa propriedade do servidor.
 
-Não renomear um modelo incompatível para fazê-lo parecer Nemotron. Não escolher BF16/NVFP4 só porque aparece numa ficha; medir suporte de runtime, driver e hardware. Não habilitar código de checkpoint sem revisão local, nem permitir download de código remoto. Os pesos não são distribuídos neste PR.
+Não renomear um modelo incompatível para fazê-lo parecer Nemotron. Não escolher BF16/NVFP4 só porque aparece numa ficha; medir suporte de runtime, driver e hardware. Não habilitar código de checkpoint sem revisão local, nem permitir download de código remoto. Os pesos não são distribuídos no pacote de código.
 
 ## 5. Evidências para homologar o futuro forward
 

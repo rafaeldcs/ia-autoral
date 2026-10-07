@@ -1,6 +1,6 @@
 # LocalAuthor — núcleo de eficiência verificável
 
-Estudo e implementação inicial em 7 de outubro de 2026. Objetivo: incorporar conceitos úteis no próprio LocalAuthor, sem APIs externas de inferência, preservando procedência de código, dados e pesos.
+Estudo e implementação iniciados em 7 de outubro de 2026 e incorporados à branch principal `main`. Objetivo: incorporar conceitos úteis no próprio LocalAuthor, sem APIs externas de inferência, preservando procedência de código, dados e pesos. O PR #3 foi integrado e encerrado; não é necessário selecionar a antiga branch para obter o upgrade.
 
 ## O que foi entregue
 
@@ -10,8 +10,11 @@ Estudo e implementação inicial em 7 de outubro de 2026. Objetivo: incorporar c
 | Planejamento de RAM/VRAM, reservas e staging | Implementado como cálculo; não aplica limites ao sistema operacional |
 | Execução SwiGLU de especialistas pequenos | Oráculo sintético; não é um forward Nemotron |
 | Alternância entre modelo textual e visual | Integrada ao FoundationService: libera o anterior antes de carregar o seguinte |
-| Perfil de raciocínio e tempo de geração | Manifesto e CLI; suporte do template ainda precisa ser homologado |
+| Perfil de raciocínio e tempo de geração | Manifesto e CLI; suporte do template precisa ser homologado por checkpoint |
+| Encerramento da aplicação e da fila | Libera modelos após parada confirmada; não descarta recursos de worker ainda ativo |
+| Verificação local de checkpoint | CLI `localauthor.foundation.smoke` com processo descartável e orçamento total |
 | Critério de aceitação de candidatos de aprendizado | Implementado para relatórios de avaliador confiável; não treina nem promove pesos |
+| Distribuição do código da main | Pacote com revisão e hash; job dependente dos testes de software |
 | Streaming real de Nemotron em CUDA/CPU | Pendente: decodificador, layouts, forward e estados específicos |
 | Treinamento/distilação de pesos, embeddings semânticos, agente com ferramentas e multimodalidade nova | Especificados, não executados por esta entrega |
 
@@ -19,6 +22,7 @@ As bibliotecas locais de referência existentes permanecem. O laboratório neura
 
 ## Leitura
 
+- [Publicação da main e teste local do checkpoint](../PUBLICACAO_MAIN.md).
 - [Estudo e arquitetura](ESTUDO.md): decisões, matemática de memória, hipóteses, riscos e sequência de evolução.
 - [Procedimento local e critérios de aceitação](EXECUCAO_LOCAL.md): comandos e evidências exigidas.
 - [Fontes e procedência](FONTES.md): referências primárias e limites de reutilização.
@@ -26,15 +30,13 @@ As bibliotecas locais de referência existentes permanecem. O laboratório neura
 - [Conhecimento: aprendizado verificável](../../knowledge/efficiency/02_aprendizado_verificavel.md).
 - [Conhecimento: programação e multimodalidade](../../knowledge/efficiency/03_programacao_multimodalidade.md).
 
-## Evidência inicial
+## Evidências históricas
 
-Foram executados 49 testes do núcleo em Python 3.13.5 e NumPy 2.3.5, CPU, numa cópia parcial dos módulos. Os hashes Git dos sete arquivos de `efficiency` foram comparados com o commit `98c0e89d744d5be017ca3c81f10038ef28120314` e coincidiram. Isso não substitui a suíte completa no checkout real.
+O commit `4a3e4b813b8df3ae1467156f2c15ade5b3d95784` passou no GitHub Actions run `37627459914`: sete jobs, incluindo Python 3.13/3.14 em Ubuntu/Windows, .NET nas duas plataformas e interface. O log Windows/Python 3.13 registra 356 testes aprovados sem skips. Esse é o resultado da revisão anterior às correções de encerramento e publicação; conferir o CI do novo commit, não reutilizar aprovação antiga como se cobrisse código diferente.
+
+O primeiro CI detectou uma divergência stat/fstat no Windows. A correção usa descritores de forma consistente sem remover campos de identidade, timestamps ou SHA-256 e inclui teste de regressão (fonte S13).
 
 O `self-check` gerou quatro especialistas minúsculos temporários e comparou 32 passos: saídas idênticas; 393216 bytes de leituras lógicas sem cache e 24576 com cache de 12288 bytes. A redução calculada é 93,75%, somente nessa sequência deliberadamente repetitiva. Não mede NVMe físico, desgaste, energia ou habilidade de programação. Não generalizar a redução para modelos reais.
-
-O primeiro CI do PR executou 355 testes: as matrizes Ubuntu/Python 3.13 e 3.14 passaram, assim como os builds e smoke tests .NET em Ubuntu/Windows e os smoke tests de interface. As matrizes Python no Windows detectaram um falso positivo na comparação de metadados de arquivos; os 15 novos testes de integração do Foundation passaram mesmo nessas matrizes.
-
-A correção usa `fstat` de forma consistente sem remover campos de identidade, timestamps ou SHA-256 (ver fonte S13). Um teste de regressão adicional reproduz a divergência entre metadados de caminho e de descritor. Foram executados 50 testes locais do núcleo após essa correção. A próxima execução completa deve descobrir 356 testes. Consulte o resultado do GitHub Actions no commit avaliado; a presença deste documento não significa CI aprovado. O PR #3 registra a situação de validação.
 
 ## Regra de comunicação
 

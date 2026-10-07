@@ -53,5 +53,10 @@ class Application:
         self.jobs.start()
 
     def close(self):
-        self.browser.close()
-        self.jobs.close()
+        # Stop the producer/consumer before disposing anything it can still use.
+        if not self.jobs.close():
+            raise PolicyError("Worker ainda ativo; modelos não foram liberados durante uma operação. Encerre o processo para interromper código nativo não cooperativo.")
+        try:
+            self.browser.close()
+        finally:
+            self.chat.foundation.unload()

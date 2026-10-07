@@ -12,8 +12,9 @@
 - Preserve hashes, originais, diferenças e diários de recuperação; teste as falhas.
 - Não remova testes ou relaxe a política para fazer o CI passar.
 - Não declare esta versão equivalente ao Codex ou a um modelo de fronteira. Registrar/carregar modelos não equivale a treiná-los.
-- Ao concluir alterações, faça commit e push na branch de trabalho após revisão e validação, sem aguardar outro pedido. Não publique segredos/dados privados; não force push. Se o envio falhar, informe o impedimento.
-- Consulte `docs/FOUNDATION.md` para instalação, processo, limites e homologação. O pipeline antigo de treino não treina o modelo foundation.
+- Por solicitação expressa do proprietário em 7 de outubro de 2026, entregar as alterações na branch principal `main`, sem deixá-las em PR ou branch paralela. Revisar, testar, publicar sem force push e verificar o CI da revisão publicada. Não abrir outro PR salvo pedido explícito. Não publicar segredos/dados privados; informar qualquer falha de envio ou validação.
+- Não marcar funcionalidades apenas especificadas como implementadas nem apagar evidências de pendências para aparentar conclusão. O pacote de código e os testes de software não são um checkpoint treinado nem uma homologação de qualidade.
+- Consulte `docs/FOUNDATION.md` para instalação, processo, limites e homologação e `docs/PUBLICACAO_MAIN.md` para a distribuição de código. O pipeline antigo de treino não treina o modelo foundation.
 
 <!-- LOCALAUTHOR_APRENDIZADO_LOCAL:BEGIN -->
 ## Continuação local do aprendizado — instruções temporárias
