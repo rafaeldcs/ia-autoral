@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-07",
+  "model": "Qwen/Qwen3-8B-GGUF",
+  "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+  "weights_changed": false,
+  "social_publication": false,
+  "all_business_management_certified": false,
+  "pages": 40,
+  "pdf_sha256": "5d51cf9143af08bbb0e34dc1460fc50ee232734c901afbb70e6b78cb4e6309a1",
+  "authorship": {
+    "supervisor": "research, management scaffold, semantic corrections, visual direction and PDF",
+    "localauthor": "actual language drafts and evaluation answers"
+  },
+  "editorial_changes": 40,
+  "review": "supervisor semantic review; no claim of human acceptance for training"
+}

@@ -1,0 +1,371 @@
+{
+  "roles": {
+    "management_scaffold": "original supervisor teaching",
+    "draft_customer_language": "actual LocalAuthor inference",
+    "final_editorial_changes": "supervisor; explicitly logged",
+    "final_approval": "technical only; human business approval still pending"
+  },
+  "edits": [
+    {
+      "kind": "momentos",
+      "item": "Crescimento com atendimento no limite",
+      "field": "post",
+      "before_sha256": "f146af759d5c3785e68c8908966765c9df7b295cce13873830fc1263fa807356",
+      "after_sha256": "44e6a8f28b6190bdeecd2b2351f03bac220349590edff7a8d9ace98b4e49f633",
+      "reason": "Do not imply support capacity has already been solved.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "momentos",
+      "item": "Lançamento de recurso ainda em teste",
+      "field": "post",
+      "before_sha256": "9d6465ca206c85a74bf1add1f34d0e3930afa899df4aaba06f69df4c90d4c924",
+      "after_sha256": "f830693e18c196b6e4eb6188a0732ad2148b27fd1b339af26f8b7d18036fa60b",
+      "reason": "Do not invite use of an unavailable resource.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "momentos",
+      "item": "Cancelamentos e reclamações recorrentes",
+      "field": "post",
+      "before_sha256": "cc342af3c2b12179aa82a83d62e33e026eb6c6fb4d0439732f57279e74bda755",
+      "after_sha256": "40ecce000c4388cfa20200cdc17da849419d89f1d51fdb20076362587acdbc42",
+      "reason": "Do not infer cause of complaints or blame client.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "momentos",
+      "item": "Incidente de indisponibilidade suspeito",
+      "field": "post",
+      "before_sha256": "24487e4ebc07a5e4d255813185dd5d18bc5f878db4d5036329f396c0c800903e",
+      "after_sha256": "a885210e10027a22d71f787f965d429fa8fd6522457ea38f6e3e240a157d4b1d",
+      "reason": "Do not suggest waiting before reacting to an incident.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "momentos",
+      "item": "Maturidade e expansão para nova região",
+      "field": "post",
+      "before_sha256": "34fce0226b392c1f62a8dbe0cd2cb31d52869de0ecbbb169878a028193127bd5",
+      "after_sha256": "76260e447a3f99211f95a25f1c67950c3d9918373732c14b98ad795a827795a5",
+      "reason": "No unverified logistics or regional functionality.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "momentos",
+      "item": "Evento comercial com prazo e termos confirmados pelo responsável",
+      "field": "post",
+      "before_sha256": "ae0b7e2e30047fb3b3d86252c841c2b30d3e4e1b546b5ed58b3456191944888c",
+      "after_sha256": "98709768f1f7369a58e07f40e34fe218494c70be8c4d2022b1151a96ad7098a0",
+      "reason": "No invented event terms; deliberately an internal template, not a ready published ad.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "momentos",
+      "item": "Mercado com concorrente anunciando nova funcionalidade",
+      "field": "post",
+      "before_sha256": "c35e0a7c26bfdce591a8671edd8efb17b041ec89d736f60a494e9c0388a5fc8e",
+      "after_sha256": "721299046e56e0e7be1982ec5baa403d9c3503ec2e601eecec32b6ee8ab27622",
+      "reason": "Market comparison must not pretend new feature exists.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "canais",
+      "item": "TikTok",
+      "field": "exemplo_post",
+      "before_sha256": "a056d1da7364bffdfb9a058dd18c93abbd0c63d05dc1252950a55aa9b4479f07",
+      "after_sha256": "66847af7fa355fcdf9fd9696305dba6a87ef4c12cd3324da5b490d3d23c1605a",
+      "reason": "No unverified report automation.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "canais",
+      "item": "Instagram",
+      "field": "exemplo_post",
+      "before_sha256": "878cf6636e305415468c9a7a26fbbe845edb57e28ba5d29d7861c4e8fdd28859",
+      "after_sha256": "3145107afe82ee2e3db19e78b0649856025ec1e0c4e8c6003e2191973e128edd",
+      "reason": "Remove unverified real-time dashboard claim.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "canais",
+      "item": "Facebook",
+      "field": "exemplo_post",
+      "before_sha256": "419dfdf387ffb58f7729af2528ca769e15b3ce420ed436368e79f5e944027543",
+      "after_sha256": "33e2a5fdc99ac0b07debfd8ec8a6c0000b7a92a20a71329bedc0a1fa7366a78c",
+      "reason": "No single-panel implementation claim without verification.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "canais",
+      "item": "YouTube",
+      "field": "exemplo_post",
+      "before_sha256": "3ed35ffb440c5a28d44098ea904d51d86c9c0f7ad1307658b7025314ac303c6a",
+      "after_sha256": "2c232697ca07ea80ef85a1068b27284e0245dd63b8528a090a05e48fa13bb83d",
+      "reason": "Tutorial is storyboard, not an executed demonstration or guarantee of no errors.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "canais",
+      "item": "WhatsApp",
+      "field": "exemplo_post",
+      "before_sha256": "76304bec608a07153689995460a24b60fb19a86af2e8c4b49d7278b0a3c9c73d",
+      "after_sha256": "f822171f4afabe9efdeb5b45a5e93e1449843f443ca20bbe96c68cb5e414b05e",
+      "reason": "Context must actually be permitted; include opt-out rather than invent support optimization.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "momentos",
+      "item": "Validação sem clientes comprovados",
+      "field": "visual",
+      "before_sha256": "d24a00ebd7e8106ea7a3b74dd3fa41a53efc3b206d1ea49c280de6ad288947ab",
+      "after_sha256": "a0c01c5eb2541cba4c4804ad1cb512b80763e80a46780b04328d7a1b535e0425",
+      "reason": "Original supervisor art direction; student brief lacked concrete composition or claimed unverified visuals.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "momentos",
+      "item": "Crescimento com atendimento no limite",
+      "field": "visual",
+      "before_sha256": "5f56aa140aab3486b7a5f4080026d17aad4200772a34b86b74b981779dda75cd",
+      "after_sha256": "a0c01c5eb2541cba4c4804ad1cb512b80763e80a46780b04328d7a1b535e0425",
+      "reason": "Original supervisor art direction; student brief lacked concrete composition or claimed unverified visuals.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "momentos",
+      "item": "Lançamento de recurso ainda em teste",
+      "field": "visual",
+      "before_sha256": "15120d6231905ae9f52517a6f690a158cb572e3acf6da8dfa4f71c45c2e806d0",
+      "after_sha256": "a0c01c5eb2541cba4c4804ad1cb512b80763e80a46780b04328d7a1b535e0425",
+      "reason": "Original supervisor art direction; student brief lacked concrete composition or claimed unverified visuals.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "momentos",
+      "item": "Sazonalidade com estoque e entrega limitados",
+      "field": "visual",
+      "before_sha256": "7f0a69426225a09ed3a763e6cd0215f06141b29c6d3fd5eff4c382bce90de23e",
+      "after_sha256": "a0c01c5eb2541cba4c4804ad1cb512b80763e80a46780b04328d7a1b535e0425",
+      "reason": "Original supervisor art direction; student brief lacked concrete composition or claimed unverified visuals.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "momentos",
+      "item": "Baixa ativação após cadastro",
+      "field": "visual",
+      "before_sha256": "604e91da44fb1a83708055f014679bafcdf50e569f1d46d9c6a66bbfebf74848",
+      "after_sha256": "a0c01c5eb2541cba4c4804ad1cb512b80763e80a46780b04328d7a1b535e0425",
+      "reason": "Original supervisor art direction; student brief lacked concrete composition or claimed unverified visuals.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "momentos",
+      "item": "Cancelamentos e reclamações recorrentes",
+      "field": "visual",
+      "before_sha256": "c596de88b05d263687eb68afb86257c38f88c2a93f414ca8c0753cc00d1cc772",
+      "after_sha256": "a0c01c5eb2541cba4c4804ad1cb512b80763e80a46780b04328d7a1b535e0425",
+      "reason": "Original supervisor art direction; student brief lacked concrete composition or claimed unverified visuals.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "momentos",
+      "item": "Incidente de indisponibilidade suspeito",
+      "field": "visual",
+      "before_sha256": "27ebc5c68078c4f2d2c8d3b4860061652da1b025c1472a16952861388699d30c",
+      "after_sha256": "13b9766572afb1e743174484e1f8d675c400e8ff04deb4f73b1ec38c75443e2e",
+      "reason": "Original supervisor art direction; student brief lacked concrete composition or claimed unverified visuals.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "momentos",
+      "item": "Caixa curto e orçamento restrito",
+      "field": "visual",
+      "before_sha256": "12060aaf6a1d616c33ade299e6ee17987370a42096be3ed39e7e04a27c0facca",
+      "after_sha256": "a0c01c5eb2541cba4c4804ad1cb512b80763e80a46780b04328d7a1b535e0425",
+      "reason": "Original supervisor art direction; student brief lacked concrete composition or claimed unverified visuals.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "momentos",
+      "item": "Mudança de posicionamento para restaurantes",
+      "field": "visual",
+      "before_sha256": "60e56a458ac27fb6aec5eeaacc09546937b83b77b5f2a36aaa1f1e9bbe109761",
+      "after_sha256": "a0c01c5eb2541cba4c4804ad1cb512b80763e80a46780b04328d7a1b535e0425",
+      "reason": "Original supervisor art direction; student brief lacked concrete composition or claimed unverified visuals.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "momentos",
+      "item": "Maturidade e expansão para nova região",
+      "field": "visual",
+      "before_sha256": "545686a857574e861e7b1941489e467dae3e0257df72acf5c54c5e5a5e991c16",
+      "after_sha256": "a0c01c5eb2541cba4c4804ad1cb512b80763e80a46780b04328d7a1b535e0425",
+      "reason": "Original supervisor art direction; student brief lacked concrete composition or claimed unverified visuals.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "momentos",
+      "item": "Evento comercial com prazo e termos confirmados pelo responsável",
+      "field": "visual",
+      "before_sha256": "a56b5a9bd20fd25fc7a8d64183d625c5a3cac59c8cfcb46d48a62b7d9c2ea1b1",
+      "after_sha256": "a0c01c5eb2541cba4c4804ad1cb512b80763e80a46780b04328d7a1b535e0425",
+      "reason": "Original supervisor art direction; student brief lacked concrete composition or claimed unverified visuals.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "momentos",
+      "item": "Mercado com concorrente anunciando nova funcionalidade",
+      "field": "visual",
+      "before_sha256": "16a3e9b57500d516c73615659262faf731b509b6fc087e7ad0e79e2894045059",
+      "after_sha256": "a0c01c5eb2541cba4c4804ad1cb512b80763e80a46780b04328d7a1b535e0425",
+      "reason": "Original supervisor art direction; student brief lacked concrete composition or claimed unverified visuals.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "canais",
+      "item": "TikTok",
+      "field": "visual",
+      "before_sha256": "052441d546959261a1783488390d8b33ba91a8310fb36aaa02ca51e65bf14aa5",
+      "after_sha256": "9c01f91d0595157848114a4534250c4705017e7fbf94c0947c861b4194af5255",
+      "reason": "Original supervisor art direction; student brief lacked concrete composition or claimed unverified visuals.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "canais",
+      "item": "Instagram",
+      "field": "visual",
+      "before_sha256": "da26ae85f8505e9d32bb121d4cd7605cb9e4ef0886902867bc71092d5a1dc851",
+      "after_sha256": "92cb03c3fe35b857ffd4ab67cdc59dbb7ff0709a6b9dc3c4e81e5623bc821597",
+      "reason": "Original supervisor art direction; student brief lacked concrete composition or claimed unverified visuals.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "canais",
+      "item": "Facebook",
+      "field": "visual",
+      "before_sha256": "ac1d289578b04f121529964e4c2f8c77277291557e0cd24f783e5475d2e0a15c",
+      "after_sha256": "a0c01c5eb2541cba4c4804ad1cb512b80763e80a46780b04328d7a1b535e0425",
+      "reason": "Original supervisor art direction; student brief lacked concrete composition or claimed unverified visuals.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "canais",
+      "item": "YouTube",
+      "field": "visual",
+      "before_sha256": "e4b8a2a8a9b4466cce10891b9b484e7b1576e40e731d50f5129cdc351d54ac15",
+      "after_sha256": "a0c01c5eb2541cba4c4804ad1cb512b80763e80a46780b04328d7a1b535e0425",
+      "reason": "Original supervisor art direction; student brief lacked concrete composition or claimed unverified visuals.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "canais",
+      "item": "LinkedIn",
+      "field": "visual",
+      "before_sha256": "55fa325f2408fef3be91ebb6b6939f1a5abaebf9f7c5c4e9a3446cca714a7eb3",
+      "after_sha256": "a0c01c5eb2541cba4c4804ad1cb512b80763e80a46780b04328d7a1b535e0425",
+      "reason": "Original supervisor art direction; student brief lacked concrete composition or claimed unverified visuals.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "canais",
+      "item": "WhatsApp",
+      "field": "visual",
+      "before_sha256": "f058de93a77eae43e6c613b11ef87f73c43b43eb431f2fd3c4ad77df5fe0b4d4",
+      "after_sha256": "a0c01c5eb2541cba4c4804ad1cb512b80763e80a46780b04328d7a1b535e0425",
+      "reason": "Original supervisor art direction; student brief lacked concrete composition or claimed unverified visuals.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "canais",
+      "item": "E-mail",
+      "field": "visual",
+      "before_sha256": "9261567611f11009faf038f5944ece1fda9b3006c3e458bfcf69ffcd4802be3f",
+      "after_sha256": "a0c01c5eb2541cba4c4804ad1cb512b80763e80a46780b04328d7a1b535e0425",
+      "reason": "Original supervisor art direction; student brief lacked concrete composition or claimed unverified visuals.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "canais",
+      "item": "Busca Google e página de destino",
+      "field": "visual",
+      "before_sha256": "f8692d6664d624b44507d5cef979bd14a13027b27859574ea08911db0aaa8b0e",
+      "after_sha256": "a0c01c5eb2541cba4c4804ad1cb512b80763e80a46780b04328d7a1b535e0425",
+      "reason": "Original supervisor art direction; student brief lacked concrete composition or claimed unverified visuals.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "comentarios",
+      "item": "Quanto custa?",
+      "field": "resposta",
+      "before_sha256": "d81338e7945dcddfd71db2f9ded4d62191867fcda08d6da151627a8e640c00f7",
+      "after_sha256": "b03329d64160dbf6e6dd6e6dcb83237231304c25d5b933f00cde212003d3bfa4",
+      "reason": "Customer clarity and fact/privacy review by supervisor; no automatic legal/commercial guarantee.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "comentarios",
+      "item": "Vocês emitem nota fiscal?",
+      "field": "resposta",
+      "before_sha256": "ab5558f60418bfc32cbf9c1fb093b5f65025848b031d295a6615e76fedf6325a",
+      "after_sha256": "41a26afe5623f6a02ca835bb86d9481b54e79e88b4b2e75cbae3ddd6f7bc20e8",
+      "reason": "Customer clarity and fact/privacy review by supervisor; no automatic legal/commercial guarantee.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "comentarios",
+      "item": "Paguei e não consigo entrar!",
+      "field": "resposta",
+      "before_sha256": "23597e3c4f6c549a21942e4ed959f2e133999c9173fd5313f0d3a02f64c3b467",
+      "after_sha256": "c8ec4a3a942ab394fe9db6b8a5e378a62702841814b7a9672ab0366630933062",
+      "reason": "Customer clarity and fact/privacy review by supervisor; no automatic legal/commercial guarantee.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "comentarios",
+      "item": "Vou publicar meu CPF e senha aqui para resolver",
+      "field": "resposta",
+      "before_sha256": "36117225224b86c9f714800e196dfca0995cc8c8ff816780b4b6c1bb3a688714",
+      "after_sha256": "10e552892e82c52d4617eb72a3071a0761528d5639095edf73db0d2cbe4525c4",
+      "reason": "Customer clarity and fact/privacy review by supervisor; no automatic legal/commercial guarantee.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "comentarios",
+      "item": "Isso funciona com qualquer integração?",
+      "field": "resposta",
+      "before_sha256": "81ea8a1beda648dd47b15664545db42eb5f42a09e941bfb13048af11b1262c6d",
+      "after_sha256": "716b524461442a1990858cfbbda9b29dfc28b315032a75d6f59f86eae99a9b15",
+      "reason": "Customer clarity and fact/privacy review by supervisor; no automatic legal/commercial guarantee.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "comentarios",
+      "item": "Vocês garantem dobrar minhas vendas?",
+      "field": "resposta",
+      "before_sha256": "2d967b41051f786cd4f265e36032bc9d8fcbeb83e87e1c3293dda3cdcacf0292",
+      "after_sha256": "2ef2a8f3e218216bfd77bc8e605a1da98136cd8e8bffb11e6cee18334b0237e8",
+      "reason": "Customer clarity and fact/privacy review by supervisor; no automatic legal/commercial guarantee.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "comentarios",
+      "item": "Quero cancelar e receber reembolso agora",
+      "field": "resposta",
+      "before_sha256": "9d3c7c0d93a563575d0fb531ebbc3e2480e70d7e3c11e9f11d513d81c71f024b",
+      "after_sha256": "12a6d32cfb1beffd4c44cb41aadfb41eea1757c94f25868573fe17f3deae5e05",
+      "reason": "Customer clarity and fact/privacy review by supervisor; no automatic legal/commercial guarantee.",
+      "editor": "supervisor; not autonomous model output"
+    },
+    {
+      "kind": "comentarios",
+      "item": "Há suspeita de vazamento; vocês vão esconder?",
+      "field": "resposta",
+      "before_sha256": "d59ee554603ca0bea968927e65523a6cbb5ccc99e454303523545af6ede9a9f3",
+      "after_sha256": "a9e96c8ba436bcc92185f1894438523c4dfb512e739a468a63f1c6ca828b6fc4",
+      "reason": "Customer clarity and fact/privacy review by supervisor; no automatic legal/commercial guarantee.",
+      "editor": "supervisor; not autonomous model output"
+    }
+  ],
+  "autonomous_model_release": false
+}

@@ -1,0 +1,22 @@
+{
+  "simulation": true,
+  "actual_shopair_results": false,
+  "A": {
+    "impressions": 15000,
+    "clicks": 300,
+    "leads": 75,
+    "qualified": 15,
+    "attended": 9,
+    "clients": 3,
+    "media": 900
+  },
+  "B": {
+    "impressions": 10000,
+    "clicks": 150,
+    "leads": 30,
+    "qualified": 15,
+    "attended": 10,
+    "clients": 5,
+    "media": 750
+  }
+}

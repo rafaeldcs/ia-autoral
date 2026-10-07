@@ -1,0 +1,452 @@
+{
+  "momentos": [
+    {
+      "nome": "Validação sem clientes comprovados",
+      "diagnostico": "Investigar necessidade antes de uma promessa comercial.",
+      "acao": "Entrevistar gestores sobre cadastro, estoque e caixa; piloto depende de responsável.",
+      "publico": "Donos de pequenas lojas e restaurantes.",
+      "cta": "Conhecer a proposta no site público.",
+      "metrica": "Conversas qualificadas / conversas realizadas, por segmento e período.",
+      "interromper_quando": "Prova insuficiente, oferta não aprovada ou capacidade de acompanhamento indisponível.",
+      "fonte": "S01; decisão HIPOTESE",
+      "post": "Avalie como o sistema pode simplificar o cadastro e gestão de estoque com base em sua rotina atual.",
+      "visual": "Arte conceitual: pergunta curta sobre a rotina, ícones de estoque/vendas/caixa e convite legível; azul/violeta/magenta, sem tela fictícia como prova."
+    },
+    {
+      "nome": "Crescimento com atendimento no limite",
+      "diagnostico": "Crescimento pode exceder capacidade de suporte.",
+      "acao": "Reduzir aquisição enquanto suporte mapeia volume e capacidade; sem culpar o cliente.",
+      "publico": "Gestores ativos e responsáveis por aquisição.",
+      "cta": "Usar canal oficial de atendimento.",
+      "metrica": "Chamados resolvidos / recebidos; backlog e tempo de resposta por período.",
+      "interromper_quando": "Fila ou falha de atendimento incompatível com o nível acordado.",
+      "fonte": "HIPOTESE; suporte precisa de dados internos",
+      "post": "O atendimento faz parte da sua operação. Se precisar de ajuda com a ShopAir, use o canal oficial e conte qual tarefa está tentando concluir.",
+      "visual": "Arte conceitual: pergunta curta sobre a rotina, ícones de estoque/vendas/caixa e convite legível; azul/violeta/magenta, sem tela fictícia como prova."
+    },
+    {
+      "nome": "Lançamento de recurso ainda em teste",
+      "diagnostico": "O recurso ainda não pode ser anunciado como pronto.",
+      "acao": "Coletar interesse e dúvidas; teste controlado somente se autorizado e disponível.",
+      "publico": "Gestores interessados no problema que o recurso pretende resolver.",
+      "cta": "Manifestar interesse ao responsável.",
+      "metrica": "Interesses qualificados e problemas reproduzidos, com janela definida.",
+      "interromper_quando": "Falha crítica, teste não autorizado ou linguagem que sugira disponibilidade.",
+      "fonte": "HIPOTESE; lançamento depende de QA",
+      "post": "Que problema você gostaria de resolver na gestão? Compartilhe sua necessidade. Recursos em desenvolvimento ainda precisam de validação antes de serem oferecidos.",
+      "visual": "Arte conceitual: pergunta curta sobre a rotina, ícones de estoque/vendas/caixa e convite legível; azul/violeta/magenta, sem tela fictícia como prova."
+    },
+    {
+      "nome": "Sazonalidade com estoque e entrega limitados",
+      "diagnostico": "Pico de demanda pode comprometer estoque e entrega do lojista.",
+      "acao": "Investigar rotina do cliente e demonstrar apenas funções verificadas de gestão.",
+      "publico": "Lojistas com operação sazonal.",
+      "cta": "Conhecer a gestão anunciada no site.",
+      "metrica": "Demonstrações qualificadas / visitas identificadas; erros de promessa de entrega.",
+      "interromper_quando": "Mensagem cria expectativa incompatível com capacidade real do cliente.",
+      "fonte": "S01; sazonalidade HIPOTESE",
+      "post": "Avalie como o sistema pode otimizar gestão de estoque e entregas, respeitando limites reais de operação.",
+      "visual": "Arte conceitual: pergunta curta sobre a rotina, ícones de estoque/vendas/caixa e convite legível; azul/violeta/magenta, sem tela fictícia como prova."
+    },
+    {
+      "nome": "Baixa ativação após cadastro",
+      "diagnostico": "Cadastros não concluídos não revelam sozinhos a causa.",
+      "acao": "Observar tarefas iniciais, oferecer orientação disponível e testar clareza.",
+      "publico": "Pessoas recém-cadastradas.",
+      "cta": "Consultar primeiros passos e solicitar ajuda.",
+      "metrica": "Concluíram tarefa / cadastrados; também medir começaram / cadastrados.",
+      "interromper_quando": "Tutorial desatualizado, falha de acesso ou piora de conclusão observada.",
+      "fonte": "S02; diagnóstico HIPOTESE",
+      "post": "Sua rotina de cadastro está desorganizada? Avalie como o sistema guia sua primeira configuração.",
+      "visual": "Arte conceitual: pergunta curta sobre a rotina, ícones de estoque/vendas/caixa e convite legível; azul/violeta/magenta, sem tela fictícia como prova."
+    },
+    {
+      "nome": "Cancelamentos e reclamações recorrentes",
+      "diagnostico": "Reclamações recorrentes pedem apuração por tema e período.",
+      "acao": "Acolher, encaminhar e verificar resolução; pausar promessa incompatível.",
+      "publico": "Clientes afetados e responsáveis de suporte.",
+      "cta": "Abrir atendimento por canal oficial.",
+      "metrica": "Casos resolvidos / recebidos; recorrência e retenção por coorte.",
+      "interromper_quando": "Promessa não cumprida, dado privado exposto ou falta de responsável.",
+      "fonte": "HIPOTESE; não há reclamações reais medidas nesta rodada",
+      "post": "Algo na sua rotina com a ShopAir não funcionou como esperado? Conte o problema pelo canal oficial de suporte. Seu relato ajuda a investigar o que precisa melhorar.",
+      "visual": "Arte conceitual: pergunta curta sobre a rotina, ícones de estoque/vendas/caixa e convite legível; azul/violeta/magenta, sem tela fictícia como prova."
+    },
+    {
+      "nome": "Incidente de indisponibilidade suspeito",
+      "diagnostico": "Há relato de indisponibilidade, não causa ou prazo confirmado.",
+      "acao": "Acionar suporte/segurança; comunicar somente o que foi confirmado e pausar promoção conflitante.",
+      "publico": "Usuários afetados, em cenário de laboratório.",
+      "cta": "Acompanhar o canal oficial de atendimento.",
+      "metrica": "Tempo até reconhecimento e atualização; casos confirmados / relatos.",
+      "interromper_quando": "Informação desatualizada ou sem validação do responsável.",
+      "fonte": "HIPOTESE; comunicado exige confirmação",
+      "post": "Está com dificuldade de acesso? Avise o suporte pelo canal oficial. Informações sobre causa e recuperação devem ser confirmadas pela equipe responsável.",
+      "visual": "Comunicado em fundo claro, título legível e canal oficial; sem contagem regressiva, causas ou previsão não confirmadas."
+    },
+    {
+      "nome": "Caixa curto e orçamento restrito",
+      "diagnostico": "Restrição de caixa limita decisões, sem provar qual canal funciona.",
+      "acao": "Definir teto aprovado e investigar aquisição qualificada e retenção; orgânico também tem custo.",
+      "publico": "Responsáveis comerciais, marketing e financeiro.",
+      "cta": "Avaliar aderência do sistema à rotina.",
+      "metrica": "Mídia / novos clientes; custos completos separados; saldo e obrigações.",
+      "interromper_quando": "Teto aprovado atingido ou capacidade/caixa inviabiliza atendimento.",
+      "fonte": "S18; decisão HIPOTESE",
+      "post": "Orçamento limitado? Defina um teto e avalie custos de aquisição e retenção de clientes.",
+      "visual": "Arte conceitual: pergunta curta sobre a rotina, ícones de estoque/vendas/caixa e convite legível; azul/violeta/magenta, sem tela fictícia como prova."
+    },
+    {
+      "nome": "Mudança de posicionamento para restaurantes",
+      "diagnostico": "Restaurante é segmento anunciado; não implica reposicionamento já decidido.",
+      "acao": "Pesquisar tarefas do restaurante e validar mensagens sem mudar marca por conta própria.",
+      "publico": "Donos e gestores de restaurantes.",
+      "cta": "Conhecer proposta para restaurantes no site.",
+      "metrica": "Interesses qualificados do segmento / interesses recebidos, por período.",
+      "interromper_quando": "Promessa de função não confirmada ou mensagem confunde software com venda de refeições.",
+      "fonte": "S01; reposicionamento HIPOTESE",
+      "post": "Gerenciar pedidos e estoque manualmente gera retrabalho. Avalie se o sistema atende sua operação.",
+      "visual": "Arte conceitual: pergunta curta sobre a rotina, ícones de estoque/vendas/caixa e convite legível; azul/violeta/magenta, sem tela fictícia como prova."
+    },
+    {
+      "nome": "Maturidade e expansão para nova região",
+      "diagnostico": "Expansão regional exige demanda, capacidade e termos, ainda não confirmados.",
+      "acao": "Entrevistar gestores da região; testar linguagem e atendimento com lote autorizado.",
+      "publico": "Gestores da região escolhida pelo responsável.",
+      "cta": "Conhecer o sistema e conversar sobre a operação.",
+      "metrica": "Conversas qualificadas e conversão por região com denominador e janela.",
+      "interromper_quando": "Atendimento ou proposta não cobre a região/necessidade.",
+      "fonte": "HIPOTESE; demanda regional não medida",
+      "post": "Sua operação atende uma nova região? Conheça a proposta da ShopAir e converse sobre as necessidades de gestão da sua loja ou restaurante.",
+      "visual": "Arte conceitual: pergunta curta sobre a rotina, ícones de estoque/vendas/caixa e convite legível; azul/violeta/magenta, sem tela fictícia como prova."
+    },
+    {
+      "nome": "Evento comercial com prazo e termos confirmados pelo responsável",
+      "diagnostico": "O cenário pressupõe termos e prazo confirmados, mas não informa desconto.",
+      "acao": "Preparar peça apenas com conteúdo confirmado; validar data, destino e responsável antes de divulgar.",
+      "publico": "Gestores cujo perfil se encaixe no evento aprovado.",
+      "cta": "Consultar convite oficial quando validado.",
+      "metrica": "Inscritos elegíveis / visitas; participantes / inscritos; vendas separadas.",
+      "interromper_quando": "Prazo encerrado ou divergência dos termos aprovados.",
+      "fonte": "HIPOTESE; não há evento real anunciado aqui",
+      "post": "Modelo interno de convite: informar evento, data, destino e condições exatamente como aprovados pelo responsável. Completar e revisar esses dados antes de produzir a peça pública.",
+      "visual": "Arte conceitual: pergunta curta sobre a rotina, ícones de estoque/vendas/caixa e convite legível; azul/violeta/magenta, sem tela fictícia como prova."
+    },
+    {
+      "nome": "Mercado com concorrente anunciando nova funcionalidade",
+      "diagnostico": "Anúncio do concorrente não comprova necessidade nem desempenho.",
+      "acao": "Comparar documentação e entrevistar gestores; priorizar problema antes de copiar funcionalidade.",
+      "publico": "Gestores com problema de decisão ou integração.",
+      "cta": "Conhecer funções confirmadas da ShopAir.",
+      "metrica": "Problemas repetidos nas entrevistas e evidência de tarefa afetada.",
+      "interromper_quando": "Comparação sem prova ou alegação de recurso ainda inexistente.",
+      "fonte": "S14-S15; prioridade HIPOTESE",
+      "post": "Estoque, vendas e caixa fazem parte da sua rotina. Conheça a proposta da ShopAir e avalie quais tarefas de gestão ela pode atender na sua operação.",
+      "visual": "Arte conceitual: pergunta curta sobre a rotina, ícones de estoque/vendas/caixa e convite legível; azul/violeta/magenta, sem tela fictícia como prova."
+    }
+  ],
+  "canais": [
+    {
+      "nome": "TikTok",
+      "objetivo": "Problema do gestor e demonstração de tarefa verificada.",
+      "formato": "Vídeo vertical, legendado, abertura/desenvolvimento/convite.",
+      "horario": "Testar janelas com dados da própria conta; sem hora universal.",
+      "metrica": "Visualização útil e visitas qualificadas; posteriormente conversão com janela.",
+      "cuidado": "Direitos da música por uso/região; revisão e aprovação antes de publicar.",
+      "fonte": "S04-S05; estratégia HIPOTESE",
+      "exemplo_post": "Pedidos, estoque e caixa fazem parte da sua rotina? Conheça a proposta de gestão da ShopAir e avalie se ela atende sua loja ou restaurante.",
+      "visual": "Vídeo vertical: rotina do gestor, uma tarefa demonstrada com tela autorizada e convite final; legendas e áreas seguras, música licenciada."
+    },
+    {
+      "nome": "Instagram",
+      "objetivo": "Clareza de valor com demonstração ou sequência educativa.",
+      "formato": "Carrossel legível ou Reel original, sem telas fictícias como prova.",
+      "horario": "Insights da conta, quando disponíveis, mais teste controlado.",
+      "metrica": "Salvos e visitas qualificadas; qualidade de leads com denominador.",
+      "cuidado": "Originalidade, direitos, acessibilidade, oferta e aprovação.",
+      "fonte": "S06; estratégia HIPOTESE",
+      "exemplo_post": "Como você acompanha estoque, vendas e caixa? Conheça a proposta da ShopAir e avalie o sistema a partir das tarefas da sua operação.",
+      "visual": "Carrossel: pergunta sobre rotina, tarefa de gestão e convite; azul/violeta, uma ideia por quadro; sem gráfico de resultado fictício."
+    },
+    {
+      "nome": "Facebook",
+      "objetivo": "Conteúdo original que responda uma dúvida de negócio.",
+      "formato": "Vídeo ou post educativo com destino verificado.",
+      "horario": "Dados da conta e janela de teste; nenhum horário já foi testado aqui.",
+      "metrica": "Visitas qualificadas e conversas pertinentes / visitas.",
+      "cuidado": "Não reutilizar peça sem direitos ou anunciar suporte24h não confirmado.",
+      "fonte": "S07; estratégia HIPOTESE",
+      "exemplo_post": "Estoque e vendas estão difíceis de acompanhar? Conheça as funções de gestão anunciadas pela ShopAir e converse sobre as necessidades da sua operação.",
+      "visual": "Arte conceitual: pergunta curta sobre a rotina, ícones de estoque/vendas/caixa e convite legível; azul/violeta/magenta, sem tela fictícia como prova."
+    },
+    {
+      "nome": "YouTube",
+      "objetivo": "Explicar uma tarefa e ajudar adoção.",
+      "formato": "Tutorial com tela autorizada e verificada, capítulos e legendas.",
+      "horario": "Relatório do público quando acessível; ajustar com desempenho observado.",
+      "metrica": "Retenção por trecho e tarefa concluída, métricas diferentes.",
+      "cuidado": "Não garantir aprendizagem em minutos nem usar repetição como prova de satisfação.",
+      "fonte": "S08-S09; estratégia HIPOTESE",
+      "exemplo_post": "Como você consulta seus relatórios de gestão? Este roteiro propõe mostrar uma tarefa da ShopAir com tela verificada e autorização. Confirme a demonstração antes de gravar.",
+      "visual": "Arte conceitual: pergunta curta sobre a rotina, ícones de estoque/vendas/caixa e convite legível; azul/violeta/magenta, sem tela fictícia como prova."
+    },
+    {
+      "nome": "LinkedIn",
+      "objetivo": "Conversar com decisor sobre problema de gestão.",
+      "formato": "Post educativo B2B com caso simulado explícito.",
+      "horario": "Hipótese de teste com dados da conta e público; sem horário fixo universal.",
+      "metrica": "Conversas qualificadas / conversas iniciadas e origem.",
+      "cuidado": "Não usar pesquisa geral como resultadoShopAir; validar provas e direitos.",
+      "fonte": "S11; estratégia HIPOTESE",
+      "exemplo_post": "Gestão desorganizada de estoque e vendas? Descubra como o sistema pode alinhar processos e avalie sua eficiência operacional.",
+      "visual": "Arte conceitual: pergunta curta sobre a rotina, ícones de estoque/vendas/caixa e convite legível; azul/violeta/magenta, sem tela fictícia como prova."
+    },
+    {
+      "nome": "WhatsApp",
+      "objetivo": "Relacionamento útil com contato que autorizou o canal.",
+      "formato": "Mensagem curta contextualizada e opção de interromper mensagens.",
+      "horario": "Preferência do destinatário e horário de atendimento aprovado.",
+      "metrica": "Respostas pertinentes / mensagens entregues; descadastros e reclamações.",
+      "cuidado": "Verificar permissão, política completa, finalidade e aprovação; consulta oficial foi parcial.",
+      "fonte": "S17; estratégia HIPOTESE",
+      "exemplo_post": "Você autorizou este contato para conversar sobre gestão. Gostaria de conhecer a proposta da ShopAir para estoque, vendas e caixa? Se preferir não receber mensagens, avise por aqui.",
+      "visual": "Arte conceitual: pergunta curta sobre a rotina, ícones de estoque/vendas/caixa e convite legível; azul/violeta/magenta, sem tela fictícia como prova."
+    },
+    {
+      "nome": "E-mail",
+      "objetivo": "Orientar uma tarefa a pessoas que autorizaram comunicação.",
+      "formato": "Texto acessível, assunto honesto, link verificado e descadastro.",
+      "horario": "Preferência/janela de teste; não prometer melhor horário.",
+      "metrica": "Cliques úteis e tarefas concluídas; abertura não basta e pode ser imprecisa.",
+      "cuidado": "Permissão, minimização, descadastro e nenhuma base comprada sem autorização.",
+      "fonte": "HIPOTESE; revisão de privacidade S16",
+      "exemplo_post": "Ferramentas de gestão desatualizadas geram retrabalho? Avalie como o sistema pode integrar estoque, vendas e relatórios para otimizar sua operação.",
+      "visual": "Arte conceitual: pergunta curta sobre a rotina, ícones de estoque/vendas/caixa e convite legível; azul/violeta/magenta, sem tela fictícia como prova."
+    },
+    {
+      "nome": "Busca Google e página de destino",
+      "objetivo": "Responder intenção de busca e explicar aderência do software.",
+      "formato": "Página com oferta verificada, exemplos e próxima ação clara.",
+      "horario": "Busca orgânica não é postagem com hora de pico; anúncios só com autorização.",
+      "metrica": "Leads qualificados / visitas e reconciliação com venda.",
+      "cuidado": "Verificar eventos e destino; UTM sem PII; nada garante ranking.",
+      "fonte": "S01,S10; estratégia HIPOTESE",
+      "exemplo_post": "Gestão de vendas e estoque desorganizada? O sistema oferece visibilidade e controle. Avalie se atende sua operação.",
+      "visual": "Arte conceitual: pergunta curta sobre a rotina, ícones de estoque/vendas/caixa e convite legível; azul/violeta/magenta, sem tela fictícia como prova."
+    }
+  ],
+  "comentarios": [
+    {
+      "nome": "Quanto custa?",
+      "encaminhamento": "Comercial pelo canal oficial.",
+      "limite": "Sem preço, plano ou oferta inventados.",
+      "fonte": "S01; fluxo HIPOTESE",
+      "resposta": "Para informar o valor e as condições corretas, precisamos confirmar a oferta com o responsável comercial. Conte o tipo de operação pelo canal oficial, sem enviar dados sensíveis aqui."
+    },
+    {
+      "nome": "Vocês emitem nota fiscal?",
+      "encaminhamento": "Comercial/suporte para confirmar escopo da oferta.",
+      "limite": "Emissão de documento não é taxa fiscal.",
+      "fonte": "S01",
+      "resposta": "A emissão de documento fiscal não está incluída na oferta da ShopAir consultada. Para confirmar o escopo e as condições vigentes, converse com o responsável comercial."
+    },
+    {
+      "nome": "Paguei e não consigo entrar!",
+      "encaminhamento": "Suporte de acesso e cobrança; verificar situação em privado.",
+      "limite": "Não pedir senha/cartão nem confirmar dado de conta em público.",
+      "fonte": "HIPOTESE",
+      "resposta": "Sinto muito pela dificuldade de acesso. Procure o suporte pelo canal oficial para verificar o caso com segurança. Não envie senha, cartão ou dados privados neste comentário."
+    },
+    {
+      "nome": "Vou publicar meu CPF e senha aqui para resolver",
+      "encaminhamento": "Responsável pelo canal para reduzir exposição e suporte oficial.",
+      "limite": "Sem coleta de credenciais pelo comentário.",
+      "fonte": "S16; procedimento HIPOTESE",
+      "resposta": "Por favor, não publique CPF ou senha aqui. Use o canal oficial de suporte para receber orientação segura, sem compartilhar credenciais."
+    },
+    {
+      "nome": "Isso funciona com qualquer integração?",
+      "encaminhamento": "Suporte técnico/comercial para integração específica.",
+      "limite": "Anunciado não significa disponível/testado para a conta.",
+      "fonte": "S01",
+      "resposta": "A compatibilidade precisa ser verificada para cada integração e configuração. Conte qual serviço deseja usar ao suporte oficial; não podemos garantir funcionamento com qualquer sistema."
+    },
+    {
+      "nome": "Vocês garantem dobrar minhas vendas?",
+      "encaminhamento": "Comercial para conversar sobre tarefa e funções confirmadas.",
+      "limite": "Nenhum ganho ou depoimento inventado.",
+      "fonte": "S01; limite HIPOTESE",
+      "resposta": "Não podemos garantir aumento de vendas. A proposta da ShopAir é apoiar tarefas de gestão; os resultados dependem da operação e precisam ser medidos."
+    },
+    {
+      "nome": "Quero cancelar e receber reembolso agora",
+      "encaminhamento": "Responsável consulta contrato/política vigente por canal oficial.",
+      "limite": "Nenhum reembolso executado e nenhuma regra criada pela IA.",
+      "fonte": "HIPOTESE",
+      "resposta": "Recebemos seu pedido. O responsável precisa conferir os termos aplicáveis e verificar o caso por um canal seguro. Não publique dados de pagamento ou conta neste comentário."
+    },
+    {
+      "nome": "Há suspeita de vazamento; vocês vão esconder?",
+      "encaminhamento": "Equipe responsável por segurança e suporte.",
+      "limite": "Apenas informação confirmada; não coletar detalhes sensíveis publicamente.",
+      "fonte": "S16; procedimento HIPOTESE",
+      "resposta": "Levamos seu relato a sério. Encaminhe as informações ao canal oficial de suporte, sem expor dados pessoais aqui, para que a equipe responsável investigue e confirme o que ocorreu."
+    }
+  ],
+  "melhorias": [
+    {
+      "nome": "Painel de funil e qualidade de leads",
+      "problema": "Decisor pode não enxergar ligação entre origem, lead e venda.",
+      "evidencia": "S14 documenta métricas por plano; S10 explica identificação de campanhas. Não foi observada falta na ShopAir.",
+      "hipotese": "Reconciliação e origem explícita podem melhorar decisão.",
+      "experimento": "Observar tarefa com gestores; comparar protótipo e rotina, incluindo dados ausentes.",
+      "aceite": "Etapas e denominadores claros; reconciliação sem duplicar venda; permissões e ausência de dado visíveis.",
+      "risco": "Dados incompletos ou atribuição incorreta.",
+      "fonte": "S10,S14; necessidade HIPOTESE"
+    },
+    {
+      "nome": "Onboarding mobile por segmento",
+      "problema": "Jornada pode dificultar primeiro uso em segmentos diferentes.",
+      "evidencia": "S02 descreve jornada; S12 descreve contextos digitais gerais, não mede dificuldadeShopAir.",
+      "hipotese": "Orientação por tarefa pode facilitar ativação.",
+      "experimento": "Teste proposto com gestor leigo em mobile, erro de validação, interrupção e retomada.",
+      "aceite": "Concluir tarefa crítica, entender erro e recuperar progresso sem ajuda indevida; aceite acordado antes do teste.",
+      "risco": "Mais etapas ou telas confusas.",
+      "fonte": "S02,S12; necessidade HIPOTESE"
+    },
+    {
+      "nome": "Central de saúde de integrações",
+      "problema": "Gestor pode desconhecer causa e estado de integração.",
+      "evidencia": "S15 apresenta hub de integrações, sem provar monitoração na ShopAir.",
+      "hipotese": "Status e recuperação podem reduzir dúvida.",
+      "experimento": "Simular expiração, falha, reenvio e webhook duplicado em HML autorizado.",
+      "aceite": "Estado fiel, diagnóstico útil, segredo protegido e reenvio idempotente.",
+      "risco": "Alertas falsos e exposição de token.",
+      "fonte": "S15; necessidade HIPOTESE"
+    },
+    {
+      "nome": "Calendário de conteúdo com aprovação",
+      "problema": "Peça pode avançar sem prova, licença ou revisão.",
+      "evidencia": "Necessidade operacional deste estudo, não fato de uso real.",
+      "hipotese": "Trilha de revisão pode reduzir publicação indevida.",
+      "experimento": "Teste proposto com editor/leitor/aprovador, peça rejeitada e perda de conexão.",
+      "aceite": "Rejeitada não publica; alterações revogam aprovação; histórico e responsável visíveis.",
+      "risco": "Tratar botão ou estado local como autorização real.",
+      "fonte": "HIPOTESE"
+    },
+    {
+      "nome": "Caixa de comentários com encaminhamento ao suporte",
+      "problema": "Comentário crítico pode ficar sem responsável.",
+      "evidencia": "Necessidade simulada de atendimento; retençãoYouTube não prova problema de suporte.",
+      "hipotese": "Encaminhamento com contexto pode reduzir perda de informação.",
+      "experimento": "Propor testes de crítica, dado pessoal, spam, indisponibilidade e retorno ao cliente.",
+      "aceite": "Sem repetir segredo; responsável atribuído; estados e retorno verificáveis.",
+      "risco": "Exposição de dados ou fila acima da capacidade.",
+      "fonte": "HIPOTESE; privacidade S16"
+    },
+    {
+      "nome": "Registro de permissões e consentimentos",
+      "problema": "Permissão pode ser desconhecida ou revogada.",
+      "evidencia": "S16 orienta proteção; consultaS17 foi parcial e requer política completa.",
+      "hipotese": "Registro de finalidade e autorização pode dar rastreabilidade, sem certificar conformidade.",
+      "experimento": "Teste proposto de revogação, finalidade incompatível e acesso por papel.",
+      "aceite": "Sem envio após revogação; prova e política acessíveis ao responsável autorizado.",
+      "risco": "Interpretação jurídica inadequada ou acesso excessivo.",
+      "fonte": "S16-S17; necessidade HIPOTESE"
+    },
+    {
+      "nome": "Biblioteca de ativos e direitos por canal",
+      "problema": "Ativo pode ser usado fora da licença.",
+      "evidencia": "S05 exige conferir uso/região de música, sem licença universal.",
+      "hipotese": "Registro por canal pode evitar reutilização indevida.",
+      "experimento": "Teste proposto com licença vencida, região não coberta e ativo sem procedência.",
+      "aceite": "Impedir agendamento incompatível; guardar autor, licença, validade e aprovação.",
+      "risco": "Cadastro incorreto não detectado; imagem sem consentimento.",
+      "fonte": "S05; necessidade HIPOTESE"
+    },
+    {
+      "nome": "Experimentos de produto com acompanhamento de ativação",
+      "problema": "Variação de produto pode confundir conclusão sobre ativação.",
+      "evidencia": "S14 demonstra preocupação comercial com métricas, não resultadoShopAir.",
+      "hipotese": "Eventos coerentes e janela podem apoiar comparação de tarefas.",
+      "experimento": "Planejar experimento com hipótese, variante, evento, negativos, consentimento e critérios de parada.",
+      "aceite": "Reconciliação de eventos; mesmo denominador; incerteza e limitações expostas.",
+      "risco": "Vieses, pouco volume ou conclusão causal indevida.",
+      "fonte": "S10,S14; necessidade HIPOTESE"
+    }
+  ],
+  "gestao": [
+    {
+      "nome": "Vendas e pipeline",
+      "rotina": "Revisar aderência, estágio e motivo de perda com vendas.",
+      "indicador": "Leads qualificados / leads; contratos / qualificados, por janela.",
+      "pergunta_critica": "A promessa comercial cabe na oferta e na capacidade?",
+      "teste": "Propor teste de origem, duplicação e passagem entre estágios.",
+      "limite": "Sem contrato, desconto ou cobrança automática não autorizados.",
+      "fonte": "HIPOTESE; rotina original do estudo"
+    },
+    {
+      "nome": "Produto e QA",
+      "rotina": "Revisar feedback, prioridade, aceite e evidência antes do lançamento.",
+      "indicador": "Tarefas concluídas / tentativas e falhas críticas por versão.",
+      "pergunta_critica": "O gestor leigo entende e conclui a tarefa?",
+      "teste": "Propor positivos, negativos, limites, mobile, teclado e recuperação.",
+      "limite": "Proposta e teste planejado não significam implementação.",
+      "fonte": "HIPOTESE; rotina original do estudo"
+    },
+    {
+      "nome": "Operações e estoque",
+      "rotina": "Verificar rotina do cliente: cadastro, reserva, entrada/saída e conciliação.",
+      "indicador": "Divergências / movimentos auditados, com período.",
+      "pergunta_critica": "Disponível para vender considera reserva e pedidos simultâneos?",
+      "teste": "Propor pedidos concorrentes, duplicação, reversão e prevenção de estoque negativo.",
+      "limite": "Não usar estoque real nem executar compra/cobrança nesta simulação.",
+      "fonte": "HIPOTESE; rotina original do estudo"
+    },
+    {
+      "nome": "Suporte e retenção",
+      "rotina": "Classificar problemas, atribuir responsável e conferir retorno.",
+      "indicador": "Retidos / clientes da coorte; resolvidos / chamados recebidos.",
+      "pergunta_critica": "Quais motivos recorrentes antecedem cancelamento?",
+      "teste": "Propor caso reaberto, cobrança contestada, perda de acesso e dado privado.",
+      "limite": "Sem causa atribuída por palpite; reembolso exige termos e responsável.",
+      "fonte": "HIPOTESE; rotina original do estudo"
+    },
+    {
+      "nome": "Financeiro e caixa",
+      "rotina": "Conciliar entradas, saídas, obrigações e teto aprovado.",
+      "indicador": "Saldo e variação por período; resultado contábil separado.",
+      "pergunta_critica": "Há caixa e capacidade para o piloto?",
+      "teste": "Propor entradas/saídas, duplicação, atraso e conciliação.",
+      "limite": "Caixa não é lucro; mídia/cliente não é CAC completo.",
+      "fonte": "HIPOTESE; S18"
+    },
+    {
+      "nome": "Pessoas e permissões",
+      "rotina": "Revisar acessos por função e revogação; separar aprovação e execução.",
+      "indicador": "Acessos indevidos / verificações; concessões com responsável e revisão.",
+      "pergunta_critica": "Qual menor acesso permite cumprir a tarefa?",
+      "teste": "Propor administrador/editor/leitor, token expirado e proibição de contaQA para cobrança.",
+      "limite": "Sem usar contaSuper para rotina de marketing.",
+      "fonte": "HIPOTESE; rotina original do estudo"
+    },
+    {
+      "nome": "Privacidade e segurança",
+      "rotina": "Revisar finalidade, minimização, ativos, acessos e incidentes com responsável.",
+      "indicador": "Incidentes e pendências por período; autorização rastreável.",
+      "pergunta_critica": "Existe permissão adequada e dado realmente necessário?",
+      "teste": "Propor exposição em comentário, injeção de instrução e revogação de acesso.",
+      "limite": "Sem certificar LGPD; sem segredo no Git, URL ou post.",
+      "fonte": "HIPOTESE; S16"
+    },
+    {
+      "nome": "Planejamento e acompanhamento executivo",
+      "rotina": "Revisar objetivos, evidências, riscos e decisão com direção e áreas.",
+      "indicador": "Objetivo com janela, origem e denominador; resultados e incerteza separados.",
+      "pergunta_critica": "O indicador melhora negócio ou só aparência do relatório?",
+      "teste": "Propor dados ausentes, métrica contraditória e aprovação pendente.",
+      "limite": "Amostra não demonstra gestão universal; IA não assume autoridade executiva.",
+      "fonte": "HIPOTESE; rotina original do estudo"
+    }
+  ]
+}
