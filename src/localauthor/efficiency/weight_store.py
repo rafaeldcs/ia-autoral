@@ -38,6 +38,22 @@ def signature(info: os.stat_result) -> tuple:
     return (info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
 
 
+def file_info(path: Path) -> os.stat_result:
+    """Use descriptor timestamps consistently (CPython Windows issue #157671).
+
+    stat(path).ctime and fstat(fd).ctime can mean different things on Windows.
+    Keep mtime/ctime/inode checks rather than dropping fields to hide the mismatch.
+    Opening for metadata does not count as reading weight payload bytes.
+    """
+    if not stat.S_ISREG(path.stat().st_mode):
+        raise PolicyError("O armazenamento exige arquivos regulares.")
+    with path.open("rb", buffering=0) as stream:
+        info = os.fstat(stream.fileno())
+        if not stat.S_ISREG(info.st_mode):
+            raise PolicyError("O armazenamento exige arquivos regulares.")
+        return info
+
+
 @dataclass(frozen=True)
 class WeightBlock:
     path: str
@@ -92,7 +108,7 @@ class WeightStore:
         for block in self.blocks.values():
             path = safe_child(self.root, block.path)
             try:
-                info = path.stat()
+                info = file_info(path)
             except OSError as exc:
                 raise PolicyError("Arquivo de pesos indisponível.") from exc
             if not stat.S_ISREG(info.st_mode) or block.offset + block.length > info.st_size:
@@ -107,7 +123,7 @@ class WeightStore:
     def _check_path(self, block: WeightBlock) -> Path:
         path = safe_child(self.root, block.path)
         try:
-            current = signature(path.stat())
+            current = signature(file_info(path))
         except OSError as exc:
             self.clear()
             raise PolicyError("Arquivo de pesos removido.") from exc
