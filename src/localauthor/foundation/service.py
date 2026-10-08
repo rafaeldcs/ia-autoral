@@ -99,14 +99,14 @@ class FoundationService:
         return spec, engine
 
     def answer(self, project_id: str, message: str, history: list[dict], evidence: list[dict],
-               cancel=None, *, input_format: str = "text", work_profile: str = "general", project_guidance=None) -> dict:
+               cancel=None, *, input_format: str = "text", work_profile: str = "general", project_guidance=None, project_memory=None) -> dict:
         project_id = identifier(project_id)
         with self._lock:
             spec, engine = self._engine("text", cancel)
             notes = markdown_evidence(self.home / "foundation" / "knowledge" / project_id, message, project_id)
             context = build_context(message, history, [*evidence, *notes], scope=project_id,
                        count=engine.count, context_tokens=spec.context_tokens, output_tokens=spec.output_tokens,
-                       work_profile=work_profile, project_guidance=project_guidance)
+                       work_profile=work_profile, project_guidance=project_guidance, project_memory=project_memory)
             content, truncated = engine.generate(context.messages, cancel)
             check_cancel(cancel)
             if not isinstance(content, str) or not content.strip():
@@ -116,6 +116,7 @@ class FoundationService:
                 "input_tokens": context.input_tokens, "history_used": bool(context.history_used),
                 "history_messages_used": context.history_used,
                 "omitted_history": context.omitted_history, "omitted_evidence": context.omitted_evidence,
+                "memory_used": list(context.memory_used), "omitted_memory": context.omitted_memory,
                 "possibly_truncated": truncated,
                 "work_profile": work_profile,
                 "notice": "Modelo local de origem registrada. Código não executado nem aplicado. "

@@ -5,6 +5,7 @@ import json
 import logging
 
 from ..chat import ChatService
+from ..conversation_memory import conversation_bytes
 from ..message_format import resolve_message_format
 from ..errors import PolicyError
 from ..util import utcnow
@@ -51,6 +52,10 @@ class FoundationChatService(ChatService):
             return super().respond(project_id, conversation_id, message, mode, cancel, input_format)
         self.validate_message(message, mode, input_format)
         input_format = resolve_message_format(message, input_format)
+        if mode == "foundation":
+            remembered = self._memory_turn(project_id, conversation_id, message, cancel, input_format)
+            if remembered is not None:
+                return remembered
         with self.lock:
             check_cancel(cancel)
             conversation = self.get(project_id, conversation_id)
@@ -62,15 +67,23 @@ class FoundationChatService(ChatService):
                 preferences = self.preferences(project_id)
                 found = self.knowledge.consult(message[:1000], project_id, False)
                 evidence = [{**item, "scope": project_id} for item in found["evidence"]]
-                response = self.foundation.answer(project_id, message, conversation["messages"],
+                # Keep memory controls visible, but do not replay forgotten
+                # preferences or list responses through the rolling history.
+                history = []
+                for i in range(0, len(conversation["messages"]) - 1, 2):
+                    pair = conversation["messages"][i:i + 2]
+                    if pair[1]["metadata"].get("origin") != "project_memory":
+                        history.extend(pair)
+                response = self.foundation.answer(project_id, message, history,
                     evidence, cancel, input_format=input_format, work_profile=preferences["work_profile"],
-                    project_guidance={k: preferences[k] for k in ("method", "wip_limit", "definition_of_done")})
+                    project_guidance={k: preferences[k] for k in ("method", "wip_limit", "definition_of_done")},
+                    project_memory=self.memories(project_id))
             try:
                 check_cancel(cancel)
                 metadata = json.dumps({k: v for k, v in response.items() if k != "content"}, ensure_ascii=False)
                 with self.store.connect() as db:
                     db.execute("BEGIN IMMEDIATE")
-                    used = db.execute("SELECT coalesce(sum(length(CAST(content AS BLOB))+length(CAST(metadata AS BLOB))),0) FROM messages").fetchone()[0]
+                    used = conversation_bytes(db)
                     size = len((message + response["content"] + metadata).encode("utf-8"))
                     if used + size > min(self.settings.max_store_bytes, 32_000_000):
                         raise PolicyError("Limite de armazenamento das conversas atingido.")

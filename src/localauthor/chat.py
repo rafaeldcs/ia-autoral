@@ -11,6 +11,7 @@ from .safety import PathPolicy, reject_secrets
 from .util import utcnow, read_json
 from .investigation import InvestigationService
 from .message_format import resolve_message_format
+from .conversation_memory import ConversationMemoryMixin, MEMORY_SCHEMA, conversation_bytes
 
 CHAT_SCHEMA = """
 CREATE TABLE IF NOT EXISTS project_preferences(
@@ -33,13 +34,14 @@ CREATE INDEX IF NOT EXISTS ix_messages_conversation ON messages(conversation_id,
 MODEL_OUTPUT_TOKENS = 220
 
 
-class ChatService:
+class ChatService(ConversationMemoryMixin):
     def __init__(self, store, settings, knowledge):
         self.store, self.settings, self.knowledge = store, settings, knowledge
         self.investigations = InvestigationService(store, settings)
         self.lock = threading.Lock()
         with store.connect() as db:
             db.executescript(CHAT_SCHEMA)
+            db.executescript(MEMORY_SCHEMA)
 
     def preferences(self, project_id):
         self.store.project(project_id)
@@ -115,6 +117,9 @@ class ChatService:
     def respond(self, project_id, conversation_id, message, mode="guide", cancel=None, input_format="auto"):
         self.validate_message(message, mode, input_format)
         input_format = resolve_message_format(message, input_format)
+        remembered = self._memory_turn(project_id, conversation_id, message, cancel, input_format)
+        if remembered is not None:
+            return remembered
         # One turn at a time preserves chronological pairs, including model jobs.
         with self.lock:
             if cancel and cancel.is_set():
@@ -148,7 +153,7 @@ class ChatService:
             metadata = json.dumps({k: v for k, v in response.items() if k != "content"}, ensure_ascii=False)
             with self.store.connect() as db:
                 db.execute("BEGIN IMMEDIATE")
-                used = db.execute("SELECT coalesce(sum(length(CAST(content AS BLOB))+length(CAST(metadata AS BLOB))),0) FROM messages").fetchone()[0]
+                used = conversation_bytes(db)
                 if used + len((message + response["content"] + metadata).encode()) > min(self.settings.max_store_bytes, 32_000_000):
                     raise PolicyError("Limite de armazenamento das conversas atingido.")
                 db.execute("INSERT INTO messages(conversation_id,role,content,metadata,created_at) VALUES(?, 'user', ?, ?, ?)", (conversation_id, message, json.dumps({"format": input_format}), now))

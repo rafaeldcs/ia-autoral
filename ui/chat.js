@@ -55,7 +55,7 @@ async function selectProject(project) { if (state.busy)
     return; hideBrowserPanel(); state.project = project; state.conversation = null; $('project-heading').textContent = project.name; $('project-heading').title = project.name; $('folder-path').textContent = project.root; $('welcome-copy').textContent = 'Converse sobre ' + project.name + '. Comece com o problema, combine o critério de pronto e planeje como testar.'; closeNavigation(); renderProjects(); resetChat(); }
 function renderMessages() { const list = $('messages'); list.replaceChildren(); const messages = state.conversation?.messages || []; $('welcome').hidden = messages.length > 0; for (const message of messages) {
     const box = el('article', '', `message ${message.role}`);
-    const names = { foundation_text: 'LocalAuthor · modelo local com contexto', project_guide: 'Guia do projeto · orientação estruturada', retrieval_only: 'Memória local · trechos recuperados', local_model: 'IA local · geração experimental', investigation_memory: 'Sistema investigado · evidências observadas', browser_session: 'Navegador da IA · sessão de investigação' };
+    const names = { project_memory: 'Memória do projeto · preferência registrada', foundation_text: 'LocalAuthor · modelo local com contexto', project_guide: 'Guia do projeto · orientação estruturada', retrieval_only: 'Memória local · trechos recuperados', local_model: 'IA local · geração experimental', investigation_memory: 'Sistema investigado · evidências observadas', browser_session: 'Navegador da IA · sessão de investigação' };
     const code = message.metadata.format === 'code';
     const label = message.role === 'user' ? 'Você' : message.metadata.qualification === 'scoped' ? 'IA local · correção avaliada em escopo limitado' : names[message.metadata.origin] || 'Assistente';
     box.append(el('div', label, 'message-label'), el(code ? 'pre' : 'div', message.content, code ? 'message-content code-content' : 'message-content'));
@@ -76,6 +76,8 @@ function renderMessages() { const list = $('messages'); list.replaceChildren(); 
         link.rel = 'noopener noreferrer';
         box.append(link);
     }
+    if (Array.isArray(message.metadata.memory_used) && (message.metadata.memory_used.length || message.metadata.omitted_memory))
+        box.append(el('small', `Memórias usadas: ${message.metadata.memory_used.length}. Fora do contexto: ${message.metadata.omitted_memory || 0}.`));
     if (message.metadata.notice)
         box.append(el('small', message.metadata.notice));
     list.append(box);
