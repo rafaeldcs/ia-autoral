@@ -1,6 +1,7 @@
 "use strict";
 const $ = id => document.getElementById(id);
-const state = { token: '', projects: [], project: null, conversation: null, busy: false };
+const state = { token: '', projects: [], project: null, conversation: null, busy: false, requestBusy: false, jobId: null };
+let voiceChat = null;
 let toastTimer;
 function el(tag, text, cls) { const node = document.createElement(tag); node.textContent = text; if (cls)
     node.className = cls; return node; }
@@ -22,9 +23,10 @@ function updateAvailability() {
     document.querySelector('.suggestions').hidden = !state.project;
     $('compose').setAttribute('aria-busy', String(state.busy));
     $('message-input').placeholder = state.project ? 'Descreva uma ideia, uma dúvida ou o próximo passo…' : 'Adicione um projeto para começar a conversar.';
+    voiceChat?.syncControls();
 }
-function busy(value) { state.busy = value; $('busy').hidden = !value; for (const node of document.querySelectorAll('#studio button,#studio select'))
-    node.disabled = value; $('message-input').disabled = value; updateAvailability(); }
+function busy(value) { state.requestBusy = value; state.busy = value || Boolean(voiceChat?.active); $('busy').hidden = !value; for (const node of document.querySelectorAll('#studio button,#studio select'))
+    node.disabled = state.busy; $('message-input').disabled = state.busy; updateAvailability(); }
 function resetChat() { state.conversation = null; $('messages').replaceChildren(); $('welcome').hidden = false; $('message-input').value = ''; updateInputCount(); updateAvailability(); renderConversations().catch(error => toast(error.message)); $('message-input').focus(); }
 function renderProjects() { const list = $('project-list'); list.replaceChildren(); for (const project of state.projects) {
     const node = el('button', project.name, project.id === state.project?.id ? 'active' : '');
@@ -53,7 +55,7 @@ async function selectProject(project) { if (state.busy)
     return; hideBrowserPanel(); state.project = project; state.conversation = null; $('project-heading').textContent = project.name; $('project-heading').title = project.name; $('folder-path').textContent = project.root; $('welcome-copy').textContent = 'Converse sobre ' + project.name + '. Comece com o problema, combine o critério de pronto e planeje como testar.'; closeNavigation(); renderProjects(); resetChat(); }
 function renderMessages() { const list = $('messages'); list.replaceChildren(); const messages = state.conversation?.messages || []; $('welcome').hidden = messages.length > 0; for (const message of messages) {
     const box = el('article', '', `message ${message.role}`);
-    const names = { project_guide: 'Guia do projeto · orientação estruturada', retrieval_only: 'Memória local · trechos recuperados', local_model: 'IA local · geração experimental', investigation_memory: 'Sistema investigado · evidências observadas', browser_session: 'Navegador da IA · sessão de investigação' };
+    const names = { foundation_text: 'LocalAuthor · modelo local com contexto', project_guide: 'Guia do projeto · orientação estruturada', retrieval_only: 'Memória local · trechos recuperados', local_model: 'IA local · geração experimental', investigation_memory: 'Sistema investigado · evidências observadas', browser_session: 'Navegador da IA · sessão de investigação' };
     const code = message.metadata.format === 'code';
     const label = message.role === 'user' ? 'Você' : message.metadata.qualification === 'scoped' ? 'IA local · correção avaliada em escopo limitado' : names[message.metadata.origin] || 'Assistente';
     box.append(el('div', label, 'message-label'), el(code ? 'pre' : 'div', message.content, code ? 'message-content code-content' : 'message-content'));
@@ -82,7 +84,7 @@ $('connect-form').onsubmit = handle(async () => { state.token = $('local-token')
     await selectProject(state.projects[0]);
 else
     $('add-project').focus(); });
-$('logout').onclick = () => { hideBrowserPanel(); state.token = ''; state.project = null; state.conversation = null; state.projects = []; $('messages').replaceChildren(); $('project-list').replaceChildren(); $('conversation-list').replaceChildren(); $('studio').hidden = true; $('connect').hidden = false; $('local-token').focus(); };
+$('logout').onclick = () => { voiceChat?.stop(); hideBrowserPanel(); state.token = ''; state.project = null; state.conversation = null; state.projects = []; $('messages').replaceChildren(); $('project-list').replaceChildren(); $('conversation-list').replaceChildren(); $('studio').hidden = true; $('connect').hidden = false; $('local-token').focus(); };
 const mobileNavigation = matchMedia('(max-width:760px)');
 function closeNavigation(collapse = false) {
     $('sidebar').classList.remove('open'); $('sidebar-scrim').hidden = true;
@@ -104,7 +106,7 @@ $('new-chat').onclick = handle(async () => { if (!state.project)
     throw Error('Adicione uma pasta de projeto primeiro.'); closeNavigation(); resetChat(); });
 for (const button of document.querySelectorAll('[data-prompt]'))
     button.onclick = () => { $('tools-dialog').close(); $('message-input').value = button.dataset.prompt; $('response-mode').value = button.dataset.mode || 'guide'; modeNotice(); updateInputCount(); $('message-input').focus(); toast('Exemplo preenchido. Edite a mensagem ou clique em Enviar.'); };
-function modeNotice() { const modes = { browser: 'Envie um endereço HTTPS para abrir o navegador da IA e acompanhar as capturas. Isso autoriza conexão ao site nesta sessão. Nunca envie senhas no chat.', investigation: 'Consulta as telas já observadas neste projeto, com data e origem. Não navega agora. Não envie senhas no chat.', guide: 'Guias estruturados e referências. Não é geração neural. Ctrl + Enter para enviar.', knowledge: 'Consulta apenas fontes deste projeto. Não inclui conversas ou fontes de outros projetos.', model: 'Laboratório: pedido curto, sem histórico nem arquivos no contexto. A saída pode estar errada e não é executada.' }; $('mode-notice').textContent = modes[$('response-mode').value]; }
+function modeNotice() { const modes = { foundation: 'Conversa com o modelo local, histórico e fontes deste projeto. Respostas podem estar erradas; código não é executado.', browser: 'Envie um endereço HTTPS para abrir o navegador da IA e acompanhar as capturas. Isso autoriza conexão ao site nesta sessão. Nunca envie senhas no chat.', investigation: 'Consulta as telas já observadas neste projeto, com data e origem. Não navega agora. Não envie senhas no chat.', guide: 'Guias estruturados e referências. Não é geração neural. Ctrl + Enter para enviar.', knowledge: 'Consulta apenas fontes deste projeto. Não inclui conversas ou fontes de outros projetos.', model: 'Laboratório: pedido curto, sem histórico nem arquivos no contexto. A saída pode estar errada e não é executada.' }; $('mode-notice').textContent = modes[$('response-mode').value]; }
 $('response-mode').onchange = () => { modeNotice(); updateInputCount(); };
 function looksLikeCode(value) {
     // Presentation only. The server independently classifies the original string.
@@ -151,6 +153,7 @@ $('compose').onsubmit = handle(async () => { if (state.busy)
         state.conversation = await api('/api/conversations', { project_id: state.project.id, title: Array.from(message.trim()).slice(0, 70).join('') });
     let response = await api('/api/chat', { project_id: state.project.id, conversation_id: state.conversation.id, message, mode: $('response-mode').value, input_format: 'auto' });
     if (response.job) {
+        state.jobId = response.job.id;
         for (let i = 0; i < 180; i++) {
             await new Promise(resolve => setTimeout(resolve, 1000));
             const job = await api('/api/jobs/' + response.job.id);
@@ -172,10 +175,16 @@ $('compose').onsubmit = handle(async () => { if (state.busy)
     renderMessages();
     await renderConversations();
 }
+catch (error) {
+    voiceChat?.stop(error.message);
+    throw error;
+}
 finally {
+    state.jobId = null;
     busy(false);
     $('message-input').focus();
-} });
+}
+if (voiceChat?.active) voiceChat.reply(state.conversation.messages.at(-1)?.content || ''); });
 $('show-rules').onclick = handle(async () => { if (!state.project)
     throw Error('Escolha um projeto primeiro.'); const data = await api('/api/project-preferences?project_id=' + state.project.id); $('method').value = data.method; $('wip').value = data.wip_limit; $('done').value = data.definition_of_done; $('work-profile').value = data.work_profile || 'general'; $('quality-rules').replaceChildren(...data.quality.map(rule => el('li', rule))); $('official-sources').replaceChildren(...data.sources.map(source => { const a = el('a', source.title + ' ↗'); a.href = source.url; a.target = '_blank'; a.rel = 'noopener noreferrer'; return a; })); const report = await api('/api/engineering-report'); $('learning-result').textContent = report.evaluation ? `Curso experimental: ${report.evaluation.passed}/${report.evaluation.total} decisões guiadas aprovadas. ${report.limitations}` : 'Novo currículo em preparação. As orientações acima foram escritas e revisadas; não significam domínio adquirido pelo modelo.'; const writing = await api('/api/communication-report').catch(() => ({})); if (writing.evaluation?.total) { $('learning-result').textContent += ` Escrita: ${writing.evaluation.passed}/${writing.evaluation.total} pedidos reformulados. ${writing.chatEnabled ? 'Candidato experimental habilitado.' : 'Candidato não ativado no chat.'}`; } $('rules-dialog').showModal(); });
 $('rules-form').onsubmit = handle(async () => { await api('/api/project-preferences', { project_id: state.project.id, method: $('method').value, wip_limit: Number($('wip').value), definition_of_done: $('done').value, work_profile: $('work-profile').value }); $('rules-dialog').close(); toast('Orientações salvas para este projeto.'); });
@@ -322,3 +331,162 @@ $('browser-login-form').onsubmit=handle(async()=>{
     try { await browserAction('login',credentials); }
     finally {credentials.username='';credentials.password='';}
 });
+// Speech input is decoded only by our server. Never use cloud SpeechRecognition.
+function voiceWav(chunks, sampleRate) {
+    const length = chunks.reduce((n, part) => n + part.length, 0);
+    const source = new Float32Array(length); let offset = 0;
+    for (const part of chunks) { source.set(part, offset); offset += part.length; }
+    const count = Math.min(480000, Math.floor(length * 16000 / sampleRate));
+    const bytes = new Uint8Array(44 + count * 2), view = new DataView(bytes.buffer);
+    const ascii = (at, value) => [...value].forEach((ch, i) => view.setUint8(at + i, ch.charCodeAt(0)));
+    ascii(0, 'RIFF'); view.setUint32(4, bytes.length - 8, true); ascii(8, 'WAVEfmt ');
+    view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true);
+    view.setUint32(24, 16000, true); view.setUint32(28, 32000, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true);
+    ascii(36, 'data'); view.setUint32(40, count * 2, true);
+    for (let i = 0; i < count; i++) {
+        const start = i * sampleRate / 16000, end = Math.min(length, (i + 1) * sampleRate / 16000);
+        let sum = 0, weight = 0;
+        for (let j = Math.floor(start); j < Math.ceil(end); j++) {
+            const w = Math.min(end, j + 1) - Math.max(start, j); sum += source[j] * w; weight += w;
+        }
+        const value = Math.max(-1, Math.min(1, sum / (weight || 1)));
+        view.setInt16(44 + i * 2, Math.round(value * (value < 0 ? 32768 : 32767)), true);
+    }
+    let binary = ''; for (let i = 0; i < bytes.length; i += 16384) binary += String.fromCharCode(...bytes.subarray(i, i + 16384));
+    return btoa(binary);
+}
+voiceChat = (() => {
+    let active = false, muted = false, epoch = 0, phase = '', stream = null, context = null, processor = null;
+    let source = null, sink = null, timer = null, request = null, abort = null, voice = null, resumeSpeech = null;
+    const status = value => { phase = value; $('voice-status').textContent = value; };
+    const syncControls = () => {
+        $('voice-start').disabled = !state.project || (state.busy && !active);
+        $('voice-start').setAttribute('aria-pressed', String(active));
+        $('voice-start').title = active ? 'Encerrar conversa por voz' : 'Conversar por voz';
+        $('voice-bar').hidden = !active;
+        $('voice-stop').disabled = false; $('voice-mute').disabled = false;
+        $('voice-mute').setAttribute('aria-pressed', String(muted));
+        $('voice-mute').textContent = muted ? 'Ouvir respostas' : 'Silenciar resposta';
+    };
+    function releaseMicrophone() {
+        clearTimeout(timer); timer = null;
+        if (processor) { processor.onaudioprocess = null; processor.disconnect(); processor = null; }
+        source?.disconnect(); sink?.disconnect(); source = sink = null;
+        stream?.getTracks().forEach(track => track.stop()); stream = null;
+        if (context) { context.close().catch(() => {}); context = null; }
+    }
+    function stop(message = '') {
+        active = false; ++epoch; releaseMicrophone();
+        abort?.abort(); abort = null;
+        if (request && state.project && state.token) api('/api/voice/cancel', {project_id: state.project.id, request_id: request}).catch(() => {});
+        request = null; resumeSpeech = null; window.speechSynthesis?.cancel();
+        if (state.jobId && state.token) api('/api/jobs/' + state.jobId + '/cancel', {}).catch(() => {});
+        busy(state.requestBusy); syncControls();
+        if (message) toast(message);
+    }
+    async function localVoice() {
+        if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) throw Error('Este aplicativo não oferece leitura de voz.');
+        for (let attempt = 0; attempt < 15; attempt++) {
+            const voices = speechSynthesis.getVoices().filter(v => v.localService === true && /^pt(?:-|$)/i.test(v.lang));
+            if (voices.length) return voices.find(v => /^pt-BR$/i.test(v.lang)) || voices[0];
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        throw Error('Instale uma voz em português no Windows para ouvir as respostas. Nenhuma voz na nuvem foi utilizada.');
+    }
+    async function start() {
+        if (active || state.busy) return;
+        if (!state.project) throw Error('Escolha um projeto para conversar.');
+        if ($('message-input').value.trim()) throw Error('Envie ou guarde a mensagem digitada antes de iniciar a voz.');
+        const version = ++epoch, project = state.project.id;
+        $('voice-confirm').disabled = true; $('voice-setup').textContent = 'Conferindo voz e modelo locais…';
+        try {
+            if (!isSecureContext || !navigator.mediaDevices?.getUserMedia) throw Error('Abra o aplicativo instalado ou um endereço HTTPS para usar o microfone.');
+            const [speech, models, selectedVoice] = await Promise.all([api('/api/voice/status'), api('/api/foundation/status'), localVoice()]);
+            if (!speech.registered) throw Error(speech.notice || 'Reconhecimento de voz não instalado no servidor.');
+            if (!models.capabilities.text.registered) throw Error('Configure o modelo de conversa local no servidor.');
+            if (version !== epoch || state.project?.id !== project) return;
+            voice = selectedVoice; active = true; muted = false; $('voice-dialog').close();
+            clearTimeout(toastTimer); $('notification').hidden = true;
+            $('response-mode').value = 'foundation'; modeNotice(); busy(false); syncControls();
+            await listen(version);
+        } finally { $('voice-confirm').disabled = false; }
+    }
+    async function listen(version = epoch) {
+        if (!active || version !== epoch) return;
+        status('Ouvindo… Faça uma pausa para enviar.');
+        try {
+            const captured = await navigator.mediaDevices.getUserMedia({audio: {echoCancellation: true, noiseSuppression: true, autoGainControl: true}, video: false});
+            if (!active || version !== epoch) { captured.getTracks().forEach(track => track.stop()); return; }
+            stream = captured;
+            for (const track of stream.getAudioTracks()) track.onended = () => { if (active && version === epoch) stop('O microfone foi desconectado.'); };
+            context = new AudioContext({sampleRate: 16000}); await context.resume();
+            if (!active || version !== epoch) return;
+            source = context.createMediaStreamSource(stream);
+            // Bounded PCM only; no downloadable encoder or script from another origin.
+            processor = context.createScriptProcessor(4096, 1, 1); sink = context.createGain(); sink.gain.value = 0;
+            source.connect(processor); processor.connect(sink); sink.connect(context.destination);
+            const rate = context.sampleRate, chunks = []; let count = 0, speech = false, lastSpeech = 0, finishing = false;
+            function finish() {
+                if (finishing || !active || version !== epoch) return; finishing = true; releaseMicrophone();
+                if (!speech) { stop('Não ouvi sua fala. Confira o microfone e comece novamente.'); return; }
+                transcribe(voiceWav(chunks, rate), version).catch(error => { if (active && version === epoch) stop(error.message); });
+            }
+            timer = setTimeout(finish, 30000);
+            processor.onaudioprocess = event => {
+                if (finishing || !active || version !== epoch) return;
+                const remaining = Math.max(0, rate * 30 - count);
+                const part = Float32Array.from(event.inputBuffer.getChannelData(0).subarray(0, remaining));
+                chunks.push(part); count += part.length;
+                const seconds = count / rate, rms = Math.sqrt(part.reduce((sum, v) => sum + v * v, 0) / (part.length || 1));
+                if (rms > .015) { speech = true; lastSpeech = seconds; }
+                if (seconds >= 30 || (speech && seconds - lastSpeech >= 1.5) || (!speech && seconds >= 10)) finish();
+            };
+        } catch (error) {
+            if (active && version === epoch) stop(error.name === 'NotAllowedError' ? 'Permita o microfone nas configurações do aplicativo ou navegador.' : 'Não consegui abrir o microfone. Confira o dispositivo de áudio.');
+        }
+    }
+    async function transcribe(audio, version) {
+        status('Entendendo sua fala no servidor local…');
+        request = crypto.randomUUID().replaceAll('-', ''); abort = new AbortController();
+        const response = await fetch('/api/voice/transcribe', {method: 'POST', cache: 'no-store',
+            headers: {Authorization: 'Bearer ' + state.token, 'Content-Type': 'application/json'},
+            body: JSON.stringify({project_id: state.project.id, request_id: request, audio}),
+            signal: AbortSignal.any([abort.signal, AbortSignal.timeout(115000)])});
+        audio = ''; const result = await response.json(); request = null; abort = null;
+        if (!active || version !== epoch) return;
+        if (!response.ok) throw Error(result.error || 'Não consegui reconhecer a fala.');
+        if (!result.offline || typeof result.text !== 'string' || !result.text.trim() || Array.from(result.text).length > 8000) throw Error('Transcrição inválida.');
+        $('message-input').value = result.text; updateInputCount();
+        status('A IA está preparando a resposta…');
+        // A voice turn is an ordinary chat turn; it gains no code/deploy permissions.
+        state.busy = false; $('compose').requestSubmit();
+    }
+    function reply(text) {
+        if (!active) return;
+        const version = epoch;
+        if (muted) { listen(version); return; }
+        const spoken = text.replace(/```[\s\S]*?```|~~~[\s\S]*?~~~/g, ' Há um trecho de código na resposta; consulte o chat. ').trim();
+        if (!spoken) { listen(version); return; }
+        status('Falando… O microfone está desligado.');
+        const utterance = new SpeechSynthesisUtterance(spoken.slice(0, 1800) + (spoken.length > 1800 ? ' A resposta completa está no chat.' : ''));
+        utterance.voice = voice; utterance.lang = voice.lang; utterance.rate = 1;
+        let finished = false;
+        const finish = () => { if (finished) return; finished = true; resumeSpeech = null; if (active && version === epoch) listen(version); };
+        resumeSpeech = finish;
+        utterance.onend = finish;
+        utterance.onerror = event => { if (muted || event.error === 'interrupted' || event.error === 'canceled') finish(); else if (active && version === epoch) stop('Não consegui ler a resposta. O texto completo permanece no chat.'); };
+        speechSynthesis.cancel(); speechSynthesis.speak(utterance);
+    }
+    $('voice-start').onclick = () => {
+        if (active) { stop('Conversa por voz encerrada.'); return; }
+        $('voice-setup').textContent = ''; $('voice-dialog').showModal();
+    };
+    $('voice-confirm').onclick = async () => { try { await start(); } catch (error) { $('voice-setup').textContent = error.message; stop(); } };
+    $('voice-stop').onclick = () => stop('Conversa por voz encerrada.');
+    $('voice-mute').onclick = () => { muted = !muted; syncControls(); if (muted) { const next = resumeSpeech; speechSynthesis.cancel(); next?.(); } };
+    $('voice-dialog').addEventListener('close', () => { if (!active) ++epoch; });
+    document.addEventListener('visibilitychange', () => { if (document.hidden && active) stop('Voz encerrada porque o aplicativo ficou em segundo plano.'); });
+    window.addEventListener('pagehide', () => stop());
+    return {get active() { return active; }, start, stop, reply, syncControls};
+})();
+voiceChat.syncControls();

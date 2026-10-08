@@ -16,6 +16,8 @@ Antes de desenhar, identifique as tarefas reais e sua frequência. No LocalAutho
 - Não peça ao usuário para escolher texto ou código. Identifique sinais fortes, como cercas Markdown, declarações de linguagem e JSON válido, mantendo prosa comum como texto. A classificação é uma indicação de apresentação: não executa, corrige nem reescreve o conteúdo e pode falhar em trechos ambíguos. O servidor confirma a classificação; clientes antigos continuam compatíveis.
 - Mantenha a caixa de mensagem compacta quando vazia, crescendo com o conteúdo até um limite com rolagem própria. Use uma linha de controles, envio com nome acessível e contagem apenas próxima ao limite. Preserve Enter para nova linha e Ctrl + Enter para enviar. Desabilite enviar quando vazio, sem perder rascunhos ou apagar conteúdo acima do limite.
 - Adote cores, espaçamento, campos e botões consistentes entre chat, marketing, modelos e ferramentas avançadas.
+- Voz começa somente por uma ação explícita, com explicação do destino do áudio, captura visível, silêncio da resposta e encerramento acessíveis. Não sobreponha rascunhos. Desligue o microfone durante transcrição, geração e leitura; libere-o ao sair, ocultar a página ou falhar. Proteja sessões e contexto contra callbacks atrasados.
+- Transcreva somente no servidor local autenticado, descarte áudio e use apenas síntese local. Voz não concede ferramentas nem permissão para executar ações. Teste silêncio, duração, rede/credencial, microfone negado, ausência de voz/modelo, concorrência, interrupção, histórico e preservação do texto. Declare dublês e diferencie fala sintética de microfone físico; não confunda inferência e consulta com treinamento.
 
 ## Verificação antes da entrega
 

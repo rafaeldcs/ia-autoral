@@ -135,6 +135,7 @@ def make_handler(app: Application, ui_path: Path):
                 if path == "/api/health":
                     return {"status": "ok", "version": "0.1.0", "mode": "platform_and_experimental_cpu_model", "offline": app.settings.offline, "model_qualified": False, "gpu_backend": False, "stats": app.store.stats(), "allowed_domains": app.settings.allowed_domains, "runner_enabled": bool(app.settings.docker_image)}
                 if path == "/api/foundation/status": return app.chat.foundation.status()
+                if path == "/api/voice/status": return app.voice.status()
                 if path == "/api/foundation/image":
                     app.store.project(q["project_id"])
                     return app.chat.foundation.image(q["project_id"], q["id"])
@@ -172,6 +173,13 @@ def make_handler(app: Application, ui_path: Path):
                         return {"path": q["path"], "sha256": sha256(raw), "content": raw.decode("utf-8")}
                     return app.tasks.preview(ident)
             if method == "POST":
+                if path in {"/api/voice/transcribe", "/api/voice/cancel"}:
+                    fields = {'project_id', 'request_id'} | ({'audio'} if path.endswith('transcribe') else set())
+                    if set(body) != fields:
+                        raise PolicyError("Envie somente projeto, identificador e áudio da fala.")
+                    if path.endswith('transcribe'):
+                        return app.voice.transcribe(body['project_id'], body['request_id'], body['audio'])
+                    return app.voice.cancel(body['project_id'], body['request_id'])
                 if path == '/api/marketing/campaigns': return app.marketing.create(body['project_id'],body['brief'])
                 if path == '/api/marketing/choice': return app.marketing.choose(body['project_id'],body['id'],body['digest'],body['choice'],body.get('source_id'))
                 if path == '/api/marketing/approve': return app.marketing.approve(body['project_id'],body['id'],body['digest'],body.get('reviewed'))

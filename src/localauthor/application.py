@@ -12,6 +12,7 @@ from .safety import PathPolicy
 from .errors import PolicyError
 from .foundation.chat import FoundationChatService as ChatService
 from .browser_workspace import BrowserWorkspace
+from .voice import VoiceService
 
 
 class Application:
@@ -20,6 +21,7 @@ class Application:
         self.store = Store(settings.home / "memory.sqlite3", settings.max_store_bytes)
         self.knowledge = KnowledgeService(self.store, settings)
         self.chat = ChatService(self.store, settings, self.knowledge)
+        self.voice = VoiceService(settings.home, self.store)
         self.browser = BrowserWorkspace(settings, self.store)
         self.chat.browser = self.browser
         self.research = ResearchService(self.store, settings)
@@ -60,6 +62,7 @@ class Application:
         self.jobs.start()
 
     def close(self):
+        self.voice.close()
         # Stop the producer/consumer before disposing anything it can still use.
         if not self.jobs.close():
             raise PolicyError("Worker ainda ativo; modelos não foram liberados durante uma operação. Encerre o processo para interromper código nativo não cooperativo.")
