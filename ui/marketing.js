@@ -8,6 +8,7 @@ const state = {
   preview: null,
   plan: null,
   modelAvailable: false,
+  browser: null,
 };
 function node(tag, content) {
   const n = document.createElement(tag);
@@ -36,7 +37,7 @@ function action(fn) {
     if (state.busy) return;
     state.busy = true;
     document
-      .querySelectorAll("button,input,select")
+      .querySelectorAll("button,input,select,textarea")
       .forEach((b) => (b.disabled = true));
     try {
       await fn(e);
@@ -45,7 +46,7 @@ function action(fn) {
     } finally {
       state.busy = false;
       document
-        .querySelectorAll("button,input,select")
+        .querySelectorAll("button,input,select,textarea")
         .forEach((b) => (b.disabled = false));
       render();
     }
@@ -111,16 +112,94 @@ function researchCandidates() {
     ["audience", "audience-url"],
     ["competitor", "competitor-url"],
     ["channel", "channel-url"],
+    ["brand", "brand-url"],
   ]
     .filter(([, id]) => $(id).value.trim())
     .map(([role, id]) => ({ role, url: $(id).value.trim() }));
 }
+function loadBrandForm() {
+  const profile = state.campaign?.brand_profile;
+  $("instagram-handle").value = profile?.instagram || "";
+  $("no-instagram").checked = profile?.no_instagram || false;
+  for (const key of ["moment", "identity", "likes", "avoid", "history"])
+    $("brand-" + key).value = profile?.[key] || "";
+  $("style-feedback").value = state.campaign?.style_approval?.feedback || "";
+  $("style-direction").value = state.campaign?.style_approval?.direction || "improve";
+  $("brand-url").value = profile?.instagram ? "https://www.instagram.com/" + profile.instagram + "/" : "";
+  $("brand-screen").hidden = true;
+  $("brand-screen").removeAttribute("src");
+  $("brand-browser-status").textContent = "";
+  $("brand-session").replaceChildren(new Option("Sem investigação: usar relatos e fontes coletadas", ""));
+  state.browser = null;
+}
+function renderBrand() {
+  const c = state.campaign;
+  $("instagram-handle").disabled = state.busy || $("no-instagram").checked;
+  $("analyze-brand").disabled = !c.brand_profile || !state.modelAvailable || state.busy;
+  $("brand-browse").disabled = !c.brand_profile?.instagram || state.busy || ["starting", "ready", "busy"].includes(state.browser?.state);
+  for (const id of ["brand-capture", "brand-scroll"])
+    $(id).disabled = state.busy || state.browser?.state !== "ready";
+  $("brand-stop").disabled = state.busy || !["starting", "ready", "busy"].includes(state.browser?.state);
+  $("brand-analysis").replaceChildren();
+  const analysis = c.brand_analysis?.content;
+  const labels = {observed:"O que a IA local identificou", preserve:"O que preservar", improve:"Melhorias propostas", questions:"Perguntas e lacunas"};
+  for (const [key, label] of Object.entries(labels)) {
+    if (!analysis) break;
+    const card = node("div", ""); card.className = "card";
+    card.append(node("h3", label));
+    for (const value of analysis[key]) card.append(node("p", value));
+    $("brand-analysis").append(card);
+  }
+  if (c.brand_analysis && !analysis)
+    $("brand-analysis").append(node("p", "A IA não produziu uma análise verificável. Tentativas preservadas; revise a entrada e tente novamente."));
+  $("brand-style").hidden = !analysis;
+  $("brand-style-status").textContent = c.style_approval ? "Direção confirmada por você: " + {preserve:"manter a linha", improve:"aprimorar mantendo a identidade", reinvent:"propor nova direção"}[c.style_approval.direction] : "A geração aguarda sua confirmação do estilo.";
+}
+async function brandSessions() {
+  const profile = state.campaign?.brand_profile;
+  const rows = await api("/api/browser/sessions?project_id=" + state.project);
+  $("brand-session").replaceChildren(new Option("Sem investigação: usar relatos e fontes coletadas", ""));
+  for (const row of rows.filter((r) => r.url === "https://www.instagram.com/" + profile?.instagram + "/"))
+    $("brand-session").add(new Option(row.created_at + " · " + row.state, row.id));
+  const selected = state.browser?.id || state.campaign?.brand_analysis?.browser_session;
+  if (selected && rows.some((r) => r.id === selected)) $("brand-session").value = selected;
+}
+async function showBrandBrowser(row) {
+  state.browser = row;
+  const frame = row.frames.at(-1);
+  $("brand-browser-status").textContent = row.error || "Navegador da LocalAuthor: " + row.state + (frame ? " · " + frame.title : "");
+  if (frame?.file) {
+    const capture = await api("/api/browser/image?project_id=" + state.project + "&id=" + row.id + "&frame=" + frame.number);
+    $("brand-screen").src = capture.data;
+    $("brand-screen").hidden = false;
+  }
+}
+async function waitBrandBrowser(row) {
+  state.browser = row;
+  const cancel = node("button", "Cancelar investigação"); cancel.type = "button";
+  cancel.onclick = async () => { try { await stopBrandBrowser(); } catch (e) { notice(e.message); } };
+  $("brand-browser-status").replaceChildren(node("span", "A LocalAuthor está observando o perfil. "), cancel);
+  const deadline = Date.now() + 90000;
+  while (Date.now() < deadline) {
+    const current = await api("/api/browser/session?project_id=" + state.project + "&id=" + row.id);
+    state.browser = current;
+    if (current.state === "ready") { await showBrandBrowser(current); await brandSessions(); return; }
+    if (["failed", "stopped", "interrupted"].includes(current.state)) throw Error(current.error || "Investigação encerrada.");
+    await new Promise((resolve) => setTimeout(resolve, 750));
+  }
+  throw Error("O navegador ainda está ocupado. Encerre a investigação ou confira a sessão nas ferramentas avançadas.");
+}
+async function stopBrandBrowser() {
+  if (state.browser && ["starting", "ready", "busy"].includes(state.browser.state))
+    state.browser = await api("/api/browser/action", {project_id:state.project, id:state.browser.id, command:{action:"stop"}});
+}
 function render() {
   $("plan-research").disabled = !state.modelAvailable || state.busy;
   const c = state.campaign;
-  for (const id of ["research-section", "choice-section", "draft-section"])
+  for (const id of ["brand-section", "research-section", "choice-section", "draft-section"])
     $(id).hidden = !c;
   if (!c) return;
+  renderBrand();
   $("choice-section").hidden = c.stage === "brief";
   $("draft-section").hidden = !c.draft;
   $("sources").replaceChildren();
@@ -147,7 +226,7 @@ function render() {
     (r) => r.role === "reference" && r.status === "collected",
   ))
     $("reference-id").add(new Option(source.title, source.source_id));
-  $("generate").disabled = !c.choice || !state.modelAvailable || state.busy;
+  $("generate").disabled = !c.choice || !c.style_approval || !state.modelAvailable || state.busy;
   $("choice-description").textContent = c.choice
     ? "Sua escolha: " +
       (c.choice.mode === "original"
@@ -285,6 +364,7 @@ $("login-form").onsubmit = action(async () => {
   await channels();
 });
 $("project").onchange = action(async () => {
+  await stopBrandBrowser();
   state.project = $("project").value;
   state.campaign = null;
   state.preview = null;
@@ -292,8 +372,10 @@ $("project").onchange = action(async () => {
   $("export-json").value = "";
   await campaigns();
   await channels();
+  loadBrandForm();
 });
 $("campaigns").onchange = action(async () => {
+  await stopBrandBrowser();
   $("export-result").hidden = true;
   $("export-json").value = "";
   state.campaign = $("campaigns").value
@@ -305,8 +387,11 @@ $("campaigns").onchange = action(async () => {
       )
     : null;
   $("reviewed").checked = false;
+  loadBrandForm();
+  await brandSessions();
 });
 $("brief").onsubmit = action(async () => {
+  await stopBrandBrowser();
   state.campaign = await api("/api/marketing/campaigns", {
     project_id: state.project,
     brief: {
@@ -321,7 +406,49 @@ $("brief").onsubmit = action(async () => {
     },
   });
   await campaigns();
-  notice("Briefing salvo. Pesquise as fontes para continuar.");
+  loadBrandForm();
+  await brandSessions();
+  notice("Briefing salvo. Informe o Instagram e as preferências antes de criar as peças.");
+});
+$("no-instagram").onchange = () => {
+  if ($("no-instagram").checked) $("instagram-handle").value = "";
+  if (state.campaign) renderBrand();
+};
+$("brand-profile").onsubmit = action(async () => {
+  await stopBrandBrowser();
+  state.campaign = await api("/api/marketing/brand", {...payload(), profile:{
+    instagram:$("instagram-handle").value, no_instagram:$("no-instagram").checked,
+    ...Object.fromEntries(["moment", "identity", "likes", "avoid", "history"].map((k) => [k, $("brand-" + k).value]))
+  }});
+  state.plan = null;
+  loadBrandForm(); await brandSessions();
+  notice("Preferências salvas. Investigue o perfil e colete fontes do mercado antes de pedir a análise.");
+});
+$("brand-browse").onclick = action(async () => {
+  const row = await api("/api/browser/start", {project_id:state.project, url:"https://www.instagram.com/" + state.campaign.brand_profile.instagram + "/", allow_network:true});
+  await waitBrandBrowser(row);
+});
+$("brand-session").onchange = action(async () => {
+  await stopBrandBrowser();
+  state.browser = null;
+  $("brand-screen").hidden = true;
+  if ($("brand-session").value)
+    await showBrandBrowser(await api("/api/browser/session?project_id=" + state.project + "&id=" + $("brand-session").value));
+});
+for (const [id, command] of [["brand-capture", "capture"], ["brand-scroll", "scroll"]])
+  $(id).onclick = action(async () => {
+    const row = await api("/api/browser/action", {project_id:state.project, id:state.browser.id,
+      command:{action:command, snapshot:state.browser.frames.at(-1).snapshot}});
+    await waitBrandBrowser(row);
+  });
+$("brand-stop").onclick = action(async () => { await stopBrandBrowser(); await showBrandBrowser(state.browser); });
+$("analyze-brand").onclick = action(async () => {
+  await job("/api/marketing/brand-analysis", {...payload(), browser_session:$("brand-session").value || null});
+  notice("A IA local apresentou sua análise. Confira as lacunas e confirme a direção que prefere.");
+});
+$("brand-style").onsubmit = action(async () => {
+  state.campaign = await api("/api/marketing/style", {...payload(), direction:$("style-direction").value, feedback:$("style-feedback").value});
+  notice("Sua direção foi registrada. A IA deve segui-la na criação e na revisão das peças.");
 });
 $("plan-research").onclick = action(async () => {
   const candidates = researchCandidates();

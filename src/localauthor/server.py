@@ -181,20 +181,30 @@ def make_handler(app: Application, ui_path: Path):
                         return app.voice.transcribe(body['project_id'], body['request_id'], body['audio'])
                     return app.voice.cancel(body['project_id'], body['request_id'])
                 if path == '/api/marketing/campaigns': return app.marketing.create(body['project_id'],body['brief'])
+                if path in {'/api/marketing/brand','/api/marketing/style'}:
+                    fields={'project_id','id','digest'} | ({'profile'} if path.endswith('brand') else {'direction','feedback'})
+                    if set(body)!=fields:raise PolicyError('Envie somente os campos necessários à descoberta da marca.')
+                    if path.endswith('brand'):return app.marketing.save_brand(body['project_id'],body['id'],body['digest'],body['profile'])
+                    return app.marketing.choose_style(body['project_id'],body['id'],body['digest'],body['direction'],body['feedback'])
                 if path == '/api/marketing/choice': return app.marketing.choose(body['project_id'],body['id'],body['digest'],body['choice'],body.get('source_id'))
                 if path == '/api/marketing/approve': return app.marketing.approve(body['project_id'],body['id'],body['digest'],body.get('reviewed'))
                 if path == '/api/marketing/connect': return app.marketing_channels.connect(body['project_id'],body['channel'],body['account'],body['api_version'],body['token'])
                 if path == '/api/marketing/disconnect': return app.marketing_channels.disconnect(body['project_id'],body['channel'])
                 if path == '/api/marketing/preview': return app.marketing_channels.preview(body['project_id'],body['id'],body['piece_id'],body.get('media_url'))
                 if path == '/api/marketing/publish': return app.marketing_channels.publish(body['project_id'],body['id'],body['piece_id'],body['payload_hash'],body.get('authorized'),body.get('media_url'))
-                if path in {'/api/marketing/research','/api/marketing/generate','/api/marketing/plan'}:
+                if path in {'/api/marketing/research','/api/marketing/generate','/api/marketing/plan','/api/marketing/brand-analysis'}:
                     expected={'project_id','id','digest'}
                     if path.endswith('research'):expected.add('plan')
                     if path.endswith('plan'):expected.add('candidates')
+                    if path.endswith('brand-analysis'):expected.add('browser_session')
                     if set(body)!=expected:raise PolicyError('Envie somente os campos necessários à etapa de marketing; credenciais não pertencem à fila.')
                     current=app.marketing.get(body['project_id'],body['id'])
                     if current['digest']!=body['digest']:raise ConflictError('A campanha mudou. Recarregue antes de continuar.')
                     if path.endswith('generate') and not current['choice']:raise PolicyError('Escolha original ou adaptação antes de gerar.')
+                    if path.endswith('generate'):app.marketing.require_brand_style(body['project_id'],current)
+                    if path.endswith('brand-analysis'):
+                        if not current.get('brand_profile'):raise PolicyError('Informe o @ e as preferências da marca antes de analisar.')
+                        if body['browser_session'] is not None:app.marketing._brand_browser(body['project_id'],body['browser_session'],current['brand_profile']['instagram'])
                     if path.endswith('research'):app.marketing.validate_sources(body['plan'])
                     if path.endswith('plan'):app.marketing.validate_sources(body['candidates'])
                     return {'job':app.jobs.submit('marketing-'+path.rsplit('/',1)[-1],body)}

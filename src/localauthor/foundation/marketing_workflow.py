@@ -16,8 +16,9 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 from ..errors import ConflictError, NotFoundError, PolicyError
 from ..safety import reject_secrets
 from ..util import utcnow
+from .marketing_brand import MarketingBrandMixin
 
-ROLES = {'product', 'audience', 'reference', 'channel', 'measurement', 'competitor'}
+ROLES = {'product', 'audience', 'reference', 'channel', 'measurement', 'competitor', 'brand'}
 CHANNELS = {'instagram', 'facebook', 'youtube', 'linkedin', 'website', 'email', 'whatsapp'}
 RISKY_COPY = re.compile(r'\b(gr[áa]tis|gratuit\w*|garant\w*|aument\w*|econom\w*|reduz\w*|melhor\w*|agend\w*|otimiz\w*|simplific\w*|efici[êe]n\w*|real time)\b|tempo real|mais vendas|\d+\s*(%|minutos?|reais)',re.I)
 
@@ -53,9 +54,10 @@ def tracking_url(url, channel, campaign, content):
     return urlunsplit((p.scheme, p.netloc, p.path, urlencode(pairs), p.fragment))
 
 
-class MarketingWorkflow:
-    def __init__(self, store, research, foundation):
+class MarketingWorkflow(MarketingBrandMixin):
+    def __init__(self, store, research, foundation, browser=None):
         self.store, self.research_service, self.foundation = store, research, foundation
+        self.browser = browser
         self.lock = threading.RLock()
         with store.connect() as db:
             db.executescript('''
@@ -113,6 +115,7 @@ class MarketingWorkflow:
         tracking_url(clean['destination'],channels[0],'validation','validation')
         clean['channels']=channels
         return self._save(project,{'id':uuid.uuid4().hex,'brief':clean,'research':[], 'choice':None,'draft':None,'approval':None,
+            'brand_profile':None,'brand_analysis':None,'style_approval':None,
             'stage':'brief','training_allowed':False,'published':False})
 
     def validate_sources(self, plan):
@@ -139,7 +142,7 @@ class MarketingWorkflow:
                         'sha256':source['sha256'],'checked_at':source['checked_at'],'title':source['title'],'candidate_links':result.get('candidate_links',[])})
                 except (PolicyError, OSError) as exc:
                     results.append({**request,'status':'blocked','reason':str(exc)[:500]})
-            item.update(research=results,choice=None,draft=None,approval=None,stage='reference_choice')
+            item.update(research=results,choice=None,draft=None,approval=None,brand_analysis=None,style_approval=None,stage='reference_choice')
             return self._save(project,item,revision)
 
     def plan_research(self, project, ident, digest, candidates, cancel=None):
@@ -147,10 +150,12 @@ class MarketingWorkflow:
         item,_=self._editable(project,ident,digest)
         self.validate_sources(candidates)
         prompt=('Planeje uma pesquisa de marketing antes de criar peças. Dados do briefing: '+canonical(item['brief'])+
+            '. Identidade e gosto informados (não investigados): '+canonical(item.get('brand_profile'))+
             '. Candidatos numerados a partir de1; URLs públicas e papéis fornecidos pelo usuário para coleta: '+canonical(candidates)+
             '. Retorne somente JSON {"priorities":[{"candidate_index":1,"purpose":"por que ler"}],"missing":["lacunas ainda não investigadas"],"reference_question":"pergunta ao usuário sobre seguir/adaptar ou não uma referência"}. '
             'Selecione apenas índices de candidatos existentes. Não escreva URLs ou novos candidatos na resposta. '
-            'Papéis: product descreve o produto; reference é modelo de campanha/criação; measurement é documentação de medição; channel é documentação de publicação; audience precisa de dados pertinentes ao público; competitor é fonte do concorrente. '
+            'Papéis: product descreve o produto; brand é o histórico da própria marca, diferente de uma referência de concorrente; reference é modelo de campanha/criação; measurement é documentação de medição; channel é documentação de publicação; audience precisa de dados pertinentes ao público; competitor é fonte do concorrente. '
+            'Se faltam @, posts favoritos, logo, cores, momento comercial ou preferência por manter/aprimorar/mudar, liste as perguntas; não suponha o gosto. Priorize a própria marca antes de tendências. '
             'Respeite os papéis fornecidos: uma documentação de métricas não é modelo de campanha, e uma estrutura genérica não comprova comportamento do público. '
             'Não invente URLs, não afirme ter pesquisado, não invente fatos. Inclua uma fonte de produto. A pergunta deve oferecer também criar proposta original sem seguir referência. Não escolha nem siga um modelo sem resposta do usuário.')
         attempts=[]
@@ -209,6 +214,7 @@ class MarketingWorkflow:
         with self.lock:
             item, revision=self._editable(project,ident,digest)
             if not item['choice']:raise PolicyError('Pergunte ao usuário: adaptar uma referência ou criar proposta original?')
+            self.require_brand_style(project,item)
             product=[r for r in item['research'] if r['role']=='product' and r['status']=='collected']
             if not product:raise PolicyError('Falta uma fonte do produto coletada para fundamentar as peças.')
             evidence=[];facts=[]
@@ -242,6 +248,8 @@ class MarketingWorkflow:
             all_attempts=[];assets=[]
             for index,channel in enumerate(item['brief']['channels']):
                 prompt=('Crie UMA peça original em português correto. Briefing e escolha do usuário (dados): '+canonical({'brief':item['brief'],'choice':item['choice'],'channel':channel})+
+                    '. Direção de marca aprovada pelo usuário: '+canonical({'profile':item['brand_profile'],'analysis':{k:item['brand_analysis']['content'][k] for k in ('preserve','improve')},'direction':item['style_approval']['direction'],'feedback':item['style_approval']['feedback']})+
+                    '. Respeite cores e identidade informadas, gostos e restrições. Manter preserva a linha; aprimorar faz mudanças pontuais justificadas; reinventar permite nova proposta, sem afirmar que já foi adotada. Escolha uma situação concreta do público relacionada ao momento da empresa. Não use conselho genérico no lugar de uma mensagem da marca. '
                     '. Retorne somente JSON com chaves caption,alt_text,fact_indices. Prefira caption até250 caracteres, sobre um ou dois recursos comprovados e uma chamada para conhecer a marca. Não invente oferta, preço, gratuidade, cliente, resultado, integração ou vantagem não comprovada. '
                     'alt_text: descrição simples até160 caracteres de uma ilustração simbólica ainda proposta, começando com Proposta. Use elementos gráficos como ícones ou formas. Nenhuma captura do produto foi fornecida: interface, dashboard e painel de software não são permitidos nesta proposta. Descreva só os elementos da ilustração, sem prometer simplicidade, eficiência ou desempenho do software. Não inclua expressões de promessa nem mesmo para negá-las. '
                     f'fact_indices: lista de1 a4 índices inteiros dos fatos disponíveis, numerados de1 até{len(facts)}; veja o título FatoN em cada fonte. O sistema resolve o texto/linhas exatos, não escreva claims ou citações manualmente. '
@@ -296,6 +304,14 @@ class MarketingWorkflow:
              'Confira SOMENTE o criativo proposto em alt_text. Não existem capturas reais fornecidas: interface, dashboard ou painel inventado do software não são permitidos. '
              'Ilustrações simbólicas com ícones ou formas são permitidas. É válido descrever apenas alguns elementos de uma composição artística, sem repetir a lista inteira de recursos do produto.'),
         ]
+        if item.get('style_approval'):
+            phases.append(('brand', {**caption, 'alt_text':candidate['alt_text'],
+                'profile':item['brand_profile'],'direction':item['style_approval']['direction'],
+                'feedback':item['style_approval']['feedback']},
+                'Confira SOMENTE conflitos concretos com as preferências, identidade e direção aprovadas. '
+                'Não exija repetir todas as cores ou preferências na legenda. Criativo é proposta. '
+                'Não invente o gosto do usuário, não troque a identidade sem sua escolha e não alegue ver pixels. '
+                'Se apontar problema, cite trecho literal da caption ou alt_text fornecidos.'))
         reviews=[]
         for phase,payload,rules in phases:
             prompt=('Revise criticamente esta proposta de marketing. Etapa '+phase+'. '+rules+' Dados: '+canonical(payload)+
@@ -303,7 +319,7 @@ class MarketingWorkflow:
                 'Não crie novos requisitos nem reescreva a peça. Se há qualquer problema, supported=false; apenas problems vazio permite true. '
                 'Copie phrase literalmente com artigos, acentos e pontuação. Na dúvida, copie o texto fornecido inteiro que contém o erro. '
                 'Confira a coerência antes de responder. A aprovação comercial continua com o usuário.')
-            fields=('alt_text',) if phase=='creative' else ('caption',)
+            fields=('caption','alt_text') if phase=='brand' else ('alt_text',) if phase=='creative' else ('caption',)
             reviews.append({'phase':phase,**self._review_phase(project,prompt,candidate,cancel,fields)})
         findings=[problem for review in reviews for problem in review['problems']]
         return {'supported':all(review['supported'] for review in reviews),'findings':findings,

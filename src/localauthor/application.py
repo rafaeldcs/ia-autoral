@@ -26,7 +26,7 @@ class Application:
         self.chat.browser = self.browser
         self.research = ResearchService(self.store, settings)
         from .foundation.marketing_workflow import MarketingWorkflow
-        self.marketing = MarketingWorkflow(self.store, self.research, self.chat.foundation)
+        self.marketing = MarketingWorkflow(self.store, self.research, self.chat.foundation, self.browser)
         from .foundation.marketing_channels import MarketingChannels
         self.marketing_channels = MarketingChannels(self.store, self.marketing, settings)
         self.tasks = TaskService(self.store, settings)
@@ -40,6 +40,7 @@ class Application:
             "marketing-research": lambda p, c: self.marketing.research(p['project_id'],p['id'],p['digest'],p['plan'],c),
             "marketing-generate": lambda p, c: self.marketing.generate(p['project_id'],p['id'],p['digest'],c),
             "marketing-plan": lambda p, c: self.marketing.plan_research(p['project_id'],p['id'],p['digest'],p['candidates'],c),
+            "marketing-brand-analysis": lambda p, c: self.marketing.analyze_brand(p['project_id'],p['id'],p['digest'],p['browser_session'],c),
         })
 
     def _train(self, payload, cancel):

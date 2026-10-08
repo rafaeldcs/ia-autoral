@@ -36,6 +36,19 @@ class MarketingHttpTests(WorkspaceCase):
             conn=http.client.HTTPConnection('127.0.0.1',self.server.server_port)
             conn.request('GET',path);response=conn.getresponse();response.read()
             self.assertEqual(response.status,200);self.assertIn("script-src 'self'",response.getheader('Content-Security-Policy'));conn.close()
+    def test_brand_intake_is_authenticated_and_blocks_generation_before_enqueue(self):
+        from tests.test_marketing_brand import PROFILE
+        brief={'brand':'Marca','audience':'Lojistas','objective':'Demonstração','destination':'https://example.com/','channels':['facebook']}
+        _,c=self.request('/api/marketing/campaigns',{'project_id':self.project['id'],'brief':brief})
+        body={'project_id':self.project['id'],'id':c['id'],'digest':c['digest'],'profile':PROFILE}
+        self.assertEqual(self.request('/api/marketing/brand',body,auth=False)[0],401)
+        self.assertEqual(self.request('/api/marketing/brand',{**body,'token':'never-store'})[0],400)
+        status,c=self.request('/api/marketing/brand',body);self.assertEqual(status,200)
+        status,error=self.request('/api/marketing/style',{'project_id':self.project['id'],'id':c['id'],'digest':c['digest'],'direction':'improve','feedback':'Preservar'})
+        self.assertEqual(status,400);self.assertFalse(self.app.jobs.list())
+        base={'project_id':self.project['id'],'id':c['id'],'digest':c['digest']}
+        self.assertEqual(self.request('/api/marketing/brand-analysis',{**base,'browser_session':'unowned'})[0],404)
+        self.assertFalse(self.app.jobs.list())
     def test_extra_credential_field_is_rejected_before_persisting_a_job(self):
         brief={'brand':'Marca','audience':'Lojistas','objective':'Demonstração','destination':'https://example.com/','channels':['facebook']}
         _,campaign=self.request('/api/marketing/campaigns',{'project_id':self.project['id'],'brief':brief})

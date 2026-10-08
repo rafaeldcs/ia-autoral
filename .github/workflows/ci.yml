@@ -81,6 +81,7 @@ jobs:
       - run: python scripts/chat-layout-smoke.py
       - run: python scripts/foundation-ui-smoke.py
       - run: python scripts/voice-ui-smoke.py
+      - run: python scripts/marketing-ui-smoke.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -100,6 +101,9 @@ jobs:
             reports/voice-ui-smoke.json
             reports/voice-desktop.png
             reports/voice-mobile.png
+            reports/marketing-ui-smoke.json
+            reports/marketing-desktop.png
+            reports/marketing-mobile.png
             reports/work-profile-mobile.png
             reports/business-metrics-desktop.png
             reports/business-metrics-mobile.png

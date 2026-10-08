@@ -89,7 +89,7 @@ class LiveBrowser {
       const links = [...document.querySelectorAll('a[href],button,[role="tab"]')].filter(visible);
       const controls = links.slice(0,80).map((node,index)=>{
         const id='control-'+index; node.setAttribute('data-localauthor-control',id);
-        return {id,name:(node.getAttribute('aria-label') || node.textContent || node.title || node.href || '').trim().slice(0,240),
+        return {id,name:(node.getAttribute('aria-label') || node.textContent.trim() || node.title || node.querySelector('img[alt]')?.alt || node.href || '').trim().slice(0,240),
           href:node.tagName==='A'?node.href:null,role:node.getAttribute('role') || (node.tagName==='A'?'link':'button'),
           navigationContext:!!node.closest('nav,aside,[role="navigation"]'),inForm:!!node.closest('form')};
       });
@@ -100,6 +100,7 @@ class LiveBrowser {
       const loginAvailable = passwords.length===1 && users.length===1 && submits.length===1;
       return {url:location.href,title:(document.title || headings[0] || 'Página sem título').slice(0,600),
         headings:headings.slice(0,60).map(s=>s.slice(0,600)),controls,loginAvailable,
+        imageDescriptions:[...document.querySelectorAll('img[alt]')].filter(visible).slice(0,12).map(n=>n.alt.trim().slice(0,240)).filter(Boolean),
         loading:[...document.querySelectorAll('[aria-busy="true"]')].some(visible) || [...document.querySelectorAll('button:disabled')].some(n=>visible(n)&&/entrando|signing in|carregando|aguarde/i.test(n.textContent)),scrollY:Math.round(scrollY),
         truncated:links.length>80 || headings.length>60};
     });
@@ -127,6 +128,7 @@ class LiveBrowser {
     const model = this.infer(observation);
     const frame = {number:++this.count,at:new Date().toISOString(),url:observation.url,title:observation.title,
       snapshot:observation.snapshot,controls:model.controls,loginAvailable:observation.loginAvailable,
+      headings:observation.headings.slice(0,6),image_descriptions:observation.imageDescriptions,
       interpretation:model.interpretation,proposal:{action:model.action,target:model.target},
       captureAction:model.captureAction,capturedBy:'LocalAuthor own browser',trigger:action,
       blockedRequests:[...this.blocked].slice(0,20),

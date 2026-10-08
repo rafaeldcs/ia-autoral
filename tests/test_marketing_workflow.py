@@ -20,9 +20,14 @@ class Collector:
 
 
 class Model:
-    def __init__(self):self.calls=0;self.responses=[]
+    def __init__(self):self.calls=0;self.responses=[];self.prompts=[]
     def answer(self,project,prompt,history,evidence,cancel=None,**kwargs):
         self.calls+=1
+        self.prompts.append(prompt)
+        if prompt.startswith('Analise a identidade'):
+            return {'content':json.dumps({'observed':['Relato do usuário: cores azul e violeta.'],
+                'preserve':['Preservar as cores declaradas.'],'improve':['Testar uma mensagem por peça.'],
+                'questions':['Você prefere manter, aprimorar ou mudar?']}),'possibly_truncated':False}
         if prompt.startswith('Revise criticamente'):
             return {'content':json.dumps({'supported':True,'problems':[]}),'evidence':[],'possibly_truncated':False}
         content=self.responses.pop(0) if self.responses else json.dumps({'caption':'Conheça catálogo e estoque. Solicite demonstração.','alt_text':'Proposta: vitrine em fundo claro.','fact_indices':[1]},ensure_ascii=False)
@@ -57,6 +62,11 @@ class MarketingWorkflowTests(unittest.TestCase):
     def prepared(self,choose=True):
         c=self.service.create(self.project,self.brief)
         c=self.service.research(self.project,c['id'],c['digest'],[{'role':'product','url':'https://example.com/product'},{'role':'reference','url':'https://example.com/template'}])
+        c=self.service.save_brand(self.project,c['id'],c['digest'],{'instagram':'marca.sintetica','no_instagram':False,
+            'moment':'Lançamento','identity':'Azul e violeta','likes':'Textos curtos','avoid':'Excesso de emojis','history':'Exemplos fornecidos pelo usuário, sem métricas.'})
+        c=self.service.analyze_brand(self.project,c['id'],c['digest'])
+        c=self.service.choose_style(self.project,c['id'],c['digest'],'improve','Preserve cores e clareza.')
+        self.model.calls=0
         if choose:c=self.service.choose(self.project,c['id'],c['digest'],'original')
         return c
     def generated(self):
@@ -164,14 +174,14 @@ class MarketingWorkflowTests(unittest.TestCase):
     def test_editorial_rejection_does_not_become_reviewable_approval(self):
         original=self.model.answer
         def reviewer(project,prompt,*args,**kwargs):
-            if prompt.startswith('Revise criticamente'):return {'content':json.dumps({'supported':False,'problems':[{'phrase':'Conheça catálogo e estoque.','reason':'A peça extrapola o fato documentado.'}]}),'possibly_truncated':False}
+            if prompt.startswith('Revise criticamente esta proposta'):return {'content':json.dumps({'supported':False,'problems':[{'phrase':'Conheça catálogo e estoque.','reason':'A peça extrapola o fato documentado.'}]}),'possibly_truncated':False}
             return original(project,prompt,*args,**kwargs)
         self.model.answer=reviewer;c=self.generated()
         self.assertEqual(c['stage'],'rejected');self.assertIsNone(c['approval'])
     def test_reviewer_cannot_invent_a_phrase_absent_from_the_piece(self):
         original=self.model.answer
         def reviewer(project,prompt,*args,**kwargs):
-            if prompt.startswith('Revise criticamente'):return {'content':json.dumps({'supported':False,'problems':[{'phrase':'frase que não existe','reason':'Erro inventado.'}]}),'possibly_truncated':False}
+            if prompt.startswith('Revise criticamente esta proposta'):return {'content':json.dumps({'supported':False,'problems':[{'phrase':'frase que não existe','reason':'Erro inventado.'}]}),'possibly_truncated':False}
             return original(project,prompt,*args,**kwargs)
         self.model.answer=reviewer;c=self.generated()
         self.assertEqual(c['stage'],'rejected');self.assertIsNone(c['approval'])

@@ -152,6 +152,7 @@ pre {
   font: inherit;
 }
 input:focus,
+textarea:focus,
 select:focus,
 button:focus-visible,
 a:focus-visible,
@@ -162,6 +163,10 @@ summary:focus-visible {
 [hidden] {
   display: none !important;
 }
+#brand-screen { max-width: 100%; max-height: 600px; object-fit: contain; border-radius: 9px; }
+#brand-investigation { margin: 20px 0; }
+#brand-analysis { margin-top: 20px; }
+#brand-section textarea { font: inherit; margin-top: 5px; }
 @media (max-width: 600px) {
   main {
     padding: 12px;
