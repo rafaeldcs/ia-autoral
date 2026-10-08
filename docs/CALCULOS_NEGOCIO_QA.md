@@ -42,10 +42,14 @@ No exercício de QA, a LocalAuthor escreveu quatro métodos de teste e um teste 
 
 ## Evidência de software e limites
 
-- Suíte local Linux: **536/536 testes**, sem falhas, erros ou pulos.
+- Suíte local Linux: **537/537 testes**, sem falhas, erros ou pulos.
 - Oráculos de aritmética: **13.842 combinações** de campanha, funil e caixa, além de esquema, tipos, arredondamento, limites e entradas inválidas. Isso não esgota o domínio inteiro de entradas.
 - Navegador: **14 fluxos de integração**; o exercício funcional adicional escrito pela LocalAuthor completou o 15º fluxo.
 - Exercício da LocalAuthor: **4/4 testes unitários** e detecção de **4/4 mutantes** (aceitar bool, tratar zero como taxa, errar unidade monetária e somar saída no caixa).
+
+Um segundo exercício supervisionado completou **6/6 métodos unitários e 6/6 mutantes detectados**. Os gabaritos monetários foram explicados pelo professor; isso não é uma avaliação cega. O supervisor montou cinco métodos de uma proposta válida com um método corrigido pela LocalAuthor. A regeneração integral posterior foi rejeitada por reintroduzir um campo inexistente e um teste negativo ambíguo. O teste de campo extra agora confirma uma entrada válida e adiciona somente uma chave com inteiro válido; sua versão anterior passava pelo tipo errado, sem detectar o defeito de esquema.
+
+A primeira instrução desse exercício também tinha ambiguidade de contrato: essa tentativa não é uma prova justa de transferência independente. Após explicitar o contrato, a proposta ainda apresentou erros reais de unidades e exceções, corrigidos com feedback. Erros do executor, como descoberta vazia, foram registrados separadamente e não contados como aprovação nem atribuídos ao modelo.
 
 Os mutantes foram introduzidos exclusivamente na cópia descartável da sandbox, e a fonte foi restaurada antes do teste de navegador. A captura de tela desse exercício foi feita pelo script escrito pela IA local, executado e supervisionado pelo controlador de QA. Não é prova de investigação visual autônoma.
 

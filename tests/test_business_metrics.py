@@ -49,6 +49,13 @@ class BusinessMetricsTests(unittest.TestCase):
         self.assertEqual(report['metrics'], {'balance_cents': -100, 'balance_brl': '-1.00'})
         self.assertIn('lucro', report['notice'])
 
+    def test_extra_count_field_rejected_after_valid_baseline(self):
+        baseline = copy.deepcopy(CAMPAIGN)
+        analyze_business_metrics(baseline)
+        baseline["data"]["unknown_count"] = 1
+        with self.assertRaises(PolicyError):
+            analyze_business_metrics(baseline)
+
     def test_zero_denominator_is_unknown_not_zero_or_infinity(self):
         for original in (CAMPAIGN, FUNNEL):
             case = copy.deepcopy(original)
