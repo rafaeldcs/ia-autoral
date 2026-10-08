@@ -49,6 +49,7 @@ jobs:
         with:
           python-version: '3.13'
       - run: dotnet build dotnet/LocalAI.Host/LocalAI.Host.csproj -c Release
+      - run: dotnet build dotnet/LocalAuthor.Lan/LocalAuthor.Lan.csproj -c Release
       - if: runner.os == 'Windows'
         run: dotnet build dotnet/LocalAuthor.Client/LocalAuthor.Client.csproj -c Release
       - run: dotnet build examples/laboratory/Laboratory.csproj -c Release

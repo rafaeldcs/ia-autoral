@@ -78,7 +78,9 @@ try {
  using var concurrency=new SemaphoreSlim(4,4);
  var advertisedOrigin=$"https://{config.Bind}:{config.Port}";
  var staticPaths=new HashSet<string>{"/","/chat.js","/chat.css","/advanced","/app.js","/styles.css",
-  "/marketing","/marketing.js","/marketing.css"};
+  "/marketing","/marketing.js","/marketing.css",
+  "/foundation","/foundation.js","/foundation.css","/business-tools.js",
+  "/workspace.css","/appearance.js"};
  app.Run(async context=>{
   context.Response.Headers.CacheControl="no-store";context.Response.Headers.XContentTypeOptions="nosniff";
   async Task Error(int code,string message){context.Response.StatusCode=code;await context.Response.WriteAsJsonAsync(new{error=message});}

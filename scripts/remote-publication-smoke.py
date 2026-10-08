@@ -54,6 +54,13 @@ with tempfile.TemporaryDirectory(prefix='localauthor-publish-check-') as tmp:
             except OSError:pass
             time.sleep(.1)
         check('Same application exposes publication for any paired device',json.loads(request('/api/device',user['AccessKey'])[1])['canPublishUpdates'])
+        for route, filename in [('/foundation', 'foundation.html'), ('/foundation.js', 'foundation.js'),
+                                ('/foundation.css', 'foundation.css'), ('/business-tools.js', 'business-tools.js'),
+                                ('/workspace.css', 'workspace.css'), ('/appearance.js', 'appearance.js')]:
+            status, content = request(route)
+            check('HTTPS gateway serves exact public UI asset ' + route,
+                  status == 200 and hashlib.sha256(content).digest() == hashlib.sha256((ROOT/'ui'/filename).read_bytes()).digest())
+        check('Public UI assets do not expose private API access', request('/api/health')[0] == 401)
         check('Initial password setup required',not json.loads(request('/api/device',user['AccessKey'])[1])['publicationPasswordConfigured'])
         check('Publication cannot proceed without initial setup',request(upload,user['AccessKey'],b'x')[0]==428)
         def setup(value,key=user['AccessKey']):return request('/api/publication-password',key,json.dumps({'password':value}).encode(),{'Content-Type':'application/json'})[0]
