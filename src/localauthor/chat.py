@@ -10,6 +10,7 @@ from .errors import PolicyError, NotFoundError
 from .safety import PathPolicy, reject_secrets
 from .util import utcnow, read_json
 from .investigation import InvestigationService
+from .message_format import resolve_message_format
 
 CHAT_SCHEMA = """
 CREATE TABLE IF NOT EXISTS project_preferences(
@@ -94,13 +95,13 @@ class ChatService:
             messages = [{**dict(r), "metadata": json.loads(r["metadata"])} for r in db.execute("SELECT * FROM messages WHERE conversation_id=? ORDER BY id", (conversation_id,))]
         return {**dict(row), "messages": messages}
 
-    def validate_message(self, message, mode, input_format="text"):
+    def validate_message(self, message, mode, input_format="auto"):
         if not isinstance(message, str) or not 1 <= len(message.strip()) <= 8000:
             raise PolicyError("Mensagem deve ter de 1 a 8.000 caracteres.")
         if mode not in {"guide", "knowledge", "model", "investigation", "browser"}:
             raise PolicyError("Modo de conversa inválido.")
-        if input_format not in {"text", "code"}:
-            raise PolicyError("Formato deve ser texto ou código.")
+        if input_format not in ("auto", "text", "code"):
+            raise PolicyError("Formato de mensagem inválido.")
         try:
             raw = message.encode("utf-8")
         except UnicodeError as exc:
@@ -111,8 +112,9 @@ class ChatService:
         if self.settings.token in message:
             raise PolicyError("Não envie o token local na conversa.")
 
-    def respond(self, project_id, conversation_id, message, mode="guide", cancel=None, input_format="text"):
+    def respond(self, project_id, conversation_id, message, mode="guide", cancel=None, input_format="auto"):
         self.validate_message(message, mode, input_format)
+        input_format = resolve_message_format(message, input_format)
         # One turn at a time preserves chronological pairs, including model jobs.
         with self.lock:
             if cancel and cancel.is_set():

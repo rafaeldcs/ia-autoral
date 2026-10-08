@@ -5,6 +5,7 @@ import json
 import logging
 
 from ..chat import ChatService
+from ..message_format import resolve_message_format
 from ..errors import PolicyError
 from ..util import utcnow
 from .experience import ExperienceStore
@@ -18,7 +19,7 @@ class FoundationChatService(ChatService):
         super().__init__(store, settings, knowledge)
         self.foundation = FoundationService(settings.home)
 
-    def validate_message(self, message, mode, input_format="text"):
+    def validate_message(self, message, mode, input_format="auto"):
         if mode in {"foundation", "image"}:
             # Keep Unicode, secret and format checks; do not use the tiny model cap.
             super().validate_message(message, "guide", input_format)
@@ -43,12 +44,13 @@ class FoundationChatService(ChatService):
         if removed and response.get("origin") == "foundation_image":
             child(self.settings.home / "foundation" / "artifacts", f"{project_id}/{run_id}.png").unlink(missing_ok=True)
 
-    def respond(self, project_id, conversation_id, message, mode="guide", cancel=None, input_format="text", image_options=None):
+    def respond(self, project_id, conversation_id, message, mode="guide", cancel=None, input_format="auto", image_options=None):
         if image_options is not None and mode != "image":
             raise PolicyError("Parâmetros visuais exigem modo imagem.")
         if mode not in {"foundation", "image"}:
             return super().respond(project_id, conversation_id, message, mode, cancel, input_format)
         self.validate_message(message, mode, input_format)
+        input_format = resolve_message_format(message, input_format)
         with self.lock:
             check_cancel(cancel)
             conversation = self.get(project_id, conversation_id)

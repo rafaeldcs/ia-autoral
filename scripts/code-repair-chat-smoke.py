@@ -33,7 +33,7 @@ const {chromium}=require('/opt/node_modules/playwright');
   const page=await context.newPage();page.setDefaultTimeout(20000);
   await page.goto('http://127.0.0.1:18765');await page.locator('#local-token').fill(token);await page.locator('#connect-form button').click();await page.locator('#studio').waitFor();
   await page.locator('#open-tools').click();await page.locator('#repair-examples summary').click();await page.getByRole('button',{name:'Testar configuração do servidor',exact:true}).click();
-  check('Example selects neural generation and preserves code',await page.locator('#response-mode').inputValue()==='model'&&await page.locator('#input-format').inputValue()==='code');
+  check('Example selects neural generation and detects code automatically',await page.locator('#response-mode').inputValue()==='model'&&await page.locator('#input-format').inputValue()==='auto'&&await page.locator('#message-input').getAttribute('spellcheck')==='false');
   check('Prefilled source is broken input, not a supplied answer',(await page.locator('#message-input').inputValue()).includes('{ reverse_proxy api:8080 }'));
   await page.locator('#send').click();await page.locator('.message.assistant pre').waitFor();
   check('Chat produces the Caddy correction from weights',await page.locator('.message.assistant pre').innerText()==='handle @api {\n    reverse_proxy api:8080\n}');

@@ -130,7 +130,8 @@
   $('mode').addEventListener('change', () => {
     $('image-options').hidden = $('mode').value !== 'image';
     $('mode-help').textContent = $('mode').value === 'image' ? 'Descreva a imagem desejada. O modelo visual precisa estar configurado para as opções escolhidas.' : 'Histórico e fontes do projeto entram no contexto. Código gerado não é executado.';
-    $('prompt').spellcheck = $('mode').value !== 'code';
+    $('prompt').setAttribute('autocorrect', 'off');
+    $('prompt').setAttribute('autocapitalize', 'off');
   });
   $('compose').addEventListener('submit', async event => {
     event.preventDefault(); if (busy) return;
@@ -141,7 +142,7 @@
       const conversation = $('conversation').value || await newConversation();
       if (!conversation) throw new Error('A seleção de projeto mudou.');
       const result = await api('/api/chat', {project_id: project, conversation_id: conversation, message: prompt,
-        mode: $('mode').value === 'image' ? 'image' : 'foundation', input_format: $('mode').value === 'code' ? 'code' : 'text',
+        mode: $('mode').value === 'image' ? 'image' : 'foundation', input_format: 'auto',
         ...($('mode').value === 'image' ? {image_options: {width: Number($('image-size').value), height: Number($('image-size').value),
           seed: Number($('image-seed').value), steps: Number($('image-steps').value)}} : {})});
       activeJob = {id: result.job.id, prompt, project}; await poll();

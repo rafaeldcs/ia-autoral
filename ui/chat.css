@@ -460,8 +460,8 @@ textarea {
 }
 .composer {
   border:1px solid #d7d7d7;
-  border-radius:18px;
-  padding:12px 16px;
+  border-radius:22px;
+  padding:14px 16px 12px;
   background:#fff;
   box-shadow:0 3px 15px #00000005;
 }
@@ -473,39 +473,23 @@ textarea {
   width:100%;
   resize:none;
   background:transparent;
-  padding:6px 0;
-  font-size:14px;
-  min-height:72px;
-  max-height:26dvh;
+  display:block;
+  padding:4px 2px;
+  font-size:15px;
+  line-height:1.6;
+  min-height:52px;
+  max-height:28dvh;
 }
 .composer textarea:focus-visible {
   outline:0;
-}
-.editor-tools {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  padding-top:4px;
-}
-.editor-tools label {
-  display:flex;
-  align-items:center;
-  gap:6px;
-  font-size:11px;
-  color:var(--muted);
-}
-.editor-tools select {
-  border:0;
-  padding:3px;
-  font-size:11px;
-  background:var(--surface);
-  border-radius:6px;
 }
 #input-count {
   font-size:11px;
   color:var(--muted);
   text-align:right;
+  max-width:42%;
+  line-height:1.35;
+  flex-shrink:0;
 }
 .input-over-limit {
   color:#b42318!important;
@@ -514,8 +498,13 @@ textarea {
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:12px;
-  margin-top:6px;
+  gap:8px;
+  margin-top:10px;
+}
+.compose-actions label {
+  min-width:0;
+  flex:1;
+  margin-right:auto;
 }
 .compose-actions select {
   font-size:12px;
@@ -523,11 +512,18 @@ textarea {
   padding:6px 4px;
   max-width:100%;
   background:transparent;
+  color:var(--muted);
+  text-overflow:ellipsis;
 }
 .compose-actions .primary {
-  font-size:12px;
-  padding:8px 14px;
-  border-radius:10px;
+  width:40px;
+  height:40px;
+  min-width:40px;
+  padding:0;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  flex-shrink:0;
 }
 .mode-notice {
   font-size:12px;
@@ -868,7 +864,7 @@ dialog ul {
     margin-left:0;
   }
   .main header {
-    min-height:60px;
+    min-height:52px;
     gap:8px;
     padding:10px 12px;
     flex-wrap:wrap;
@@ -920,13 +916,10 @@ dialog ul {
   }
   .compose-actions select {
     font-size:11px;
-    max-width:210px;
+    max-width:min(210px,100%);
   }
   .compose-actions .primary {
-    padding:8px 11px;
-  }
-  .editor-tools {
-    flex-wrap:wrap;
+    padding:0;
   }
   #input-count {
     font-size:10px;
@@ -978,5 +971,4 @@ dialog ul {
 :root[data-theme="dark"] :is(button:hover,.tool-links a:hover) { background: #383838; }
 :root[data-theme="dark"] .primary { background: #ececec; color: #202020; border-color: #ececec; }
 :root[data-theme="dark"] .primary:hover { background: #d1d1d1; }
-:root[data-theme="dark"] .editor-tools select { background: #333; }
 .appearance-control { margin-top: 20px; }

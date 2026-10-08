@@ -189,11 +189,13 @@ def main(browser_channel=None):
                     expect(page.locator("#status")).to_contain_text("Concluído")
                     assert page.evaluate("window.PWNED") is None
                     report["flows"].append("text job, automatic conversation creation, inert output rendering")
-                    page.locator("#mode").select_option("code")
-                    page.locator("#prompt").fill("Escreva uma validação de estoque")
+                    assert page.locator('#mode option[value="code"]').count() == 0
+                    page.locator("#prompt").fill('const estoque = 0;\n// Explique uma validação de estoque')
                     page.locator("#send").click()
                     expect(page.locator("#messages article")).to_have_count(4, timeout=15000)
-                    report["flows"].append("code mode and conversation history")
+                    saved_code = app.chat.get(item["id"], page.locator("#conversation").input_value())
+                    assert saved_code['messages'][-2]['metadata']['format'] == 'code'
+                    report["flows"].append("automatic code detection and conversation history")
                     page.locator("#mode").select_option("image")
                     expect(page.locator("#image-options")).to_be_visible()
                     page.locator("#image-seed").fill("17")

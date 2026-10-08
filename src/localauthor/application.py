@@ -34,7 +34,7 @@ class Application:
             "research": lambda p, c: self.research.collect(p["urls"], p["scope"], c),
             "verify": lambda p, c: self.runner.run(p["task_id"], p["kind"], p.get("project_file", ""), c),
             "train": self._train,
-            "chat": lambda p, c: self.chat.respond(p["project_id"], p["conversation_id"], p["message"], p.get("mode", "guide"), c, p.get("input_format", "text"), image_options=p.get("image_options")),
+            "chat": lambda p, c: self.chat.respond(p["project_id"], p["conversation_id"], p["message"], p.get("mode", "guide"), c, p.get("input_format", "auto"), image_options=p.get("image_options")),
             "marketing-research": lambda p, c: self.marketing.research(p['project_id'],p['id'],p['digest'],p['plan'],c),
             "marketing-generate": lambda p, c: self.marketing.generate(p['project_id'],p['id'],p['digest'],c),
             "marketing-plan": lambda p, c: self.marketing.plan_research(p['project_id'],p['id'],p['digest'],p['candidates'],c),

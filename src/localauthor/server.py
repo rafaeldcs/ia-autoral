@@ -217,10 +217,10 @@ def make_handler(app: Application, ui_path: Path):
                         from .foundation.visual import ImageOptions
                         ImageOptions.parse(body["image_options"])
                     app.chat.get(body["project_id"], body["conversation_id"])
-                    app.chat.validate_message(body["message"], body.get("mode", "guide"), body.get("input_format", "text"))
+                    app.chat.validate_message(body["message"], body.get("mode", "guide"), body.get("input_format", "auto"))
                     if body.get("mode") in {"model", "foundation", "image"}:
                         return {"job": app.jobs.submit("chat", {k: body[k] for k in ("project_id", "conversation_id", "message", "mode", "input_format", "image_options") if k in body})}
-                    return app.chat.respond(body["project_id"], body["conversation_id"], body["message"], body.get("mode", "guide"), input_format=body.get("input_format", "text"))
+                    return app.chat.respond(body["project_id"], body["conversation_id"], body["message"], body.get("mode", "guide"), input_format=body.get("input_format", "auto"))
                 if path == "/api/consult": return app.knowledge.consult(body["query"], body.get("scope", "global"), body.get("include_global") is True)
                 if path == "/api/import":
                     scope = body.get("scope", "global")

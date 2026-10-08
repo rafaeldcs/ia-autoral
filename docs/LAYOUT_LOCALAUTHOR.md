@@ -5,7 +5,7 @@ A interface usa a organização solicitada pelo proprietário, inspirada no Code
 ## Onde encontrar cada área
 
 - **Lateral:** nova conversa, projetos e conversas do projeto selecionado. “Pasta do projeto” expande o caminho completo. O botão de recolher amplia o chat; no celular, a lateral abre sobre a página.
-- **Centro:** boas-vindas ou histórico; mensagem, formato e modo de resposta ficam na caixa inferior. O aviso abaixo informa o funcionamento do modo selecionado.
+- **Centro:** boas-vindas ou histórico; mensagem e modo de resposta ficam na caixa inferior. Texto e código são identificados automaticamente, sem seleção de formato. O aviso abaixo informa o funcionamento do modo selecionado.
 - **Cabeçalho:** projeto atual, investigação de site, orientações do projeto e ferramentas.
 - **Ferramentas:** links para marketing, modelos locais e ferramentas avançadas, cada um com descrição. Os exercícios de correção foram retirados do chat e ficam nesta janela.
 - **Investigação:** painel próprio à direita em telas grandes e tela inteira no celular; Escape recolhe o painel quando não houver outro diálogo aberto.
@@ -16,6 +16,10 @@ Chat, marketing, modelos e ferramentas avançadas compartilham cores neutras, ca
 Em **Ferramentas → Aparência**, escolha clara, escura ou conforme o sistema. A preferência visual é preservada neste navegador/aplicativo e acompanha as demais áreas do mesmo servidor. Não são armazenados token, mensagens ou senhas com essa preferência. A lista de projetos tem rolagem própria, para manter as conversas acessíveis mesmo com muitas pastas.
 
 ## Validação e atualização
+
+A caixa de mensagem tem uma linha de controles e cresce automaticamente conforme o conteúdo. O contador aparece próximo ao limite; o botão de envio tem nome acessível e fica desabilitado quando a mensagem está vazia. Enter mantém uma nova linha, e Ctrl + Enter envia. A identificação automática usa sinais de código e JSON no servidor, com uma indicação visual correspondente no editor. O texto original é salvo sem alterar espaços, comentários, aspas, acentos ou quebras de linha; mensagens continuam sendo renderizadas como texto inerte. A detecção é conservadora e não garante reconhecer toda linguagem ou todo trecho ambíguo.
+
+O campo de formato não é exibido. Um identificador oculto foi preservado para compatibilidade com clientes instalados que restauram rascunhos; o chat web envia sempre `input_format=auto`. A API também identifica o formato quando esse campo é omitido, mantendo suporte às indicações explícitas de clientes anteriores. Na área Modelos locais, conversar e criar imagem permanecem funções distintas; analisar código não exige mais um modo separado.
 
 `scripts/chat-layout-smoke.py` executa verificações reais de navegador usando apenas projetos temporários e respostas do guia estruturado. Verifica persistência das preferências, histórico, texto inerte, preservação de rascunhos, foco, ferramentas, painel de investigação e dimensões de 320 a 1440 pixels. Não mede a inteligência do modelo.
 

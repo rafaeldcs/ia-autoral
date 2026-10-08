@@ -109,6 +109,22 @@ class ChatTests(WorkspaceCase):
         reopened = Application(self.settings)
         self.assertEqual(reopened.chat.get(self.project['id'], self.conversation['id'])['messages'][0]['content'].encode(), source.encode())
 
+    def test_automatic_format_preserves_code_and_mixed_message(self):
+        source = 'Explique sem mudar:\r\n```csharp\r\n\tstring s = "ação";  \r\n// <script>inativo</script>\r\n```\r\nObrigado.\r\n'
+        result = self.chat.respond(self.project['id'], self.conversation['id'], source)
+        self.assertEqual(result['messages'][0]['content'].encode(), source.encode())
+        self.assertEqual(result['messages'][0]['metadata']['format'], 'code')
+
+    def test_prose_is_not_code_just_because_it_mentions_a_language(self):
+        result = self.chat.respond(self.project['id'], self.conversation['id'], 'Quero revisar um código em C#.')
+        self.assertEqual(result['messages'][0]['metadata']['format'], 'text')
+
+    def test_invalid_format_does_not_save_messages(self):
+        for fmt in ['html', None, []]:
+            with self.subTest(format=fmt), self.assertRaises(PolicyError):
+                self.chat.respond(self.project['id'], self.conversation['id'], 'Revisar projeto', input_format=fmt)
+        self.assertEqual(self.chat.get(self.project['id'], self.conversation['id'])['messages'], [])
+
     def test_invalid_unicode_and_overflow_are_rejected_not_truncated(self):
         for source,mode in [('x'*8001,'guide'), ('á'*91,'model'), ('\ud800','guide')]:
             with self.subTest(mode=mode), self.assertRaises(PolicyError):

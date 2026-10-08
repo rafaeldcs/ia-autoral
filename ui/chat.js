@@ -16,6 +16,7 @@ catch (error) {
 function updateAvailability() {
     const unavailable = !state.project || state.busy;
     for (const node of document.querySelectorAll('#new-chat,#show-rules,#compose button,#compose select,#message-input,[data-prompt]')) node.disabled = unavailable;
+    $('send').disabled = unavailable || !$('message-input').value.trim();
     $('start-project').hidden = Boolean(state.project);
     $('suggestion-help').hidden = !state.project;
     document.querySelector('.suggestions').hidden = !state.project;
@@ -102,25 +103,37 @@ $('project-create').onsubmit = handle(async () => { const project = await api('/
 $('new-chat').onclick = handle(async () => { if (!state.project)
     throw Error('Adicione uma pasta de projeto primeiro.'); closeNavigation(); resetChat(); });
 for (const button of document.querySelectorAll('[data-prompt]'))
-    button.onclick = () => { $('tools-dialog').close(); $('message-input').value = button.dataset.prompt; $('response-mode').value = button.dataset.mode || 'guide'; if (button.dataset.format) { $('input-format').value = button.dataset.format; $('input-format').dispatchEvent(new Event('change')); } modeNotice(); updateInputCount(); $('message-input').focus(); toast('Exemplo preenchido. Edite a mensagem ou clique em Enviar.'); };
+    button.onclick = () => { $('tools-dialog').close(); $('message-input').value = button.dataset.prompt; $('response-mode').value = button.dataset.mode || 'guide'; modeNotice(); updateInputCount(); $('message-input').focus(); toast('Exemplo preenchido. Edite a mensagem ou clique em Enviar.'); };
 function modeNotice() { const modes = { browser: 'Envie um endereço HTTPS para abrir o navegador da IA e acompanhar as capturas. Isso autoriza conexão ao site nesta sessão. Nunca envie senhas no chat.', investigation: 'Consulta as telas já observadas neste projeto, com data e origem. Não navega agora. Não envie senhas no chat.', guide: 'Guias estruturados e referências. Não é geração neural. Ctrl + Enter para enviar.', knowledge: 'Consulta apenas fontes deste projeto. Não inclui conversas ou fontes de outros projetos.', model: 'Laboratório: pedido curto, sem histórico nem arquivos no contexto. A saída pode estar errada e não é executada.' }; $('mode-notice').textContent = modes[$('response-mode').value]; }
 $('response-mode').onchange = () => { modeNotice(); updateInputCount(); };
+function looksLikeCode(value) {
+    // Presentation only. The server independently classifies the original string.
+    const codeLine = /^\s*(?:(?:def|async\s+def|class)\s+\w+[^\n]*[:{]\s*$|(?:export\s+)?(?:async\s+)?function\s+\w+\s*\(|(?:const|let|var|string|int|bool|double|decimal)\s+\w+\s*=|(?:public|private|protected|internal)\s+(?:static\s+)?(?:class|void|async|Task|[A-Z]\w*)\b|(?:from\s+[\w.]+\s+import\s+|import\s+(?:[\w.]+|[{'\"])|using\s+[\w.]+\s*;)|(?:SELECT\s+.+\s+FROM\b|INSERT\s+INTO\b|CREATE\s+TABLE\b|UPDATE\s+\w+\s+SET\b)|(?:console\.(?:log|error)|print|Assert\.\w+|assert\.\w+)\s*\(|(?:if|for|while)\s*\([^\n]*\)\s*[{:]|(?:handle|reverse_proxy|server|location)\s+[^\n]*[{}]|(?:return|throw)\s+[^\n]+;\s*$)/im;
+    if (/^\s{0,3}(?:`{3,}|~{3,})/m.test(value) || codeLine.test(value) || /^\s*<([A-Za-z][\w:-]*)\b[^>]*>[\s\S]*<\/\1>\s*$/i.test(value)) return true;
+    if (/^\s*[\[{]/.test(value)) { try { const parsed = JSON.parse(value); return parsed !== null && typeof parsed === 'object'; } catch {} }
+    return false;
+}
 function updateInputCount() {
     const value = $('message-input').value;
     const chars = Array.from(value).length;
     const bytes = new TextEncoder().encode(value).length;
     $('input-count').textContent = `${chars.toLocaleString('pt-BR')} / 8.000 caracteres` + ($('response-mode').value === 'model' ? ` · IA: ${bytes}/180 bytes` : '');
     $('input-count').classList.toggle('input-over-limit', chars > 8000 || ($('response-mode').value === 'model' && bytes > 180));
+    $('input-count').hidden = chars < 6400 && !($('response-mode').value === 'model' && bytes > 150);
+    const input = $('message-input');
+    const code = looksLikeCode(value);
+    input.spellcheck = !code;
+    input.setAttribute('autocorrect', 'off');
+    input.setAttribute('autocapitalize', 'off');
+    input.classList.toggle('code-input', code);
+    input.style.height = 'auto';
+    input.style.height = Math.min(Math.max(input.scrollHeight, 52), Math.min(220, innerHeight * .28)) + 'px';
+    $('send').disabled = !state.project || state.busy || !value.trim();
 }
 $('message-input').oninput = updateInputCount;
-$('input-format').onchange = () => {
-    const code = $('input-format').value === 'code';
-    const input = $('message-input');
-    input.spellcheck = !code;
-    input.setAttribute('autocorrect', code ? 'off' : 'on');
-    input.setAttribute('autocapitalize', code ? 'off' : 'sentences');
-    input.classList.toggle('code-input', code);
-};
+// Compatibility with installed clients that restore draft format through this ID.
+$('input-format').onchange = updateInputCount;
+window.addEventListener('resize', updateInputCount);
 $('message-input').onkeydown = event => { if (!event.isComposing && event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
     event.preventDefault();
     $('compose').requestSubmit();
@@ -136,7 +149,7 @@ $('compose').onsubmit = handle(async () => { if (state.busy)
     busy(true); try {
     if (!state.conversation)
         state.conversation = await api('/api/conversations', { project_id: state.project.id, title: Array.from(message.trim()).slice(0, 70).join('') });
-    let response = await api('/api/chat', { project_id: state.project.id, conversation_id: state.conversation.id, message, mode: $('response-mode').value, input_format: $('input-format').value });
+    let response = await api('/api/chat', { project_id: state.project.id, conversation_id: state.conversation.id, message, mode: $('response-mode').value, input_format: 'auto' });
     if (response.job) {
         for (let i = 0; i < 180; i++) {
             await new Promise(resolve => setTimeout(resolve, 1000));

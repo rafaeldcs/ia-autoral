@@ -13,6 +13,8 @@ Antes de desenhar, identifique as tarefas reais e sua frequência. No LocalAutho
 - Na navegação móvel, mova o foco para dentro, mantenha Tab/Shift+Tab no painel, feche com Escape e devolva o foco ao botão de abertura. Diálogos têm título acessível, fechamento e foco restituído.
 - Explique a primeira ação quando não houver projetos. Desabilite apenas as ações indisponíveis; nunca esconda uma falha ou transforme ausência de capacidade em sucesso.
 - Renderize mensagens e código como texto inerte. Preserve acentos, aspas, comentários, espaços e quebras de linha; não use conteúdo recebido como HTML.
+- Não peça ao usuário para escolher texto ou código. Identifique sinais fortes, como cercas Markdown, declarações de linguagem e JSON válido, mantendo prosa comum como texto. A classificação é uma indicação de apresentação: não executa, corrige nem reescreve o conteúdo e pode falhar em trechos ambíguos. O servidor confirma a classificação; clientes antigos continuam compatíveis.
+- Mantenha a caixa de mensagem compacta quando vazia, crescendo com o conteúdo até um limite com rolagem própria. Use uma linha de controles, envio com nome acessível e contagem apenas próxima ao limite. Preserve Enter para nova linha e Ctrl + Enter para enviar. Desabilite enviar quando vazio, sem perder rascunhos ou apagar conteúdo acima do limite.
 - Adote cores, espaçamento, campos e botões consistentes entre chat, marketing, modelos e ferramentas avançadas.
 
 ## Verificação antes da entrega

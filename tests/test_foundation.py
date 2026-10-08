@@ -344,6 +344,15 @@ class FoundationIntegrationTests(WorkspaceCase):
         self.assertTrue(row["metadata"]["generation_context"])
         self.assertEqual(len(first["messages"]), 2)
 
+    def test_automatic_code_format_reaches_experience_and_history(self):
+        source = 'const texto = "ação";\n// comentário intacto\n'
+        result = self.respond(source)
+        self.assertEqual(result['messages'][0]['content'], source)
+        self.assertEqual(result['messages'][0]['metadata']['format'], 'code')
+        row = ExperienceStore(self.settings.home).get(self.project['id'], result['messages'][-1]['metadata']['experience_id'])
+        self.assertEqual(row['kind'], 'code')
+        self.assertEqual(row['training_allowed'], 0)
+
     def test_model_cache_reused_then_invalidated(self):
         self.respond()
         service = self.app.chat.foundation
