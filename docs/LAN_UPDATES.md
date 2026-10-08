@@ -1,5 +1,9 @@
 # Atualização automática do cliente Windows
 
+## Interface reorganizada — cliente 0.3.6
+
+As ações do aplicativo agora ficam no botão **Conexão e atualizações**: conectar, reconectar, esquecer e publicar continuam disponíveis. O status permanece visível. O chat usa uma única lateral para projetos e conversas; exercícios e áreas secundárias ficam em **Ferramentas**. Detalhes e verificações: [organização da interface](LAYOUT_LOCALAUTHOR.md).
+
 ## Instalador único e senha de publicação — 0.3.2
 
 Use o mesmo instalador conectado em todos os computadores. Na primeira abertura conectada, enquanto o servidor ainda não tem senha, o aplicativo pede para criar e confirmar uma senha de 12 a 256 caracteres. O primeiro cadastro feito por um dispositivo pareado define a senha única do servidor. Faça esse cadastro antes de distribuir o instalador a outras pessoas. Se fechar a tela, pode continuar usando a IA; publicar permanece bloqueado até cadastrar a senha.

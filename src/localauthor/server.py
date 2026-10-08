@@ -19,7 +19,8 @@ MAX_BODY = 2_500_000
 STATIC = {"/": "chat.html", "/advanced": "index.html", "/app.js": "app.js", "/styles.css": "styles.css", "/chat.js": "chat.js", "/chat.css": "chat.css",
           "/foundation": "foundation.html", "/foundation.js": "foundation.js", "/foundation.css": "foundation.css",
           "/business-tools.js": "business-tools.js",
-          "/marketing": "marketing.html", "/marketing.js": "marketing.js", "/marketing.css": "marketing.css"}
+          "/marketing": "marketing.html", "/marketing.js": "marketing.js", "/marketing.css": "marketing.css",
+          "/workspace.css": "workspace.css", "/appearance.js": "appearance.js"}
 
 
 def make_handler(app: Application, ui_path: Path):

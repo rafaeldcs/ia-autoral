@@ -73,29 +73,41 @@ def check_business_tools(page, report, project, other, reports):
     page.set_viewport_size({'width': 1440, 'height': 1000})
     report['flows'].append('business cash: negative balance, cash not profit, desktop/mobile layout')
     # A stale response must not restore numbers after a field edit or project switch.
+    scenario = {'action': None}
+    handled_actions = []
     def delayed(route):
-        time.sleep(.3)
+        # Mutate after interception, when submission has actually started. A timer
+        # set before Playwright scrolls/clicks can fire before the request, making
+        # the response current rather than stale and the test nondeterministic.
+        if scenario['action'] == 'edit':
+            page.evaluate("""() => {
+              document.getElementById('business-incoming_cents').value = '2';
+              document.getElementById('business-incoming_cents').dispatchEvent(new Event('input', {bubbles:true}));
+            }""")
+        elif scenario['action'] == 'project':
+            page.evaluate("""other => {
+              document.getElementById('project').value = other;
+              document.getElementById('project').dispatchEvent(new Event('change', {bubbles:true}));
+            }""", other)
+        if scenario['action']:
+            handled_actions.append(scenario['action'])
         route.fulfill(status=200, content_type='application/json', body=json.dumps({
             'kind': 'cash', 'metrics': {'balance_brl': '99999.00'},
             'notice': '<img src=x onerror=window.PWNED=1>'}))
     page.route('**/api/foundation/business-metrics', delayed)
-    page.evaluate("""() => setTimeout(() => {
-      document.getElementById('business-incoming_cents').value = '2';
-      document.getElementById('business-incoming_cents').dispatchEvent(new Event('input', {bubbles:true}));
-    }, 50)""")
+    scenario['action'] = 'edit'
     page.locator('#business-form button').click()
     expect(page.locator('#business-form button')).to_be_enabled()
     expect(result).to_be_empty()
     expect(page.locator('#business-use')).to_be_hidden()
-    page.evaluate("""other => setTimeout(() => {
-      document.getElementById('project').value = other;
-      document.getElementById('project').dispatchEvent(new Event('change', {bubbles:true}));
-    }, 50)""", other)
+    scenario['action'] = 'project'
     page.locator('#business-form button').click()
     expect(page.locator('#project')).to_have_value(other)
     expect(page.locator('#business-form button')).to_be_enabled()
     expect(result).to_be_empty()
     expect(page.locator('#business-use')).to_be_hidden()
+    assert handled_actions == ['edit', 'project'], 'Both mutations happened during an intercepted request'
+    scenario['action'] = None
     page.locator('#project').select_option(project)
     page.locator('#business-kind').select_option('cash')
     fill({'opening_cents': '0', 'incoming_cents': '1', 'outgoing_cents': '0'})

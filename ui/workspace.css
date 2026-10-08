@@ -1,0 +1,220 @@
+:root {
+  color-scheme:light;
+  --bg:#fff;
+  --panel:#fafafa;
+  --line:#e4e4e4;
+  --text:#262626;
+  --muted:#666;
+  --accent:#5142ba;
+  --warn:#8a5b00;
+  --danger:#b42318;
+  font:14px/1.65 'Segoe UI',system-ui,sans-serif;
+  color:var(--text);
+  background:var(--bg);
+}
+body {
+  color:var(--text);
+  background:#fff;
+}
+h1 {
+  font-size:28px;
+  letter-spacing:-.8px;
+  line-height:1.3;
+}
+h2 {
+  font-size:19px;
+  letter-spacing:-.3px;
+}
+h3 {
+  font-size:15px;
+}
+header {
+  border-bottom:1px solid var(--line);
+  background:#fff;
+}
+header nav {
+  font-size:12px;
+}
+main {
+  max-width:1180px;
+  padding:28px 32px;
+}
+a,.item a {
+  color:var(--accent);
+  text-underline-offset:3px;
+}
+p,li {
+  overflow-wrap:anywhere;
+}
+.card,section,#login-form {
+  border-color:var(--line);
+  box-shadow:none;
+}
+.card {
+  background:#fafafa;
+  border-radius:12px;
+  padding:26px;
+}
+section,#login-form {
+  border-radius:12px;
+}
+input,textarea,select {
+  background:#fff;
+  color:var(--text);
+  border-color:#d0d0d0;
+  border-radius:8px;
+  padding:10px 12px;
+}
+input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible,summary:focus-visible {
+  outline:2px solid var(--accent);
+  outline-offset:3px;
+}
+button {
+  background:#242424;
+  color:#fff;
+  border-color:#242424;
+  font-weight:500;
+  border-radius:8px;
+  min-height:38px;
+}
+button:hover {
+  background:#404040;
+  filter:none;
+}
+.secondary,nav button {
+  background:#fff;
+  color:var(--text);
+  border-color:var(--line);
+}
+.secondary:hover,nav button:hover {
+  background:#eee;
+}
+.danger {
+  color:var(--danger);
+  border-color:#d3a9a3;
+  background:#fff;
+}
+nav button.active {
+  background:#e9e9e9;
+  color:var(--text);
+  border-color:#bdbdbd;
+}
+.notice {
+  background:#f7f5ec;
+  color:#635b3e;
+  border-color:#e5dfc7;
+}
+.badge {
+  background:#eee;
+  color:#555;
+}
+.eyebrow {
+  color:var(--muted);
+}
+pre {
+  background:#f0f0f0;
+  color:#303030;
+  border-color:var(--line);
+  border-radius:8px;
+  padding:16px;
+}
+fieldset {
+  border:1px solid var(--line);
+  border-radius:9px;
+  padding:16px;
+  margin:16px 0;
+}
+summary {
+  font-weight:600;
+  padding:8px 0;
+}
+.metadata,footer {
+  color:var(--muted);
+}
+#message {
+  background:#edf6f0;
+  color:#244b32;
+  border-color:#bad3c4;
+  box-shadow:0 8px 30px #0002;
+}
+#message.error {
+  background:#fff0ef;
+  color:#8f2117;
+  border-color:#e3b6af;
+}
+#marketing-result,#business-result {
+  overflow-wrap:anywhere;
+}
+.shell-links {
+  display:flex;
+  gap:16px;
+  flex-wrap:wrap;
+  font-size:12px;
+  margin:0;
+}
+#workspace>section {
+  margin:24px 0;
+  padding:28px;
+}
+.grid {
+  gap:24px;
+}
+.toolbar {
+  gap:12px;
+}
+#workspace>details {
+  border:1px solid var(--line);
+  padding:10px 16px;
+  border-radius:9px;
+  margin:18px 0;
+}
+@media(max-width:850px) {
+  main {
+    padding:20px 16px;
+  }
+  .card,#workspace>section {
+    padding:20px;
+  }
+  .grid {
+    gap:16px;
+  }
+  .scopebar label {
+    min-width:0;
+  }
+  .scopebar {
+    display:block;
+  }
+  header {
+    padding:18px 16px;
+    gap:16px;
+  }
+  .shell-links {
+    gap:12px;
+  }
+  h1 {
+    font-size:25px;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #1b1b1b;
+  --panel: #242424;
+  --line: #393939;
+  --text: #ececec;
+  --muted: #b0b0b0;
+  --accent: #b5a8ff;
+  --danger: #ffaca4;
+  background: var(--bg);
+}
+:root[data-theme="dark"] :is(body,header,main) { background: var(--bg); color: var(--text); }
+:root[data-theme="dark"] :is(.card,section,#login-form,dialog) { background: var(--panel); color: var(--text); }
+:root[data-theme="dark"] :is(input,textarea,select,pre) { background: #272727; color: var(--text); border-color: #474747; }
+:root[data-theme="dark"] button { background: #ececec; color: #202020; border-color: #ececec; }
+:root[data-theme="dark"] :is(.secondary,nav button) { background: #272727; color: var(--text); border-color: #474747; }
+:root[data-theme="dark"] nav button.active { background: #3b3b3b; }
+:root[data-theme="dark"] :is(button:hover,.secondary:hover,nav button:hover) { background: #777; }
+:root[data-theme="dark"] .notice { background: #302d23; color: #e3d5ad; border-color: #4c4534; }
+:root[data-theme="dark"] .badge { background: #383838; color: #ddd; }
+:root[data-theme="dark"] #message { background: #233b2c; color: #d2eddb; }
+:root[data-theme="dark"] #message.error { background: #402623; color: #ffb8ae; }

@@ -66,9 +66,15 @@ sealed class ClientForm : Form {
  public ClientForm(string[] args) {
   Text="LocalAuthor — IA da sua rede";Width=1280;Height=880;MinimumSize=new Size(700,550);StartPosition=FormStartPosition.CenterScreen;
   Font=new Font("Segoe UI",10);BackColor=Color.White;
-  var top=new FlowLayoutPanel{Dock=DockStyle.Top,AutoSize=true,Padding=new Padding(8),WrapContents=true};top.Controls.AddRange([import,reconnect,forget,publishUpdate,status,updateStatus,postponeUpdate]);
+  // Keep connection administration out of the conversation's everyday toolbar.
+  var menu=new Button{Text="Conexão e atualizações ▾",AutoSize=true,Height=36};
+  var actions=new FlowLayoutPanel{Dock=DockStyle.Top,AutoSize=true,Padding=new Padding(12,4,12,8),WrapContents=true,Visible=false,BackColor=Color.FromArgb(247,247,247)};
+  actions.Controls.AddRange([import,reconnect,forget,publishUpdate]);
+  var top=new FlowLayoutPanel{Dock=DockStyle.Top,AutoSize=true,Padding=new Padding(12,4,12,4),WrapContents=true};
+  top.Controls.AddRange([menu,status,updateStatus,postponeUpdate]);
+  menu.Click+=(_,_)=>{actions.Visible=!actions.Visible;menu.Text=actions.Visible?"Conexão e atualizações ▴":"Conexão e atualizações ▾";};
   content.Controls.Add(new Label{Dock=DockStyle.Fill,Text="Conectando à sua IA…\n\nSe o servidor está neste computador, ele será iniciado automaticamente.\nSeus projetos e conversas permanecem no servidor.",TextAlign=ContentAlignment.MiddleCenter,Font=new Font("Segoe UI",16)});
-  Controls.Add(content);Controls.Add(top);
+  Controls.Add(content);Controls.Add(actions);Controls.Add(top);
   int i=Array.IndexOf(args,"--smoke");if(i>=0){smokeFile=args[i+1];reportFile=args[i+2];Opacity=0;ShowInTaskbar=false;}
   int savedIndex=Array.IndexOf(args,"--smoke-saved");if(savedIndex>=0){home=Path.GetFullPath(args[savedIndex+1]);reportFile=args[savedIndex+2];Opacity=0;ShowInTaskbar=false;}
   int autoIndex=Array.IndexOf(args,"--auto-update-smoke");if(autoIndex>=0){smokeFile=Path.GetFullPath(args[autoIndex+1]);automaticTestReport=Path.GetFullPath(args[autoIndex+2]);home=Path.Combine(Path.GetDirectoryName(automaticTestReport)!,"isolated-client-data");Opacity=0;ShowInTaskbar=false;}

@@ -27,7 +27,9 @@ function busy(value) { state.busy = value; $('busy').hidden = !value; for (const
 function resetChat() { state.conversation = null; $('messages').replaceChildren(); $('welcome').hidden = false; $('message-input').value = ''; updateInputCount(); updateAvailability(); renderConversations().catch(error => toast(error.message)); $('message-input').focus(); }
 function renderProjects() { const list = $('project-list'); list.replaceChildren(); for (const project of state.projects) {
     const node = el('button', project.name, project.id === state.project?.id ? 'active' : '');
+    node.replaceChildren(el('span', project.name, 'nav-label'));
     node.setAttribute('aria-current', project.id === state.project?.id ? 'true' : 'false');
+    node.title = project.name;
     node.onclick = handle(() => selectProject(project));
     list.append(node);
 } }
@@ -35,16 +37,19 @@ async function renderConversations() { if (!state.project)
     return; const project = state.project; const rows = await api('/api/conversations?project_id=' + project.id); if (state.project?.id !== project.id)
     return; const list = $('conversation-list'); list.replaceChildren(); $('conversation-empty').hidden = rows.length > 0; for (const row of rows) {
     const node = el('button', row.title, row.id === state.conversation?.id ? 'active' : '');
+    node.replaceChildren(el('span', row.title, 'nav-label'));
     node.setAttribute('aria-current', row.id === state.conversation?.id ? 'true' : 'false');
+    node.title = row.title;
     node.onclick = handle(async () => { const data = await api('/api/conversation?project_id=' + project.id + '&id=' + row.id); if (state.project?.id === project.id) {
         state.conversation = data;
         renderMessages();
+        closeNavigation();
         await renderConversations();
     } });
     list.append(node);
 } }
 async function selectProject(project) { if (state.busy)
-    return; hideBrowserPanel(); state.project = project; state.conversation = null; $('project-heading').textContent = project.name; $('folder-path').textContent = project.root; $('welcome-copy').textContent = 'Converse sobre ' + project.name + '. Comece com o problema, combine o critério de pronto e planeje como testar.'; $('sidebar').classList.remove('open'); renderProjects(); resetChat(); }
+    return; hideBrowserPanel(); state.project = project; state.conversation = null; $('project-heading').textContent = project.name; $('project-heading').title = project.name; $('folder-path').textContent = project.root; $('welcome-copy').textContent = 'Converse sobre ' + project.name + '. Comece com o problema, combine o critério de pronto e planeje como testar.'; closeNavigation(); renderProjects(); resetChat(); }
 function renderMessages() { const list = $('messages'); list.replaceChildren(); const messages = state.conversation?.messages || []; $('welcome').hidden = messages.length > 0; for (const message of messages) {
     const box = el('article', '', `message ${message.role}`);
     const names = { project_guide: 'Guia do projeto · orientação estruturada', retrieval_only: 'Memória local · trechos recuperados', local_model: 'IA local · geração experimental', investigation_memory: 'Sistema investigado · evidências observadas', browser_session: 'Navegador da IA · sessão de investigação' };
@@ -77,17 +82,27 @@ $('connect-form').onsubmit = handle(async () => { state.token = $('local-token')
 else
     $('add-project').focus(); });
 $('logout').onclick = () => { hideBrowserPanel(); state.token = ''; state.project = null; state.conversation = null; state.projects = []; $('messages').replaceChildren(); $('project-list').replaceChildren(); $('conversation-list').replaceChildren(); $('studio').hidden = true; $('connect').hidden = false; $('local-token').focus(); };
-$('open-menu').onclick = () => { $('sidebar').classList.add('open'); $('close-menu').focus(); };
-$('close-menu').onclick = () => { $('sidebar').classList.remove('open'); $('open-menu').focus(); };
+const mobileNavigation = matchMedia('(max-width:760px)');
+function closeNavigation(collapse = false) {
+    $('sidebar').classList.remove('open'); $('sidebar-scrim').hidden = true;
+    if (collapse && !mobileNavigation.matches) document.body.classList.add('sidebar-collapsed');
+    $('open-menu').setAttribute('aria-expanded', String(!mobileNavigation.matches && !document.body.classList.contains('sidebar-collapsed')));
+}
+$('open-menu').onclick = () => { document.body.classList.remove('sidebar-collapsed'); if (mobileNavigation.matches) { $('sidebar').classList.add('open'); $('sidebar-scrim').hidden = false; } $('open-menu').setAttribute('aria-expanded', 'true'); $('close-menu').focus(); };
+$('close-menu').onclick = () => { closeNavigation(true); $('open-menu').focus(); };
+$('sidebar-scrim').onclick = () => { closeNavigation(); $('open-menu').focus(); };
+mobileNavigation.addEventListener('change', () => closeNavigation());
+closeNavigation();
+$('open-tools').onclick = $('sidebar-tools').onclick = () => $('tools-dialog').showModal();
 $('start-project').onclick = () => $('add-project').click();
 $('add-project').onclick = () => { $('project-dialog').showModal(); $('project-name').focus(); };
 for (const button of document.querySelectorAll('[data-close]'))
     button.onclick = () => $(button.dataset.close).close();
 $('project-create').onsubmit = handle(async () => { const project = await api('/api/projects', { name: $('project-name').value, root: $('project-root').value }); state.projects = await api('/api/projects'); $('project-dialog').close(); $('project-create').reset(); await selectProject(project); toast('Projeto adicionado. Sua pasta foi preservada.'); });
 $('new-chat').onclick = handle(async () => { if (!state.project)
-    throw Error('Adicione uma pasta de projeto primeiro.'); resetChat(); });
+    throw Error('Adicione uma pasta de projeto primeiro.'); closeNavigation(); resetChat(); });
 for (const button of document.querySelectorAll('[data-prompt]'))
-    button.onclick = () => { $('message-input').value = button.dataset.prompt; $('response-mode').value = button.dataset.mode || 'guide'; if (button.dataset.format) { $('input-format').value = button.dataset.format; $('input-format').dispatchEvent(new Event('change')); } modeNotice(); updateInputCount(); $('message-input').focus(); toast('Exemplo preenchido. Edite a mensagem ou clique em Enviar.'); };
+    button.onclick = () => { $('tools-dialog').close(); $('message-input').value = button.dataset.prompt; $('response-mode').value = button.dataset.mode || 'guide'; if (button.dataset.format) { $('input-format').value = button.dataset.format; $('input-format').dispatchEvent(new Event('change')); } modeNotice(); updateInputCount(); $('message-input').focus(); toast('Exemplo preenchido. Edite a mensagem ou clique em Enviar.'); };
 function modeNotice() { const modes = { browser: 'Envie um endereço HTTPS para abrir o navegador da IA e acompanhar as capturas. Isso autoriza conexão ao site nesta sessão. Nunca envie senhas no chat.', investigation: 'Consulta as telas já observadas neste projeto, com data e origem. Não navega agora. Não envie senhas no chat.', guide: 'Guias estruturados e referências. Não é geração neural. Ctrl + Enter para enviar.', knowledge: 'Consulta apenas fontes deste projeto. Não inclui conversas ou fontes de outros projetos.', model: 'Laboratório: pedido curto, sem histórico nem arquivos no contexto. A saída pode estar errada e não é executada.' }; $('mode-notice').textContent = modes[$('response-mode').value]; }
 $('response-mode').onchange = () => { modeNotice(); updateInputCount(); };
 function updateInputCount() {
@@ -151,8 +166,18 @@ finally {
 $('show-rules').onclick = handle(async () => { if (!state.project)
     throw Error('Escolha um projeto primeiro.'); const data = await api('/api/project-preferences?project_id=' + state.project.id); $('method').value = data.method; $('wip').value = data.wip_limit; $('done').value = data.definition_of_done; $('work-profile').value = data.work_profile || 'general'; $('quality-rules').replaceChildren(...data.quality.map(rule => el('li', rule))); $('official-sources').replaceChildren(...data.sources.map(source => { const a = el('a', source.title + ' ↗'); a.href = source.url; a.target = '_blank'; a.rel = 'noopener noreferrer'; return a; })); const report = await api('/api/engineering-report'); $('learning-result').textContent = report.evaluation ? `Curso experimental: ${report.evaluation.passed}/${report.evaluation.total} decisões guiadas aprovadas. ${report.limitations}` : 'Novo currículo em preparação. As orientações acima foram escritas e revisadas; não significam domínio adquirido pelo modelo.'; const writing = await api('/api/communication-report').catch(() => ({})); if (writing.evaluation?.total) { $('learning-result').textContent += ` Escrita: ${writing.evaluation.passed}/${writing.evaluation.total} pedidos reformulados. ${writing.chatEnabled ? 'Candidato experimental habilitado.' : 'Candidato não ativado no chat.'}`; } $('rules-dialog').showModal(); });
 $('rules-form').onsubmit = handle(async () => { await api('/api/project-preferences', { project_id: state.project.id, method: $('method').value, wip_limit: Number($('wip').value), definition_of_done: $('done').value, work_profile: $('work-profile').value }); $('rules-dialog').close(); toast('Orientações salvas para este projeto.'); });
-document.addEventListener('keydown', event => { if (event.key === 'Escape')
-    $('sidebar').classList.remove('open'); });
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !document.querySelector('dialog[open]')) {
+        if ($('sidebar').classList.contains('open')) { closeNavigation(); $('open-menu').focus(); }
+        else if (!$('browser-panel').hidden) { hideBrowserPanel(); $('open-browser').focus(); }
+    }
+    if (event.key === 'Tab' && mobileNavigation.matches && $('sidebar').classList.contains('open')) {
+        const nodes = [...$('sidebar').querySelectorAll('button:not(:disabled),a[href],summary')].filter(node => node.getClientRects().length);
+        const first = nodes[0], last = nodes.at(-1);
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    }
+});
 
 updateAvailability();
 
