@@ -8,6 +8,7 @@ import shutil
 import sys
 import tempfile
 import threading
+import time
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / "src"), str(ROOT)]
@@ -16,6 +17,98 @@ from localauthor.config import Settings
 from localauthor.foundation.service import FoundationService
 from localauthor.server import create_server
 from tests.test_foundation import DummyText, DummyImage, register_fixture
+
+
+def check_business_tools(page, report, project, other, reports):
+    """Real browser plus actual arithmetic API; model conversation remains a double."""
+    from playwright.sync_api import expect
+    page.locator('#business-tools summary').click()
+    def fill(values):
+        for field, value in values.items():
+            page.locator(f'#business-{field}').fill(str(value))
+    fill({'impressions': 12500, 'clicks': 250, 'leads': 50,
+          'new_clients': 5, 'spend_cents': '1250,00'})
+    page.locator('#business-form button').click()
+    result = page.locator('#business-result')
+    expect(result).to_contain_text('Custo por lead (R$): 25.00')
+    expect(result).to_contain_text('Custo de mídia por cliente (R$): 250.00')
+    page.locator('#business-use').click()
+    assert '"spend_cents":125000' in page.locator('#prompt').input_value()
+    assert page.locator('#messages article').count() == 0
+    fill({'spend_cents': '0,29'})
+    expect(page.locator('#business-use')).to_be_hidden()
+    page.locator('#business-form button').click()
+    expect(result).to_contain_text('Custo por lead (R$): 0.01')
+    page.locator('#business-use').click()
+    assert '"spend_cents":29' in page.locator('#prompt').input_value()
+    fill({'spend_cents': '1,234'})
+    page.locator('#business-form button').click()
+    expect(result).to_contain_text('inválido')
+    expect(page.locator('#business-use')).to_be_hidden()
+    fill({'spend_cents': '1', 'leads': 251})
+    page.locator('#business-form button').click()
+    expect(result).to_contain_text('Ordem')
+    report['flows'].append('business campaign: real CPL/media-per-client arithmetic, cent precision, invalid format/order, no automatic generation')
+    page.locator('#business-kind').select_option('funnel')
+    fill({'registrations': 200, 'started': 50, 'completed': 20})
+    page.locator('#business-form button').click()
+    expect(result).to_contain_text('Conclusão/cadastros (%): 10.00')
+    expect(result).to_contain_text('Total sem concluir: 180')
+    fill({'registrations': 0, 'started': 0, 'completed': 0})
+    page.locator('#business-form button').click()
+    expect(result).to_contain_text('Conclusão/cadastros (%): indisponível')
+    report['flows'].append('business funnel: denominators, abandoned stages, zero is unknown')
+    page.locator('#business-kind').select_option('cash')
+    fill({'opening_cents': '8800', 'incoming_cents': '3200', 'outgoing_cents': '4700'})
+    page.locator('#business-form button').click()
+    expect(result).to_contain_text('Saldo de caixa (R$): 7300.00')
+    expect(result).to_contain_text('não lucro')
+    page.screenshot(path=str(reports / 'business-metrics-desktop.png'), full_page=True)
+    fill({'opening_cents': '0', 'incoming_cents': '0,01', 'outgoing_cents': '1,01'})
+    page.locator('#business-form button').click()
+    expect(result).to_contain_text('Saldo de caixa (R$): -1.00')
+    page.set_viewport_size({'width': 390, 'height': 844})
+    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+    page.screenshot(path=str(reports / 'business-metrics-mobile.png'), full_page=True)
+    page.set_viewport_size({'width': 1440, 'height': 1000})
+    report['flows'].append('business cash: negative balance, cash not profit, desktop/mobile layout')
+    # A stale response must not restore numbers after a field edit or project switch.
+    def delayed(route):
+        time.sleep(.3)
+        route.fulfill(status=200, content_type='application/json', body=json.dumps({
+            'kind': 'cash', 'metrics': {'balance_brl': '99999.00'},
+            'notice': '<img src=x onerror=window.PWNED=1>'}))
+    page.route('**/api/foundation/business-metrics', delayed)
+    page.evaluate("""() => setTimeout(() => {
+      document.getElementById('business-incoming_cents').value = '2';
+      document.getElementById('business-incoming_cents').dispatchEvent(new Event('input', {bubbles:true}));
+    }, 50)""")
+    page.locator('#business-form button').click()
+    expect(page.locator('#business-form button')).to_be_enabled()
+    expect(result).to_be_empty()
+    expect(page.locator('#business-use')).to_be_hidden()
+    page.evaluate("""other => setTimeout(() => {
+      document.getElementById('project').value = other;
+      document.getElementById('project').dispatchEvent(new Event('change', {bubbles:true}));
+    }, 50)""", other)
+    page.locator('#business-form button').click()
+    expect(page.locator('#project')).to_have_value(other)
+    expect(page.locator('#business-form button')).to_be_enabled()
+    expect(result).to_be_empty()
+    expect(page.locator('#business-use')).to_be_hidden()
+    page.locator('#project').select_option(project)
+    page.locator('#business-kind').select_option('cash')
+    fill({'opening_cents': '0', 'incoming_cents': '1', 'outgoing_cents': '0'})
+    page.locator('#business-form button').click()
+    expect(result).to_contain_text('<img src=x')
+    assert page.evaluate('window.PWNED') is None
+    assert page.locator('#business-result img').count() == 0
+    page.unroute('**/api/foundation/business-metrics', delayed)
+    page.locator('#project').select_option(other)
+    expect(result).to_be_empty()
+    page.locator('#project').select_option(project)
+    assert page.locator('#business-form input').first.input_value() == ''
+    report['flows'].append('business result: stale edit/project response discarded, project cleanup, inert malicious text')
 
 
 def main(browser_channel=None):
@@ -77,6 +170,7 @@ def main(browser_channel=None):
                     page.locator("#marketing-form button").click()
                     expect(page.locator("#marketing-result")).to_contain_text("Maior CTR: B")
                     report["flows"].append("deterministic campaign rates, invalid counts rejected, draft only, stale results discarded")
+                    check_business_tools(page, report, item['id'], second['id'], reports)
                     page.locator("#prompt").fill("Explique estoque")
                     page.locator("#send").click()
                     expect(page.locator("#messages article")).to_have_count(2, timeout=15000)
@@ -121,6 +215,8 @@ def main(browser_channel=None):
                     page.locator("#logout").click()
                     expect(page.locator("#login")).to_be_visible()
                     assert page.locator("#messages").inner_text() == ""
+                    assert page.locator('#business-result').inner_text() == ''
+                    assert page.locator('#business-form input').first.input_value() == ''
                     report["flows"].append("mobile layout and logout cleanup")
                     page.goto(f"http://127.0.0.1:{server.server_port}/")
                     page.locator("#local-token").fill(settings.token)

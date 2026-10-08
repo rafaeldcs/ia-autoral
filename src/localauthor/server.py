@@ -18,6 +18,7 @@ from .util import read_json, write_json, sha256
 MAX_BODY = 2_500_000
 STATIC = {"/": "chat.html", "/advanced": "index.html", "/app.js": "app.js", "/styles.css": "styles.css", "/chat.js": "chat.js", "/chat.css": "chat.css",
           "/foundation": "foundation.html", "/foundation.js": "foundation.js", "/foundation.css": "foundation.css",
+          "/business-tools.js": "business-tools.js",
           "/marketing": "marketing.html", "/marketing.js": "marketing.js", "/marketing.css": "marketing.css"}
 
 
@@ -188,6 +189,14 @@ def make_handler(app: Application, ui_path: Path):
                     if path.endswith('research'):app.marketing.validate_sources(body['plan'])
                     if path.endswith('plan'):app.marketing.validate_sources(body['candidates'])
                     return {'job':app.jobs.submit('marketing-'+path.rsplit('/',1)[-1],body)}
+                if path == "/api/foundation/business-metrics":
+                    if set(body) != {"project_id", "payload"}:
+                        raise PolicyError("Envie somente projeto e dados do cálculo.")
+                    if not isinstance(body["project_id"], str) or not body["project_id"].strip() or len(body["project_id"]) > 128:
+                        raise PolicyError("Projeto inválido.")
+                    app.store.project(body["project_id"])
+                    from .foundation.business_metrics import analyze_business_metrics
+                    return analyze_business_metrics(body["payload"])
                 if path == "/api/foundation/marketing-metrics":
                     app.store.project(body["project_id"])
                     from .foundation.marketing import compare_campaigns

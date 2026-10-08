@@ -13,7 +13,7 @@
   }
   function setBusy(value) {
     busy = value;
-    for (const id of ['send', 'project', 'conversation', 'mode', 'new-conversation', 'marketing-use']) $(id).disabled = value;
+    for (const id of ['send', 'project', 'conversation', 'mode', 'new-conversation', 'marketing-use', 'business-use']) $(id).disabled = value;
     for (const id of ['image-size', 'image-steps', 'image-seed']) $(id).disabled = value;
     $('cancel').hidden = !value; $('cancel').disabled = false;
   }
@@ -197,5 +197,15 @@
     const proposal = 'Proponha próximos experimentos a partir destes cálculos locais sobre dados fornecidos, sem afirmar que houve publicação ou gasto real:\n' + JSON.stringify(marketingReport);
     if (proposal.length > 8000) { say('Análise excede o orçamento do pedido.'); return; }
     $('mode').value = 'text'; $('mode').dispatchEvent(new Event('change')); $('prompt').value = proposal; $('prompt').focus();
+  });
+  installBusinessTools({
+    api, getProject: () => $('project').value,
+    isConnected: () => Boolean(token), isBusy: () => busy,
+    useReport: report => {
+      const proposal = 'Interprete estes cálculos locais sobre dados informados. Preserve as contas, unidades e limites. Não afirme gasto, publicação, receita causal ou treinamento: '+JSON.stringify(report);
+      if (proposal.length > 8000) { say('Análise excede o orçamento do pedido.'); return; }
+      $('mode').value = 'text'; $('mode').dispatchEvent(new Event('change'));
+      $('prompt').value = proposal; $('prompt').focus();
+    }
   });
 })();

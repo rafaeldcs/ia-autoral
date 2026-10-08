@@ -477,6 +477,42 @@ class FoundationHttpTests(WorkspaceCase):
         self.assertEqual(self.app.chat.foundation._cache,{})
         self.assertEqual(self.app.jobs.list(),[])
 
+    def test_business_metrics_auth_project_and_exact_envelope(self):
+        from tests.test_business_metrics import CAMPAIGN
+        body = {"project_id": self.project["id"], "payload": CAMPAIGN}
+        self.assertEqual(self.request("/api/foundation/business-metrics", body, authenticated=False)[0], 401)
+        self.assertEqual(self.request("/api/foundation/business-metrics", {**body, "project_id": "unknown"})[0], 404)
+        self.assertEqual(self.request("/api/foundation/business-metrics", {**body, "publish": True})[0], 400)
+        self.assertEqual(self.request("/api/foundation/business-metrics", {"project_id": self.project["id"]})[0], 400)
+
+        for project in (None, True, False, 1, [], {}, "", " ", "x" * 129, " " * 128 + "x"):
+            with self.subTest(project=project):
+                self.assertEqual(self.request("/api/foundation/business-metrics",
+                    {**body, "project_id": project})[0], 400)
+
+    def test_business_metrics_all_kinds_without_inference_jobs_or_writes(self):
+        from tests.test_business_metrics import CAMPAIGN, FUNNEL, CASH
+        before = self.app.chat.foundation.status()
+        for case in (CAMPAIGN, FUNNEL, CASH):
+            status, result = self.request("/api/foundation/business-metrics",
+                                         {"project_id": self.project["id"], "payload": case})
+            self.assertEqual(status, 200)
+            self.assertEqual(result["kind"], case["kind"])
+            self.assertIs(result["published"], False)
+            self.assertIs(result["weights_trained"], False)
+        self.assertEqual(self.app.chat.foundation.status(), before)
+        self.assertEqual(self.app.chat.foundation._cache, {})
+        self.assertEqual(self.app.jobs.list(), [])
+
+    def test_business_metrics_bad_values_are_http400_not_http500(self):
+        from tests.test_business_metrics import CAMPAIGN
+        for value in ([], {}, True, "campaign", {**CAMPAIGN, "kind": []},
+                      {**CAMPAIGN, "data": {**CAMPAIGN["data"], "clicks": True}},
+                      {**CAMPAIGN, "data": {**CAMPAIGN["data"], "leads": 251}}):
+            with self.subTest(value=value):
+                self.assertEqual(self.request("/api/foundation/business-metrics",
+                    {"project_id": self.project["id"], "payload": value})[0], 400)
+
     def test_chat_runs_through_persistent_job(self):
         conversation = self.app.chat.create(self.project["id"], "HTTP")
         status, data = self.request("/api/chat", {"project_id": self.project["id"],

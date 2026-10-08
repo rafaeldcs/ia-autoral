@@ -1,11 +1,12 @@
 """GGUF lab control contracts using explicit doubles; not model qualification."""
+import io
 from pathlib import Path
 import threading
 import unittest
 from unittest.mock import patch, Mock
 
 from localauthor.errors import PolicyError
-from localauthor.foundation.gguf_lab import GgufLabRuntime, completion, valid_profile, valid_decoding, verify_gpu_offload, private_diagnostic
+from localauthor.foundation.gguf_lab import GgufLabRuntime, completion, valid_profile, valid_decoding, verify_gpu_offload, private_diagnostic, diagnostic_line_allowed
 
 
 class GgufLabTests(unittest.TestCase):
@@ -15,6 +16,33 @@ class GgufLabTests(unittest.TestCase):
         self.assertNotIn(key.encode(),safe)
         self.assertIn(b"offloaded 37/37",safe)
         with self.assertRaises(PolicyError):private_diagnostic(b"x"*1000001,key)
+    def test_startup_keeps_gpu_proof_and_post_startup_discards_redundant_debug_only(self):
+        debug = b"0.03.150.000 D load_tensors: CUDA0 offloaded 33/33 layers to GPU\n"
+        idle = b"0.04.000.001 I srv update_slots: all slots are idle\n"
+        self.assertTrue(diagnostic_line_allowed(debug, False))
+        self.assertTrue(diagnostic_line_allowed(idle, False))
+        self.assertFalse(diagnostic_line_allowed(debug, True))
+        self.assertFalse(diagnostic_line_allowed(idle, True))
+
+    def test_post_startup_keeps_warnings_errors_information_and_unknown_formats(self):
+        for line in (b"0.04.000.001 W all slots are idle but unhealthy\n",
+                     b"0.04.000.001 E all slots are idle due to error\n",
+                     b"0.04.000.001 I request completed\n",
+                     b"unknown format CUDA0 offloaded 33/33 layers\n",
+                     b"unclassified diagnostic fragment\n"):
+            with self.subTest(line=line):
+                self.assertTrue(diagnostic_line_allowed(line, True))
+
+    def test_repeated_close_with_suppressed_diagnostics_is_idempotent(self):
+        runtime = object.__new__(GgufLabRuntime)
+        runtime.process = None; runtime.reader = None
+        runtime.log = io.BytesIO(); runtime.key_dir = Mock()
+        runtime.suppressed_diagnostic_lines = 7
+        runtime.close()
+        self.assertTrue(runtime.log.closed)
+        runtime.close()  # A failed request and its enclosing worker may both close.
+        self.assertTrue(runtime.log.closed)
+
     def test_device_visibility_and_partial_offload_do_not_prove_gpu_inference(self):
         for log in ("CUDA0: RTX2060", "CUDA0: RTX2060 offloaded 2/37 layers to GPU", "offloaded 37/37 layers to GPU", "CUDA0 offloaded 0/0 layers to GPU"):
             with self.subTest(log=log), self.assertRaises(PolicyError): verify_gpu_offload(log)

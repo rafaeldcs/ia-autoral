@@ -26,6 +26,19 @@ def private_diagnostic(raw, key):
     return raw.replace(key.encode("ascii"), b"[private-api-key]")
 
 
+def diagnostic_line_allowed(raw: bytes, after_startup: bool) -> bool:
+    if not after_startup:
+        return True
+    match = re.match(rb"^\d+(?:\.\d+)*\s+([DIWE])\s", raw)
+    if not match:
+        return True
+    severity = match.group(1)
+    if severity == b'D':
+        return False
+    if severity == b'I' and b'all slots are idle' in raw:
+        return False
+    return True
+
 def verify_gpu_offload(log_text):
     """A visible device is insufficient: every requested model layer must load."""
     matches = re.findall(r"offloaded (\d+)/(\d+) layers to GPU", log_text)
@@ -85,6 +98,8 @@ class GgufLabRuntime:
         self.log = self.log_path.open("xb")
         self.compute = {"device": "CPU", "offloaded_layers": 0}
         self.reader = None
+        self._diagnostics_ready = False
+        self.suppressed_diagnostic_lines = 0
         self.key = secrets.token_hex(32)
         key_file = Path(self.key_dir.name) / "api.key"
         key_file.write_text(self.key, encoding="ascii"); key_file.chmod(0o600)
@@ -112,6 +127,9 @@ class GgufLabRuntime:
                     except PolicyError:
                         self.process.terminate()
                         safe = b"Diagnostic exceeded budget; owned process stopped.\n"
+                    if not diagnostic_line_allowed(safe, self._diagnostics_ready):
+                        self.suppressed_diagnostic_lines += 1
+                        continue
                     if written + len(safe) > MAX_DIAGNOSTIC_BYTES:
                         self.process.terminate()
                         self.log.write(b"Total diagnostic budget reached; owned process stopped.\n"); self.log.flush()
@@ -130,6 +148,7 @@ class GgufLabRuntime:
                 except (OSError, PolicyError): time.sleep(0.2)
             else: raise PolicyError("GGUF não carregou dentro de 120 segundos.")
             if gpu: self.compute = verify_gpu_offload(self.log_path.read_text(encoding="utf-8", errors="replace"))
+            self._diagnostics_ready = True
         except Exception:
             self.close(); raise
 
@@ -198,5 +217,7 @@ class GgufLabRuntime:
             self.reader.join(timeout=5)
         if self.process is not None and self.process.stdout is not None:
             self.process.stdout.close()
+        if self.suppressed_diagnostic_lines and not self.log.closed:
+            self.log.write((f"Suppressed redundant diagnostic lines: {self.suppressed_diagnostic_lines}\n").encode("ascii"))
         self.log.close()
         self.key_dir.cleanup()
