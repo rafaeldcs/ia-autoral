@@ -92,7 +92,7 @@ sealed class SetupForm : Form {
  bool installed;
  readonly CheckBox startWithWindows=new(){Text="Abrir LocalAuthor ao entrar no Windows",AutoSize=true,Checked=WindowsStartup.Preferred};
  readonly Button install=new(){Text="Instalar LocalAuthor",AutoSize=true,Height=44};
- readonly Label message=new(){AutoSize=true,MaximumSize=new Size(500,0),Text="Instalação para este usuário do Windows.\n\nO aplicativo acessa a IA do seu servidor pela rede local.\n.NET está incluído. WebView2 será instalado se necessário, sem download.\n\nDepois, importe o arquivo de conexão criado no servidor.\nNenhuma chave de acesso está incluída neste instalador."};
+ readonly Label message=new(){AutoSize=true,MaximumSize=new Size(500,0),Text="Instalação para este usuário do Windows.\n\nO aplicativo acessa a IA do seu servidor pela rede local.\n.NET e WebView2 estão incluídos.\n\nNeste computador servidor, a conexão é automática. Para um computador novo da rede, use a cópia privada do instalador vinculada ao servidor.\nUma conexão existente será preservada."};
  public SetupForm() {
   if(Installer.HasConnection)message.Text="Instalação para este usuário do Windows.\n\nEste instalador já está conectado ao seu servidor LocalAuthor.\n.NET e WebView2 estão incluídos.\n\nAo abrir o aplicativo, a conexão será automática.\nUse esta cópia privada apenas no computador autorizado.";
   Text="Instalar LocalAuthor";ClientSize=new Size(560,400);StartPosition=FormStartPosition.CenterScreen;Font=new Font("Segoe UI",11);FormBorderStyle=FormBorderStyle.FixedDialog;MaximizeBox=false;

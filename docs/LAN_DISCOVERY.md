@@ -1,6 +1,6 @@
 # Descoberta automática do servidor
 
-## Uso na própria máquina servidor (cliente 0.3.5)
+## Uso na própria máquina servidor (cliente 0.3.7)
 
 Ao abrir pelo atalho ou pela inicialização do Windows, o cliente reconhece o servidor instalado no perfil Windows atual. Se ainda não houver conexão, cadastra um dispositivo local e guarda a credencial com DPAPI, sem pedir que o usuário crie ou importe um arquivo. Se a conexão já existir, preserva sua identidade e permissões. Uma conexão salva para outro servidor continua sendo respeitada; acesso revogado ou credencial corrompida não gera outra credencial silenciosamente.
 
@@ -16,7 +16,9 @@ O cliente atualizado tenta primeiro o endereço salvo. Se ele não responder, en
 
 A consulta contém a identidade pública do certificado e um identificador aleatório da tentativa. Nenhuma chave de acesso é transmitida por UDP. Antes de enviar a autorização por HTTPS, o cliente verifica o certificado exato e sua validade. Respostas de outra identidade, identificadores de tentativa incorretos e certificados diferentes são rejeitados. Uma chave revogada continua revogada após descoberta.
 
-O cliente verifica a conexão a cada 15 segundos e reage à mudança de endereço de rede. Ao encontrar o servidor, salva o novo endereço para o usuário Windows. Durante a reconexão, tenta preservar o texto ainda não enviado no chat e a seleção de projeto e conversa, se continuarem disponíveis. Isso não substitui salvar alterações em outras telas.
+O cliente verifica a conexão a cada 15 segundos e inicia uma verificação assim que recebe a mudança de endereço de rede, serializando tentativas para evitar reconexões concorrentes. Ao encontrar o servidor, salva o novo endereço para o usuário Windows e verifica as atualizações. Uma página que falhou ao carregar também é reconectada automaticamente, mesmo que a saúde da API esteja acessível. Durante a reconexão, tenta preservar o texto ainda não enviado no chat e a seleção de projeto e conversa, se continuarem disponíveis. Isso não substitui salvar alterações em outras telas.
+
+Não há barra permanente de conexão na janela. O IP e as ações manuais ficam em **Ferramentas → Este computador**. A descoberta funciona em segundo plano independentemente desse menu. Um cliente novo deve receber o instalador privado conectado; um anúncio UDP sozinho nunca concede autorização para acessar projetos.
 
 ## Preparação
 

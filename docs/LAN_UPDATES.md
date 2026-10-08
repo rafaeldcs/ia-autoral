@@ -1,8 +1,12 @@
 # Atualização automática do cliente Windows
 
-## Interface reorganizada — cliente 0.3.6
+## Aplicativo sem barra de conexão — cliente 0.3.7
 
-As ações do aplicativo agora ficam no botão **Conexão e atualizações**: conectar, reconectar, esquecer e publicar continuam disponíveis. O status permanece visível. O chat usa uma única lateral para projetos e conversas; exercícios e áreas secundárias ficam em **Ferramentas**. Detalhes e verificações: [organização da interface](LAYOUT_LOCALAUTHOR.md).
+O chat ocupa toda a área do aplicativo, sem a barra nativa superior de conexão. Abra **Ferramentas e configurações → Este computador → Conexão e atualizações deste aplicativo** para consultar o IP, reconectar, trocar o vínculo ou publicar uma versão. Nas outras áreas existe **Configurações do aplicativo**; `Ctrl + ,` também abre esse menu. A barra de título e os controles de janela do Windows permanecem disponíveis.
+
+A conexão e a atualização não dependem de abrir esse menu. O cliente usa o endereço salvo e procura o servidor pareado por UDP quando o IP falha, verifica a cada 15 segundos e reage à mudança de rede. Após recuperar a conexão, verifica também as atualizações. Um aviso temporário aparece durante o download/reinício ou quando uma reconexão falha; ele não é uma barra permanente. Aparência e seleção de modo não são formulários pendentes; rascunhos e formulários editados continuam bloqueando o reinício.
+
+Para uma **instalação nova em outro computador**, use o instalador privado conectado: ele inclui o vínculo autorizado, portanto não pede arquivo nem exige digitar o IP. O instalador público genérico não concede acesso a um servidor desconhecido. Instalações já pareadas preservam sua conexão e recebem o cliente publicado automaticamente. A descoberta não atravessa a internet nem redes com isolamento entre clientes. Detalhes: [descoberta na rede](LAN_DISCOVERY.md).
 
 ## Instalador único e senha de publicação — 0.3.2
 

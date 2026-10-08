@@ -84,6 +84,12 @@ with tempfile.TemporaryDirectory(prefix="LocalAuthor local startup ") as tempora
         native.parent.mkdir(exist_ok=True)
         run(CLIENT, "--startup", "--smoke-local-server", local, home, native)
         check("Cold startup with no imported file opens authenticated native chat", json.loads(native.read_text())["desktopLogin"])
+        shell = json.loads(native.read_text())
+        check("Native header is absent from the connected workspace", shell["nativeHeaderAbsent"])
+        check("Local administration lives inside Tools", shell["desktopSettingsInTools"])
+        check("Bridge rejects foreign origins and commands that mutate data", shell["bridgeRestricted"])
+        check("Malformed and unsupported WebView messages are ignored", shell["bridgeIgnoresInvalidMessages"])
+        check("Tools opens the native connection and update menu", shell["desktopSettingsMenuOpened"])
         devices_file = lan / "devices.json"
         devices = json.loads(devices_file.read_text())
         check("One local device enrolled with least privilege", len(devices) == 1 and devices[0]["Role"] == "client")

@@ -1,6 +1,8 @@
 # LocalAuthor — instalar, ensinar e atualizar na rede local
 
-Guia da versão 0.3.5 · Windows x64 · atualizado em 29/09/2026.
+Guia da versão 0.3.7 · Windows x64 · atualizado em 08/10/2026.
+
+O aplicativo não exibe mais uma barra de conexão acima do chat. O IP e as ações manuais ficam em **Ferramentas e configurações → Este computador**. Descoberta, reconexão e atualizações continuam automáticas em computadores pareados; os avisos de atualização aparecem apenas quando necessários. Em uma instalação nova na rede, use o instalador privado conectado, que já inclui o vínculo autorizado. Não há etapa de selecionar arquivo de conexão.
 
 ## 1. Como sua instalação funciona
 

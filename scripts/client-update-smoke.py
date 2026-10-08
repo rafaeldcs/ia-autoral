@@ -92,7 +92,7 @@ with tempfile.TemporaryDirectory(prefix='localauthor-update-check-') as temp:
                 stream.write(bytes([original ^ 255]))
         (releases / 'current.json').write_text(json.dumps(manifest))
         return digest
-    def attempt(name, expected_success=True, source=pair, automatic=False):
+    def attempt(name, expected_success=True, source=pair, automatic=False, extra_args=()):
         folder = base / name
         folder.mkdir()
         executable = folder / 'LocalAuthor.Client.exe'
@@ -100,7 +100,7 @@ with tempfile.TemporaryDirectory(prefix='localauthor-update-check-') as temp:
         sentinel = folder / 'connection-preserved.txt'
         sentinel.write_text('configuration untouched')
         report = folder / 'result.json'
-        parent = subprocess.run([str(executable), '--auto-update-smoke' if automatic else '--update-smoke', str(source), str(report)], creationflags=FLAGS, timeout=90)
+        parent = subprocess.run([str(executable), '--auto-update-smoke' if automatic else '--update-smoke', str(source), str(report), *extra_args], creationflags=FLAGS, timeout=90)
         if expected_success:
             check(name + ': old process exits for update', parent.returncode == 0)
             job = Path(Path(str(report) + '.job').read_text())
@@ -143,9 +143,11 @@ with tempfile.TemporaryDirectory(prefix='localauthor-update-check-') as temp:
         draft_report = draft_folder / 'draft.json'
         run(draft_client, '--auto-update-smoke', pair, draft_report, '--draft')
         check('Unsent draft defers automatic restart in real native chat', wait_file(draft_report)['passed'] and sha(draft_client) == sha(old))
-        executable, report, state, job = attempt('successful-update', automatic=True)
+        executable, report, state, job = attempt('successful-update', automatic=True, extra_args=('--appearance',))
         check('Updater confirms new process startup', state.get('state') == 'completed')
         check('New native application reopens authenticated chat', wait_file(report)['desktopLogin'])
+        check('New native application has no connection header', wait_file(report)['nativeHeaderAbsent'])
+        check('Changing saved appearance does not block automatic update', state.get('state') == 'completed' and sha(executable) == sha(new))
         check('Installed binary equals published version', sha(executable) == sha(new))
         check('Old executable remains recoverable', any(sha(p) == sha(old) for p in executable.parent.glob('*.previous')))
         check('Adjacent configuration remains untouched', (executable.parent / 'connection-preserved.txt').read_text() == 'configuration untouched')
