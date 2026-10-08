@@ -1,0 +1,29 @@
+[
+  {
+    "family": "Outfit",
+    "source": "https://raw.githubusercontent.com/google/fonts/5e8a3ba899557829a76cfdac30fa512bda91d7ca/ofl/outfit/Outfit%5Bwght%5D.ttf",
+    "license": "https://raw.githubusercontent.com/google/fonts/5e8a3ba899557829a76cfdac30fa512bda91d7ca/ofl/outfit/OFL.txt",
+    "sha256": "fc7287273e66929776e2ba54f144fe699080bec29f61bf649d70d871468aeade",
+    "revision": "5e8a3ba899557829a76cfdac30fa512bda91d7ca"
+  },
+  {
+    "family": "Jakarta",
+    "source": "https://raw.githubusercontent.com/google/fonts/5e8a3ba899557829a76cfdac30fa512bda91d7ca/ofl/plusjakartasans/PlusJakartaSans%5Bwght%5D.ttf",
+    "license": "https://raw.githubusercontent.com/google/fonts/5e8a3ba899557829a76cfdac30fa512bda91d7ca/ofl/plusjakartasans/OFL.txt",
+    "sha256": "89b3fb38aa0d275d7a731d0d817a4f1622b316b4d7fbdedcf02ee9099ff68bc8",
+    "revision": "5e8a3ba899557829a76cfdac30fa512bda91d7ca"
+  },
+  {
+    "asset": "logo original ShopAir",
+    "source": "https://shopair.com.br/icon.png",
+    "sha256": "847b6a66cdf8b4c194205c772290ab0bc2a5c79e94614e4033dbe82e68f72abb",
+    "matches_code_asset": true
+  },
+  {
+    "palette_source": "src/components/public/BrandSystem.jsx",
+    "typography_source": "src/index.css",
+    "logo_component": "src/components/brand/ShopAirMark.jsx",
+    "application_revision": "160ebeb4b06956f0e553332def3ad2b48e220e83",
+    "verification": "Official public logo equals application PNG byte-for-byte; current public site captured by LocalAuthor own browser."
+  }
+]

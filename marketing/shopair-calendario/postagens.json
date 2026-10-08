@@ -1,0 +1,839 @@
+{
+  "reviewed": true,
+  "consultation_date": "07-08/10/2026",
+  "market": [
+    {
+      "name": "Nuvemshop | ponto de entrada",
+      "observation": "A página separa necessidades de quem começa e de quem já vende por outros canais, oferecendo entradas claras para conhecer a plataforma.",
+      "application": "Abrir com a situação do lojista; apresentar a ShopAir por catálogo e rotina, sem alegar superioridade ou exclusividade."
+    },
+    {
+      "name": "Loja Integrada | começo orientado",
+      "observation": "A comunicação mostra a construção da loja, identidade própria e orientação para iniciar.",
+      "application": "Usar um checklist de apresentação do produto e convidar à prévia, sem copiar a estética ou histórias de clientes."
+    },
+    {
+      "name": "Anota AI | operação de restaurante",
+      "observation": "A página de cardápio organiza a mensagem ao redor de pedidos e rotina do restaurante.",
+      "application": "Dedicar uma semana ao gestor de restaurante; tornar entrega e retirada compreensíveis com exemplos cotidianos."
+    },
+    {
+      "name": "Saipos | dor e demonstração",
+      "observation": "A página liga estoque, financeiro e operação a perguntas de gestão e oferece demonstração.",
+      "application": "Mostrar perguntas que o dono faz no cotidiano e associar somente aos recursos anunciados da ShopAir, sem importar funcionalidades da Saipos."
+    }
+  ],
+  "sources": [
+    {
+      "id": "F01",
+      "label": "ShopAir | produto e escopo",
+      "url": "https://shopair.com.br/",
+      "note": "Site público consultado; recursos anunciados, não homologação de cada fluxo."
+    },
+    {
+      "id": "F02",
+      "label": "ShopAir | prévia pública",
+      "url": "https://shopair.com.br/demonstracao",
+      "note": "Material ilustrativo. Sem cadastro, compra ou dados de cliente real nesta pesquisa."
+    },
+    {
+      "id": "F03",
+      "label": "Nuvemshop",
+      "url": "https://www.nuvemshop.com.br/",
+      "note": "Benchmark de segmentação e entrada comercial; não transferir resultados à ShopAir."
+    },
+    {
+      "id": "F04",
+      "label": "Loja Integrada",
+      "url": "https://lojaintegrada.com.br/",
+      "note": "Benchmark de início orientado; sem cópia de campanha."
+    },
+    {
+      "id": "F05",
+      "label": "Anota AI | cardápio",
+      "url": "https://anota.ai/home/funcionalidade/cardapio-digital/",
+      "note": "Benchmark de comunicação para restaurante."
+    },
+    {
+      "id": "F06",
+      "label": "Saipos | restaurante",
+      "url": "https://saipos.com/sistema/restaurante",
+      "note": "Benchmark de problemas de gestão e demonstração."
+    },
+    {
+      "id": "F07",
+      "label": "Sebrae | Pesquisa Serviço 2025",
+      "url": "https://agenciasebrae.com.br/cultura-empreendedora/whatsapp-e-o-principal-meio-de-comunicacao-para-80-dos-negocios-de-servico/",
+      "note": "Publicado 17/10/2025; >1.300 pequenos negócios de serviço; não representa automaticamente os seguidores da ShopAir."
+    },
+    {
+      "id": "F08",
+      "label": "Meta | Best Practices Instagram",
+      "url": "https://about.fb.com/news/2024/10/best-practices-education-hub-creators-instagram/",
+      "note": "Publicado 01/10/2024; orientações e dados específicos da conta, não horário universal."
+    },
+    {
+      "id": "F09",
+      "label": "TikTok | Creative best practices",
+      "url": "https://ads.tiktok.com/resources/help/article/creative-best-practices?lang=en",
+      "note": "Atualizado junho/2025; vertical, gancho inicial, corpo e chamada. Não prova conversão da campanha."
+    },
+    {
+      "id": "F10",
+      "label": "W3C | WCAG 2.2",
+      "url": "https://www.w3.org/TR/WCAG22/",
+      "note": "Referência de contraste para texto; cálculo não certifica todo o produto."
+    }
+  ],
+  "scope": [
+    [
+      "Varejo e restaurante",
+      "Site apresenta loja online, catálogo de produtos/variações e operação de restaurante com cardápio, preparo e entrega ou retirada. A comunicação desta campanha não promete velocidade ou resultado comercial."
+    ],
+    [
+      "Gestão essencial",
+      "Produtos, clientes, fornecedores, vendas, estoque, caixa e relatórios compõem o escopo essencial anunciado."
+    ],
+    [
+      "ERP Plus: adicional opcional",
+      "Compras, armazéns, financeiro gerencial e integrações são apresentados como expansão. Não colocar esse escopo como automaticamente incluso na base."
+    ],
+    [
+      "Não incluídos",
+      "Emissão fiscal, contabilidade oficial e folha não estão incluídas no escopo informado. Não anunciar esses recursos como parte da ShopAir."
+    ],
+    [
+      "Integrações: condições a conferir",
+      "O site anuncia integrações, incluindo WhatsApp. Isso não prova disponibilidade automática em toda conta, plano ou ambiente. As peças evitam afirmar que um bot responde sozinho ou que todos os serviços estão ativos."
+    ]
+  ],
+  "stories": [
+    {
+      "week": 1,
+      "day": "quarta",
+      "text": "Seu catálogo já mostra as variações de cada produto?",
+      "interaction": "Enquete: “Sim” / “Preciso organizar”."
+    },
+    {
+      "week": 1,
+      "day": "sexta",
+      "text": "O que você quer ver na prévia de uma loja online?",
+      "interaction": "Caixa: “Catálogo, variações ou rotina?”."
+    },
+    {
+      "week": 2,
+      "day": "quarta",
+      "text": "No seu restaurante, o cliente pede mais entrega ou retirada?",
+      "interaction": "Enquete: “Entrega” / “Retirada”."
+    },
+    {
+      "week": 2,
+      "day": "sexta",
+      "text": "Qual informação não pode faltar no seu cardápio?",
+      "interaction": "Caixa de respostas; não solicitar dados pessoais."
+    },
+    {
+      "week": 3,
+      "day": "quarta",
+      "text": "Hoje, o que exige mais atenção: estoque ou caixa?",
+      "interaction": "Enquete com as duas opções."
+    },
+    {
+      "week": 3,
+      "day": "sexta",
+      "text": "Você sabe quais recursos são essenciais e quais são adicionais?",
+      "interaction": "Remeter à peça P09; link do site somente se recurso disponível."
+    },
+    {
+      "week": 4,
+      "day": "quarta",
+      "text": "Antes de publicar: foto, descrição e opções conferidas?",
+      "interaction": "Checklist educativo; revisão feita pelo responsável."
+    },
+    {
+      "week": 4,
+      "day": "sexta",
+      "text": "Sua operação é loja, restaurante ou as duas?",
+      "interaction": "Três opções na interação disponível; convite ao site da ShopAir."
+    }
+  ],
+  "responses": [
+    {
+      "question": "“Quanto custa?”",
+      "reply": "Os planos e condições vigentes estão no site da ShopAir. Você administra uma loja ou restaurante? Podemos orientar a consulta conforme sua necessidade, sem antecipar preço ou condição não confirmada."
+    },
+    {
+      "question": "“Tem nota fiscal?”",
+      "reply": "A emissão fiscal não está incluída no escopo informado. Qual necessidade você precisa atender? Vamos confirmar as opções com a equipe, sem prometer um recurso que não foi verificado."
+    },
+    {
+      "question": "“Tudo está incluído?”",
+      "reply": "A gestão essencial e o ERP Plus têm escopos diferentes; o ERP Plus é opcional. Conte qual parte da operação quer organizar para conferirmos o que atende sua necessidade."
+    },
+    {
+      "question": "“O WhatsApp responde sozinho?”",
+      "reply": "O site apresenta integração com WhatsApp, mas esta campanha não confirma atendimento automático. Vamos verificar o recurso e as condições com a equipe antes de orientar seu uso."
+    },
+    {
+      "question": "“Quero conhecer.”",
+      "reply": "Conheça a ShopAir em shopair.com.br. Se quiser acompanhamento, diga qual tipo de negócio administra e qual rotina deseja organizar. Informe um meio de contato somente se autorizar o retorno."
+    }
+  ],
+  "measurement": [
+    [
+      "Antes de começar",
+      "Responsável de marketing registra por canal: período, peça, alcance, reproduções, salvamentos, cliques reportados e fonte. Comercial registra contato, tipo de operação, necessidade e consentimento. Não preencher dado ausente com zero."
+    ],
+    [
+      "Indicadores que não se confundem",
+      "Salvamentos / alcance mede relação com conteúdo. Conclusões / reproduções mede vídeo conforme definição do canal. Contatos qualificados / contatos avaliados mede adequação comercial. Sempre informar período, numerador, denominador e método; denominador zero = indisponível."
+    ],
+    [
+      "Origem e links",
+      "Facebook pode usar UTM por peça: utm_source=facebook, utm_medium=organic_social, utm_campaign=shopair_rotina_4s, utm_content=Pxx. Instagram usa bio compartilhada com utm_content=bio; não atribuir cada visita a um post sem evidência adicional. Parâmetros não comprovam analytics ativos."
+    ],
+    [
+      "Um experimento de mensagem",
+      "Comparar no futuro duas aberturas do P02, alterando só o gancho, com mesmo canal, público, formato, destino e janela. Definir antes amostra viável e métrica; orgânico em dias diferentes envolve confundidores. Sem volume suficiente, resultado inconclusivo, sem proclamar vencedor."
+    ],
+    [
+      "Revisão semanal e decisão",
+      "Registrar hipótese, evidência, dificuldade comercial e mudança proposta. Se a peça gera dúvida de escopo, corrigir antes de ampliar alcance. Se não há dados suficientes, continuar coletando ou reformular a hipótese; curtidas isoladas não provam venda. Avaliar novos testes sem garantir melhoria."
+    ]
+  ],
+  "operations": [
+    [
+      "Definir início e destino",
+      "Escolher data da Semana 1 e ajustar calendário real. Conferir site, bio e meio de contato utilizáveis. Verificar que a equipe atende o destino; não inventar perfil ou telefone."
+    ],
+    [
+      "Aprovar escopo e arte",
+      "Responsável pelo produto confere recursos, módulo, limites e página vigente. Marketing revisa ortografia, logo, contraste, margem e direitos de fotos, voz e música. As prévias tipográficas do PDF são conceitos; vídeos exigem gravação."
+    ],
+    [
+      "Programar nas contas",
+      "Somente após autorização da empresa, usar ferramenta oficial/conector disponível. Conferir conta, canal, horário, prévia e confirmação do agendamento. PDF e calendário não equivalem a post agendado. Esta entrega não acionou redes sociais nem gastou verba."
+    ],
+    [
+      "Acompanhar e responder",
+      "Marketing confere publicação e comentários; comercial acolhe o interessado com consentimento. Produto esclarece dúvidas de recurso. Revisão semanal une essas informações para melhorar a próxima semana."
+    ],
+    [
+      "Proveniência e limites",
+      "Respostas e prompts originais ficam privados; materiais publicados aqui são propostas revisadas e editáveis. Modelo e revisão de pesos, controles e quantidade de revisões aparecem no registro de entrega. Conteúdo para consulta não autoriza treino; nenhuma promoção de autonomia foi feita."
+    ]
+  ],
+  "contrast": {
+    "white_blue": 5.636175347469205,
+    "white_magenta": 3.9147129878352054
+  },
+  "strategy": {
+    "posicionamento": "Vitrine online e gestão para duas rotinas: lojas e restaurantes. Uma mensagem prática, ligada ao que o dono precisa organizar."
+  },
+  "posts": [
+    {
+      "headline": "Organize sua rotina com ShopAir",
+      "legenda_instagram": "Cansado de misturar vendas, estoque e clientes no papel? Tenha um catálogo online e gerencie tudo em um só lugar. Conheça a ShopAir pelo link da bio.",
+      "legenda_facebook": "Como manter o controle de produtos, vendas e caixa sem bagunça? Tenha uma vitrine online e organize sua gestão diária. Conheça a ShopAir: https://shopair.com.br/.",
+      "cta_arte": "Conheça a ShopAir",
+      "porque": "A escolha prioriza a organização da rotina do dono, que busca integrar catálogo e gestão de estoque sem complicação.",
+      "slides": [
+        {
+          "titulo": "Vitrine e gestão unidas",
+          "apoio": "Controle produtos, clientes e vendas com facilidade."
+        }
+      ],
+      "alt_text": "Arte estática com logo ShopAir, fundo claro, faixa azul-roxo-rosa e textos: Vitrine e gestão unidas.",
+      "id": "P01",
+      "format": "estatico",
+      "format_label": "Arte estática",
+      "theme": "Loja online e rotina organizada",
+      "audience": "lojistas e restaurantes",
+      "week": 1,
+      "day": "terça",
+      "time": "12h",
+      "segment_label": "Lojistas",
+      "intent": "Apresentar vitrine e gestão como proposta do produto.",
+      "art_direction": "Vitrine de um lado e cartões conceituais de catálogo/estoque do outro. Não simular painel real. Logo discreta; título escuro, fundo claro e faixa azul-roxo-rosa.",
+      "metric": "Visitas ao destino atribuíveis ao link identificado; cliques não são contatos.",
+      "source_ids": [
+        "F01"
+      ],
+      "visual_support": "Controle produtos, clientes e vendas com facilidade.",
+      "local_proposal_sha256": "7e499fd479287035b06ff30cbad6e15e78d9abf74027fac4927dc8b9b0e98e91",
+      "editorial_state": "supervised_reviewed_proposal"
+    },
+    {
+      "headline": "Como organizar seu catálogo?",
+      "legenda_instagram": "Um catálogo claro com fotos, descrições e cores ajuda seu cliente a encontrar o que precisa rápido. Evite dúvidas e aumente a confiança na sua loja. Conheça a ShopAir pelo link da bio.",
+      "legenda_facebook": "Um catálogo claro com fotos, descrições e cores ajuda seu cliente a encontrar o que precisa rápido. Evite dúvidas e aumente a confiança na sua loja. Conheça a ShopAir: https://shopair.com.br/.",
+      "cta_arte": "Conheça a ShopAir",
+      "porque": "A escolha foca na necessidade do lojista de organizar informações visuais de forma clara, sem prometer resultados específicos ou dados não comprovados.",
+      "slides": [
+        {
+          "titulo": "Organize suas opções",
+          "apoio": "Liste produtos e variações de forma simples."
+        },
+        {
+          "titulo": "Use fotos reais",
+          "apoio": "Imagens claras ajudam o cliente a identificar o item."
+        },
+        {
+          "titulo": "Descreva com precisão",
+          "apoio": "Textos objetivos evitam dúvidas sobre o produto."
+        },
+        {
+          "titulo": "Conheça a ShopAir",
+          "apoio": "Gerencie seu catálogo com organização e clareza."
+        }
+      ],
+      "alt_text": "Carrossel com logo ShopAir, fundo claro, faixa azul-roxo-rosa e textos: Organize suas opções; Use fotos reais; Descreva com precisão; Conheça a ShopAir.",
+      "id": "P02",
+      "format": "carrossel",
+      "format_label": "Carrossel",
+      "theme": "Catálogo que explica o produto",
+      "audience": "lojista com variações",
+      "week": 1,
+      "day": "quinta",
+      "time": "12h",
+      "segment_label": "Lojistas",
+      "intent": "Ensinar o lojista a apresentar opções de produto.",
+      "art_direction": "Sequência tipográfica com ícones de foto, descrição e variação. Exemplo educativo de produto sem preço ou marca de cliente. Quarto slide encerra com chamada.",
+      "metric": "Salvamentos / contas alcançadas, se ambos estiverem disponíveis no Insights.",
+      "source_ids": [
+        "F01"
+      ],
+      "visual_support": "Liste produtos e variações de forma simples.",
+      "local_proposal_sha256": "57080d19047023deb4639363c56dab8d3707cd24efae20a0521a263312e30894",
+      "editorial_state": "supervised_reviewed_proposal"
+    },
+    {
+      "headline": "Do catálogo à conversa",
+      "legenda_instagram": "Transforme seu catálogo de produtos e variações em uma vitrine online acessível. Veja como organizar sua mercadoria com facilidade. Conheça a ShopAir pelo link da bio.",
+      "legenda_facebook": "Organize seus produtos e variações em uma vitrine online acessível. Veja como gerenciar seu estoque com facilidade. Conheça a ShopAir: https://shopair.com.br/.",
+      "cta_arte": "Conheça a ShopAir",
+      "porque": "O vídeo liga a apresentação do produto a uma pergunta cotidiana do lojista. Mostrar um exemplo ilustrativo permite avaliar a proposta antes de entrar em contato.",
+      "texto_capa": "Do catálogo à vitrine",
+      "cenas": [
+        {
+          "inicio": 0,
+          "fim": 3,
+          "tela": "Apresentador em plano médio, olhando para a câmera; pergunta também em legenda.",
+          "fala": "Seus produtos já aparecem online?"
+        },
+        {
+          "inicio": 3,
+          "fim": 8,
+          "tela": "Captura da prévia pública ilustrativa da ShopAir; sem área autenticada ou dados pessoais.",
+          "fala": "Conheça o catálogo da ShopAir."
+        },
+        {
+          "inicio": 8,
+          "fim": 14,
+          "tela": "Detalhe de produto/prato na prévia, mantendo o rótulo Prévia ilustrativa.",
+          "fala": "Apresente produtos com fotos e descrições."
+        },
+        {
+          "inicio": 14,
+          "fim": 20,
+          "tela": "Apresentador e diagrama editorial de opções; não fingir tela funcional não verificada.",
+          "fala": "Mostre as variações de cada item."
+        },
+        {
+          "inicio": 20,
+          "fim": 26,
+          "tela": "Prévia pública identificada, alternando rosto e produto sem enviar pedidos.",
+          "fala": "Veja um exemplo na prévia ilustrativa."
+        },
+        {
+          "inicio": 26,
+          "fim": 30,
+          "tela": "Apresentador com logo original e indicação visual do destino da chamada.",
+          "fala": "Conheça a ShopAir pelo link da bio."
+        }
+      ],
+      "alt_text": "Vídeo com apresentador, logo ShopAir e prévia ilustrativa de vitrine e produtos. Texto na tela acompanha as falas; última cena indica o destino.",
+      "id": "P03",
+      "format": "video",
+      "format_label": "Vídeo 30s",
+      "theme": "Da vitrine à conversa comercial",
+      "audience": "lojista iniciando online",
+      "week": 1,
+      "day": "sábado",
+      "time": "18h",
+      "segment_label": "Lojistas",
+      "intent": "Levar o decisor à prévia sem fingir operação real.",
+      "art_direction": "Pessoa apresentando catálogo na prévia pública. Alternar rosto e tela autorizada; manter indicação de prévia ilustrativa. Não gravar checkout ou área autenticada.",
+      "metric": "Tempo médio assistido e conclusão de vídeo, conforme definição do canal.",
+      "source_ids": [
+        "F01",
+        "F02",
+        "F09"
+      ],
+      "visual_support": "Do catálogo à vitrine",
+      "local_proposal_sha256": "ef9fa4243e00a7587783c112e633407604f06b33ed3b78119a53090a1a3e4818",
+      "editorial_state": "supervised_reviewed_proposal"
+    },
+    {
+      "headline": "Do cardápio à entrega",
+      "legenda_instagram": "Você já imaginou centralizar o cardápio, o preparo e a entrega ou retirada do seu restaurante em um só lugar? A ShopAir simplifica essa operação para você focar no que importa. Conheça a ShopAir pelo link da bio.",
+      "legenda_facebook": "Centralizar o cardápio, o preparo e a entrega ou retirada do seu restaurante é mais fácil do que parece. A ShopAir organiza essa operação para você. Conheça a ShopAir: https://shopair.com.br/.",
+      "cta_arte": "Conheça a ShopAir",
+      "porque": "A escolha da mensagem parte da hipótese de que o gestor busca resolver a desordem operacional no dia a dia, não do desempenho comprovado de vendas.",
+      "slides": [
+        {
+          "titulo": "Organize seu cardápio",
+          "apoio": "Gerencie suas opções de comida de forma clara e acessível para todos."
+        },
+        {
+          "titulo": "Facilite o preparo",
+          "apoio": "Controle o fluxo da cozinha para agilizar o atendimento aos clientes."
+        },
+        {
+          "titulo": "Controle entrega e retirada",
+          "apoio": "Organize as opções de entrega para clientes e retirada para quem prefere buscar."
+        },
+        {
+          "titulo": "Conheça a ShopAir",
+          "apoio": "Conheça cardápio, preparo e modalidades de atendimento na proposta da ShopAir."
+        }
+      ],
+      "alt_text": "Carrossel com logo ShopAir, fundo claro, faixa azul-roxo-rosa e textos: Organize seu cardápio; Facilite o preparo; Controle entrega e retirada; Conheça a ShopAir.",
+      "id": "P04",
+      "format": "carrossel",
+      "format_label": "Carrossel",
+      "theme": "Cardápio e operação de restaurante",
+      "audience": "gestor de restaurante",
+      "week": 2,
+      "day": "terça",
+      "time": "12h",
+      "segment_label": "Restaurantes",
+      "intent": "Explicar a proposta para quem administra um restaurante.",
+      "art_direction": "Sequência visual: cardápio, preparo, modalidade e chamada. Diagrama editorial, sem representar tela ou fluxo técnico não verificado. Fotos próprias de prato somente se houver direito de uso.",
+      "metric": "Salvamentos / contas alcançadas e dúvidas recebidas sobre restaurante.",
+      "source_ids": [
+        "F01"
+      ],
+      "visual_support": "Gerencie suas opções de comida de forma clara e acessível para todos.",
+      "local_proposal_sha256": "6462a87032126ff204d4427e5d8d5f2d1a615a2202cc4b66aa124f4c5f1ff2f9",
+      "editorial_state": "supervised_reviewed_proposal"
+    },
+    {
+      "headline": "Entrega ou retirada? Deixe claro antes",
+      "legenda_instagram": "Seu cliente sabe se pode receber o pedido ou buscar no restaurante? Entrega e retirada são modalidades diferentes. Informar quais opções você oferece ajuda na escolha antes do pedido. A ShopAir apresenta essas possibilidades para restaurantes. Conheça a ShopAir pelo link da bio.",
+      "legenda_facebook": "Seu cliente sabe se pode receber o pedido ou buscar no restaurante? Entrega e retirada são modalidades diferentes. Informar quais opções você oferece ajuda na escolha antes do pedido. A ShopAir apresenta essas possibilidades para restaurantes. Conheça a ShopAir: https://shopair.com.br/.",
+      "cta_arte": "Conheça a ShopAir",
+      "porque": "A pergunta expõe uma dúvida concreta da rotina do restaurante. A hipótese é que explicar as modalidades interessa ao gestor que precisa comunicar seu atendimento com clareza.",
+      "slides": [
+        {
+          "titulo": "Entrega ou Retirada?",
+          "apoio": "Comunique as opções para evitar confusão no pedido."
+        }
+      ],
+      "alt_text": "Arte estática com logo ShopAir, fundo claro, faixa azul-roxo-rosa e textos: Entrega ou Retirada?.",
+      "id": "P05",
+      "format": "estatico",
+      "format_label": "Arte estática",
+      "theme": "Entrega ou retirada? Clareza antes do pedido",
+      "audience": "restaurante com delivery",
+      "week": 2,
+      "day": "quinta",
+      "time": "12h",
+      "segment_label": "Restaurantes",
+      "intent": "Mostrar importância de informar a modalidade disponível.",
+      "art_direction": "Duas opções visuais: sacola para retirada e percurso simples para entrega. Headline como pergunta ao gestor. Sem taxa, tempo, mapa real ou marca de restaurante.",
+      "metric": "Conversas de interessados; registrar origem declarada e necessidade.",
+      "source_ids": [
+        "F01"
+      ],
+      "visual_support": "Comunique as opções para evitar confusão no pedido.",
+      "local_proposal_sha256": "03d66eadfea63e138ed4c2558a2cc82dc05ab3ffbe1de75dd3670122a74b1c4d",
+      "editorial_state": "supervised_reviewed_proposal"
+    },
+    {
+      "headline": "Como mostrar seu cardápio online",
+      "legenda_instagram": "Você já imaginou levar o cardápio do restaurante para a tela do cliente? Com a prévia ilustrativa da ShopAir, você mostra os pratos de forma clara e organizada. Conheça a ShopAir pelo link da bio.",
+      "legenda_facebook": "Você já imaginou levar o cardápio do restaurante para a tela do cliente? Com a prévia ilustrativa da ShopAir, você mostra os pratos de forma clara e organizada. Conheça a ShopAir: https://shopair.com.br/.",
+      "cta_arte": "Conheça a ShopAir",
+      "porque": "Mostrar pratos na prévia ajuda o gestor a entender a apresentação do cardápio. A hipótese é que produto visível e modalidades claras geram perguntas mais úteis que um slogan genérico.",
+      "texto_capa": "Cardápio online",
+      "cenas": [
+        {
+          "inicio": 0,
+          "fim": 3,
+          "tela": "Apresentador em plano médio, olhando para a câmera; pergunta também em legenda.",
+          "fala": "Seu cardápio está fácil de encontrar?"
+        },
+        {
+          "inicio": 3,
+          "fim": 8,
+          "tela": "Captura da prévia pública ilustrativa da ShopAir; sem área autenticada ou dados pessoais.",
+          "fala": "Veja os pratos numa prévia da ShopAir."
+        },
+        {
+          "inicio": 8,
+          "fim": 14,
+          "tela": "Detalhe de produto/prato na prévia, mantendo o rótulo Prévia ilustrativa.",
+          "fala": "A plataforma apresenta cardápio e operação de restaurante."
+        },
+        {
+          "inicio": 14,
+          "fim": 20,
+          "tela": "Apresentador e diagrama editorial de opções; não fingir tela funcional não verificada.",
+          "fala": "Conheça as possibilidades de entrega e retirada."
+        },
+        {
+          "inicio": 20,
+          "fim": 26,
+          "tela": "Prévia pública identificada, alternando rosto e produto sem enviar pedidos.",
+          "fala": "Explore a prévia ilustrativa para conhecer a proposta."
+        },
+        {
+          "inicio": 26,
+          "fim": 30,
+          "tela": "Apresentador com logo original e indicação visual do destino da chamada.",
+          "fala": "Conheça a ShopAir pelo link da bio."
+        }
+      ],
+      "alt_text": "Vídeo com apresentador, logo ShopAir e prévia ilustrativa de cardápio de restaurante. Texto na tela acompanha as falas; última cena indica o destino.",
+      "id": "P06",
+      "format": "video",
+      "format_label": "Vídeo 30s",
+      "theme": "Como apresentar o cardápio online",
+      "audience": "gestor de restaurante",
+      "week": 2,
+      "day": "sábado",
+      "time": "18h",
+      "segment_label": "Restaurantes",
+      "intent": "Dar um exemplo de apresentação de cardápio.",
+      "art_direction": "Pessoa mostrando a prévia de cardápio no celular. Detalhes do prato e modalidade como exemplos; sem dados pessoais, pedido enviado ou promessa de prazo.",
+      "metric": "Conclusões do vídeo / reproduções, conforme relatório do canal.",
+      "source_ids": [
+        "F01",
+        "F02",
+        "F09"
+      ],
+      "visual_support": "Cardápio online",
+      "local_proposal_sha256": "b4b702b56dbb8f14d4d99c96b7f1faeda2a530cdbd6ff7e232c74edb2016fc43",
+      "editorial_state": "supervised_reviewed_proposal"
+    },
+    {
+      "headline": "O que tenho disponível?",
+      "legenda_instagram": "O que há disponível? O que saiu? Como está o caixa? Essas perguntas fazem parte da rotina de uma loja. A gestão essencial da ShopAir reúne estoque, caixa e relatórios para apoiar esse acompanhamento. Veja se a proposta atende ao seu negócio. Conheça a ShopAir pelo link da bio.",
+      "legenda_facebook": "O que há disponível? O que saiu? Como está o caixa? Essas perguntas fazem parte da rotina de uma loja. A gestão essencial da ShopAir reúne estoque, caixa e relatórios para apoiar esse acompanhamento. Veja se a proposta atende ao seu negócio. Conheça a ShopAir: https://shopair.com.br/.",
+      "cta_arte": "Conheça a ShopAir",
+      "porque": "A peça conecta as perguntas do dono aos fatos anunciados da ferramenta, apresentando o software como solução para dúvidas operacionais sem prometer resultados específicos.",
+      "slides": [
+        {
+          "titulo": "O que há disponível",
+          "apoio": "Verifique itens em estoque sem sair da loja."
+        },
+        {
+          "titulo": "O que saiu",
+          "apoio": "Acompanhe movimentação de produtos no dia."
+        },
+        {
+          "titulo": "Caixa atual",
+          "apoio": "Confira o saldo financeiro do período."
+        },
+        {
+          "titulo": "Conheça a ShopAir",
+          "apoio": "Conheça a ShopAir para gerir estoque, caixa e relatórios."
+        }
+      ],
+      "alt_text": "Carrossel com logo ShopAir, fundo claro, faixa azul-roxo-rosa e textos: O que há disponível; O que saiu; Caixa atual; Conheça a ShopAir.",
+      "id": "P07",
+      "format": "carrossel",
+      "format_label": "Carrossel",
+      "theme": "Estoque e caixa no dia a dia",
+      "audience": "dono de loja",
+      "week": 3,
+      "day": "terça",
+      "time": "12h",
+      "segment_label": "Lojistas",
+      "intent": "Associar recursos essenciais às perguntas da gestão.",
+      "art_direction": "Três cartões editoriais: disponibilidade, saída e caixa. Usar perguntas, não números simulados que pareçam resultado. Encerrar convidando ao produto.",
+      "metric": "Salvamentos e visitas ao perfil; acompanhar sem misturar denominadores.",
+      "source_ids": [
+        "F01"
+      ],
+      "visual_support": "Verifique itens em estoque sem sair da loja.",
+      "local_proposal_sha256": "897ff3b3d054aa1d53cd49ea4b978182d9ea50f1b9db3cca5902b7427710d632",
+      "editorial_state": "supervised_reviewed_proposal"
+    },
+    {
+      "headline": "Atenda melhor com contexto",
+      "legenda_instagram": "Quando o cliente pergunta pelo WhatsApp, você confirma qual produto ele quer e como pretende receber? Conferir essas informações é um cuidado do atendimento. A ShopAir apresenta integração com WhatsApp; conheça a proposta e confirme as condições para o seu negócio. Conheça a ShopAir pelo link da bio.",
+      "legenda_facebook": "Quando o cliente pergunta pelo WhatsApp, você confirma qual produto ele quer e como pretende receber? Conferir essas informações é um cuidado do atendimento. A ShopAir apresenta integração com WhatsApp; conheça a proposta e confirme as condições para o seu negócio. Conheça a ShopAir: https://shopair.com.br/.",
+      "cta_arte": "Conheça a ShopAir",
+      "porque": "Escolher a mensagem certa depende do contexto do pedido. Falar com base nas informações do cliente mostra cuidado e atenção.",
+      "slides": [
+        {
+          "titulo": "Confirme antes de responder",
+          "apoio": "Produto, quantidade e modalidade ajudam a entender a dúvida do cliente."
+        },
+        {
+          "titulo": "Entenda o pedido",
+          "apoio": "Verificar modalidade e informações ajuda a dar a resposta correta e útil."
+        },
+        {
+          "titulo": "Informação útil para a conversa",
+          "apoio": "Quem atende confere os detalhes e responde com clareza."
+        },
+        {
+          "titulo": "Conheça a ShopAir",
+          "apoio": "Gestão de negócios feita com foco em boas práticas de atendimento."
+        }
+      ],
+      "alt_text": "Carrossel com logo ShopAir, fundo claro, faixa azul-roxo-rosa e textos: Confirme antes de responder; Entenda o pedido; Informação útil para a conversa; Conheça a ShopAir.",
+      "id": "P08",
+      "format": "carrossel",
+      "format_label": "Carrossel",
+      "theme": "Conversa com cliente com mais contexto",
+      "audience": "lojista que usa WhatsApp",
+      "week": 3,
+      "day": "quinta",
+      "time": "12h",
+      "segment_label": "Lojistas",
+      "intent": "Ligar atendimento a informação útil, sem bot inventado.",
+      "art_direction": "Balões editoriais com produto e modalidade de atendimento, sem nome/número real. Sinalizar exemplo. Nenhuma imagem deve sugerir resposta automática do sistema.",
+      "metric": "Conversas iniciadas por decisores; não atribuir automaticamente ao post.",
+      "source_ids": [
+        "F01",
+        "F07"
+      ],
+      "visual_support": "Produto, quantidade e modalidade ajudam a entender a dúvida do cliente.",
+      "local_proposal_sha256": "8d5fb1b0d6b5005a39c21062524038605cbafd49dbf55b6e5e352d8a03366396",
+      "editorial_state": "supervised_reviewed_proposal"
+    },
+    {
+      "headline": "Essencial agora, módulos depois",
+      "legenda_instagram": "Gerencie produtos, clientes e vendas com o essencial da ShopAir. Adicione compras, armazéns e financeiro gerencial apenas quando fizer sentido com o ERP Plus opcional. Conheça a ShopAir pelo link da bio.",
+      "legenda_facebook": "Gerencie produtos, clientes e vendas com o essencial da ShopAir. Adicione compras, armazéns e financeiro gerencial apenas quando fizer sentido com o ERP Plus opcional. Conheça a ShopAir: https://shopair.com.br/.",
+      "cta_arte": "Conheça a ShopAir",
+      "porque": "A gestão começa com o essencial para o dia a dia, e módulos adicionais surgem quando o negócio exige mais.",
+      "slides": [
+        {
+          "titulo": "Essencial ou Adicional?",
+          "apoio": "Estoque, caixa e relatórios no essencial. Compras e armazéns no ERP Plus opcional."
+        }
+      ],
+      "alt_text": "Arte estática com logo ShopAir, fundo claro, faixa azul-roxo-rosa e textos: Essencial ou Adicional?.",
+      "id": "P09",
+      "format": "estatico",
+      "format_label": "Arte estática",
+      "theme": "Essencial agora, módulos quando fizer sentido",
+      "audience": "decisor comparando plataforma",
+      "week": 3,
+      "day": "sábado",
+      "time": "18h",
+      "segment_label": "Lojas e restaurantes",
+      "intent": "Esclarecer o que é base e o que é adicional.",
+      "art_direction": "Dois blocos com hierarquia equivalente: gestão essencial e ERP Plus opcional. O adicional deve ter rótulo visível. Não colocar exclusões em rodapé ilegível.",
+      "metric": "Cliques no destino identificado e dúvidas sobre módulos.",
+      "source_ids": [
+        "F01"
+      ],
+      "visual_support": "Estoque, caixa e relatórios no essencial. Compras e armazéns no ERP Plus opcional.",
+      "local_proposal_sha256": "655a0ff707f40ec33a1f195047a6a3498cfabf895aa9564c92609c113b8a9913",
+      "editorial_state": "supervised_reviewed_proposal"
+    },
+    {
+      "headline": "Conferiu sua vitrine antes de publicar?",
+      "legenda_instagram": "Publicar o catálogo sem conferir fotos e descrições pode gerar confusão. O ideal é validar cada item antes de liberar. Use esse cuidado para organizar sua vitrine com tranquilidade. Conheça a ShopAir pelo link da bio.",
+      "legenda_facebook": "Evite erros no catálogo conferindo imagens e textos antes de publicar. Um checklist simples ajuda a organizar suas vendas com mais cuidado. Conheça a ShopAir: https://shopair.com.br/",
+      "cta_arte": "Conheça a ShopAir",
+      "porque": "A mensagem foca na necessidade de organização manual antes da publicação para evitar retrabalho. O interesse do lojista é manter sua vitrine impecável sem depender de funções automáticas.",
+      "slides": [
+        {
+          "titulo": "Confira as fotos primeiro",
+          "apoio": "Garanta que todas as imagens estejam claras e corretas antes de liberar a vitrine."
+        },
+        {
+          "titulo": "Verifique as descrições",
+          "apoio": "Leia os textos com atenção para evitar erros de informação no seu catálogo."
+        },
+        {
+          "titulo": "Cheque as variações",
+          "apoio": "Confirme tamanhos, cores e modelos para que o cliente encontre exatamente o que busca."
+        },
+        {
+          "titulo": "Conheça a ShopAir",
+          "apoio": "Conheça a plataforma e prepare seu catálogo com informação clara."
+        }
+      ],
+      "alt_text": "Carrossel com logo ShopAir, fundo claro, faixa azul-roxo-rosa e textos: Confira as fotos primeiro; Verifique as descrições; Cheque as variações; Conheça a ShopAir.",
+      "id": "P10",
+      "format": "carrossel",
+      "format_label": "Carrossel",
+      "theme": "Checklist antes de publicar sua vitrine",
+      "audience": "lojista preparando catálogo",
+      "week": 4,
+      "day": "terça",
+      "time": "12h",
+      "segment_label": "Lojistas",
+      "intent": "Preparar uma vitrine com informação compreensível.",
+      "art_direction": "Checklist em quatro slides: fotografia, descrição, variações/modalidades e revisão pelo responsável. A ação é humana; não fingir validação automática.",
+      "metric": "Salvamentos / contas alcançadas e dúvidas sobre preparação do catálogo.",
+      "source_ids": [
+        "F01"
+      ],
+      "visual_support": "Garanta que todas as imagens estejam claras e corretas antes de liberar a vitrine.",
+      "local_proposal_sha256": "2ad209b4fb29d98780b9d798be22903cf59b8f750112e32090214f5525647347",
+      "editorial_state": "supervised_reviewed_proposal"
+    },
+    {
+      "headline": "Qual operação combina com seu negócio?",
+      "legenda_instagram": "Seu negócio é loja, restaurante ou híbrido? Descubra como organizar vitrine e cardápio na mesma plataforma. Conheça a ShopAir pelo link da bio.",
+      "legenda_facebook": "Seu negócio é loja, restaurante ou híbrido? Descubra como organizar vitrine e cardápio na mesma plataforma. Conheça a ShopAir: https://shopair.com.br/",
+      "cta_arte": "Conheça a ShopAir",
+      "porque": "A pergunta ajuda o decisor a se reconhecer como público da plataforma. Mostrar vitrine e cardápio explica as possibilidades sem depender de um depoimento ou resultado inventado.",
+      "texto_capa": "Sua operação ideal.",
+      "cenas": [
+        {
+          "inicio": 0,
+          "fim": 3,
+          "tela": "Apresentador em plano médio, olhando para a câmera; pergunta também em legenda.",
+          "fala": "Sua operação é loja ou restaurante?"
+        },
+        {
+          "inicio": 3,
+          "fim": 8,
+          "tela": "Captura da prévia pública ilustrativa da ShopAir; sem área autenticada ou dados pessoais.",
+          "fala": "Na ShopAir, conheça a vitrine de produtos."
+        },
+        {
+          "inicio": 8,
+          "fim": 14,
+          "tela": "Detalhe de produto/prato na prévia, mantendo o rótulo Prévia ilustrativa.",
+          "fala": "Para restaurante, veja a proposta de cardápio."
+        },
+        {
+          "inicio": 14,
+          "fim": 20,
+          "tela": "Apresentador e diagrama editorial de opções; não fingir tela funcional não verificada.",
+          "fala": "Seu negócio reúne as duas rotinas?"
+        },
+        {
+          "inicio": 20,
+          "fim": 26,
+          "tela": "Prévia pública identificada, alternando rosto e produto sem enviar pedidos.",
+          "fala": "A prévia ilustrativa ajuda a conhecer a plataforma."
+        },
+        {
+          "inicio": 26,
+          "fim": 30,
+          "tela": "Apresentador com logo original e indicação visual do destino da chamada.",
+          "fala": "Conheça a ShopAir pelo link da bio."
+        }
+      ],
+      "alt_text": "Vídeo com apresentador, logo ShopAir e prévia ilustrativa de vitrine e produtos. Texto na tela acompanha as falas; última cena indica o destino.",
+      "id": "P11",
+      "format": "video",
+      "format_label": "Vídeo 30s",
+      "theme": "Qual operação combina com seu negócio?",
+      "audience": "varejo, restaurante ou híbrido",
+      "week": 4,
+      "day": "quinta",
+      "time": "12h",
+      "segment_label": "Lojas e restaurantes",
+      "intent": "Apresentar varejo, restaurante e operação híbrida.",
+      "art_direction": "Rosto do apresentador e prévias ilustrativas de vitrine/cardápio. Composição alterna os dois negócios; não criar depoimentos nem personagens que pareçam clientes reais.",
+      "metric": "Visitas ao destino e contatos por tipo de negócio, com origem registrada.",
+      "source_ids": [
+        "F01",
+        "F02",
+        "F09"
+      ],
+      "visual_support": "Sua operação ideal.",
+      "local_proposal_sha256": "46494ee5851fe1f46a4b3bd7dd34c7f33e2cc9e0df82e0416780fdf81f3930a6",
+      "editorial_state": "supervised_reviewed_proposal"
+    },
+    {
+      "headline": "Conheça a ShopAir para sua rotina",
+      "legenda_instagram": "Sua rotina de gestão merece uma ferramenta que se integra ao seu dia a dia. Conheça a ShopAir, plataforma feita para lojas e restaurantes que buscam organizar suas operações com clareza. Descubra como ela pode transformar sua gestão atual. Conheça a ShopAir pelo link da bio.",
+      "legenda_facebook": "Sua rotina de gestão merece uma ferramenta que se integra ao seu dia a dia. Conheça a ShopAir, plataforma feita para lojas e restaurantes que buscam organizar suas operações com clareza. Descubra como ela pode transformar sua gestão atual. Conheça a ShopAir: https://shopair.com.br/.",
+      "cta_arte": "Conheça a ShopAir",
+      "porque": "A escolha foca na necessidade do dono de ter uma ferramenta que se integre naturalmente à rotina do negócio, sem complexidade desnecessária.",
+      "slides": [
+        {
+          "titulo": "Organize sua rotina",
+          "apoio": "Plataforma de vitrine online e gestão para lojas e restaurantes."
+        }
+      ],
+      "alt_text": "Arte estática com logo ShopAir, fundo claro, faixa azul-roxo-rosa e textos: Organize sua rotina.",
+      "id": "P12",
+      "format": "estatico",
+      "format_label": "Arte estática",
+      "theme": "Conheça a ShopAir para a sua rotina",
+      "audience": "decisor pronto para contato",
+      "week": 4,
+      "day": "sábado",
+      "time": "18h",
+      "segment_label": "Lojas e restaurantes",
+      "intent": "Convidar o decisor a conhecer o produto para sua rotina.",
+      "art_direction": "Texto curto com logo original e três perguntas de qualificação no apoio de produção. Não desenhar formulário de cadastro falso na arte. Chamada para conhecer o site.",
+      "metric": "Contatos qualificados deduplicados; não confundir com visitas ou curtidas.",
+      "source_ids": [
+        "F01"
+      ],
+      "visual_support": "Plataforma de vitrine online e gestão para lojas e restaurantes.",
+      "local_proposal_sha256": "80fcfd5b7f426e900f89fbc48d8dd288f70f220d4c4595bc454513330c47a832",
+      "editorial_state": "supervised_reviewed_proposal"
+    }
+  ],
+  "authorship": {
+    "local_author": "Initial drafts, multiple factual/format revisions, real local inference. Final pieces selected and edited under supervision.",
+    "codex": "Market/product research, factual review, editorial corrections, calendar, visual direction and document composition.",
+    "weights_changed": false,
+    "autonomy_qualified": false,
+    "publication_executed": false
+  },
+  "editorial_changes": [
+    {
+      "id": "P03",
+      "editor": "Codex",
+      "reason": "Falas editadas a partir de propostas locais para caber nas cenas, manter fatos e chamar ao destino correto. Refinamentos locais curtos/inventados foram rejeitados."
+    },
+    {
+      "id": "P04",
+      "editor": "Codex",
+      "reason": "Revisão de escopo e chamada: removeu convite ambíguo e a promessa de solução ideal."
+    },
+    {
+      "id": "P05",
+      "editor": "Codex",
+      "reason": "Redação corrigida após refinamento local ainda confundir entrega/retirada; não usar afirmações de rapidez ou erro zero."
+    },
+    {
+      "id": "P06",
+      "editor": "Codex",
+      "reason": "Falas editadas a partir de propostas locais para caber nas cenas, manter fatos e chamar ao destino correto. Refinamentos locais curtos/inventados foram rejeitados."
+    },
+    {
+      "id": "P07",
+      "editor": "Codex",
+      "reason": "Selecionou slides de proposta local anterior; editou legenda para remover metalinguagem e absolutos. Refinamento local que inventou conciliação foi rejeitado."
+    },
+    {
+      "id": "P08",
+      "editor": "Codex",
+      "reason": "Texto distingue boa prática humana de função do sistema; refinamento que garantiu precisão da interação foi rejeitado."
+    },
+    {
+      "id": "P09",
+      "editor": "Codex",
+      "reason": "Resumiu apoio para legibilidade mantendo ERP Plus opcional; adaptação mecânica do destino por canal."
+    },
+    {
+      "id": "P10",
+      "editor": "Codex",
+      "reason": "Polimento da pergunta e chamada final; checklist continua orientação editorial, não função automática."
+    },
+    {
+      "id": "P11",
+      "editor": "Codex",
+      "reason": "Falas editadas a partir de propostas locais para caber nas cenas, manter fatos e chamar ao destino correto. Refinamentos locais curtos/inventados foram rejeitados."
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "editorial_cases_reviewed": 12,
+  "caption_destinations_checked": 24,
+  "carousels": 5,
+  "static_pieces": 4,
+  "videos": 3,
+  "video_durations_seconds": [
+    30,
+    30,
+    30
+  ],
+  "stories": 8,
+  "published": false,
+  "autonomy_qualified": false,
+  "human_editorial_changes": [
+    {
+      "id": "P03",
+      "editor": "Codex",
+      "reason": "Falas editadas a partir de propostas locais para caber nas cenas, manter fatos e chamar ao destino correto. Refinamentos locais curtos/inventados foram rejeitados."
+    },
+    {
+      "id": "P04",
+      "editor": "Codex",
+      "reason": "Revisão de escopo e chamada: removeu convite ambíguo e a promessa de solução ideal."
+    },
+    {
+      "id": "P05",
+      "editor": "Codex",
+      "reason": "Redação corrigida após refinamento local ainda confundir entrega/retirada; não usar afirmações de rapidez ou erro zero."
+    },
+    {
+      "id": "P06",
+      "editor": "Codex",
+      "reason": "Falas editadas a partir de propostas locais para caber nas cenas, manter fatos e chamar ao destino correto. Refinamentos locais curtos/inventados foram rejeitados."
+    },
+    {
+      "id": "P07",
+      "editor": "Codex",
+      "reason": "Selecionou slides de proposta local anterior; editou legenda para remover metalinguagem e absolutos. Refinamento local que inventou conciliação foi rejeitado."
+    },
+    {
+      "id": "P08",
+      "editor": "Codex",
+      "reason": "Texto distingue boa prática humana de função do sistema; refinamento que garantiu precisão da interação foi rejeitado."
+    },
+    {
+      "id": "P09",
+      "editor": "Codex",
+      "reason": "Resumiu apoio para legibilidade mantendo ERP Plus opcional; adaptação mecânica do destino por canal."
+    },
+    {
+      "id": "P10",
+      "editor": "Codex",
+      "reason": "Polimento da pergunta e chamada final; checklist continua orientação editorial, não função automática."
+    },
+    {
+      "id": "P11",
+      "editor": "Codex",
+      "reason": "Falas editadas a partir de propostas locais para caber nas cenas, manter fatos e chamar ao destino correto. Refinamentos locais curtos/inventados foram rejeitados."
+    }
+  ],
+  "pdf": {
+    "pages": 33,
+    "rendered_pages": 33,
+    "extracted_text_characters": 44469,
+    "replacement_characters": 0,
+    "all_post_ids_present": true,
+    "pdf_sha256": "0ea89ee597faf99e44400ad5ec2136312530941525c13e64a6946595dd35954b",
+    "visual_review": "All 33 rendered pages inspected; no clipping/overlap found"
+  },
+  "software_validation": {
+    "tests_run": 537,
+    "passed": 537,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "environment": "isolated Linux sandbox"
+  },
+  "models": [
+    {
+      "id": "Qwen/Qwen3-8B-GGUF",
+      "revision": "7c41481f57cb95916b40956ab2f0b139b296d974"
+    },
+    {
+      "id": "unsloth/Qwen3.5-9B-GGUF",
+      "revision": "3885219b6810b007914f3a7950a8d1b469d598a5"
+    }
+  ],
+  "inference": {
+    "complete_responses": 63,
+    "private_rpc_packaging_errors": 12,
+    "truncated_responses": 0,
+    "production_profile_changed": false,
+    "weights_changed": false
+  },
+  "collected_public_sources": 11
+}
