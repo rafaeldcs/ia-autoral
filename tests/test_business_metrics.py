@@ -140,4 +140,3 @@ class BusinessMetricsTests(unittest.TestCase):
             balance = opening+incoming-outgoing
             self.assertEqual(result['balance_cents'], balance)
             self.assertEqual(result['balance_brl'], expected_ratio(balance, 1))
-

@@ -67,11 +67,11 @@ async function businessSubmit(event,state,els,deps){event.preventDefault();if(!e
 function installBusinessTools(deps) {
   const form = document.getElementById("business-form");
   const els = {
-    form, 
-    kind: document.getElementById("business-kind"), 
-    fields: document.getElementById("business-fields"), 
-    result: document.getElementById("business-result"), 
-    use: document.getElementById("business-use"), 
+    form,
+    kind: document.getElementById("business-kind"),
+    fields: document.getElementById("business-fields"),
+    result: document.getElementById("business-result"),
+    use: document.getElementById("business-use"),
     button: form.querySelector("button")
   };
   const state = { version: 0, report: null, reportProject: null };
@@ -107,4 +107,3 @@ function installBusinessTools(deps) {
 
   rebuild();
 }
-
