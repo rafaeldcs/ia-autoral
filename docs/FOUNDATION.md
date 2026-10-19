@@ -12,6 +12,10 @@ Implementado: registro local com inventário SHA-256, carregamento opcional, con
 
 Em 19/10/2026 houve [uma comparação real de imagem com a ShopAir](reports/SHOPAIR_VISUAL_BENCHMARK_20261019.md), usando o checkpoint SD 1.5 já existente e uma RTX 2060 em sandbox offline. Foram entregues 19 casos. Nas mesmas configurações, os PNGs anterior/atual permaneceram idênticos e a diferença mediana de tempo foi de cerca de 0,7%, sem ganho confiável demonstrado. A qualidade das novas candidatas continua pendente de aprovação; esse teste específico não registra nem ativa automaticamente um modelo no servidor principal.
 
+### Leads por projeto
+
+O módulo `/leads` adiciona contexto comercial com fontes, entrada autenticada, histórico, triagem estruturada pelo modelo textual, rascunhos com textos aprovados e revisão humana. A fila HTTPS opcional recebe eventos de um backend e é consultada pelo servidor local, com recibos e deduplicação. A configuração fica em **Conectar site**; credenciais usam DPAPI no servidor Windows. Consulte [Leads e oportunidades](LEADS_LOCAL.md) para operação, instalação e limites. Esse fluxo não implementa disparos, conectores de entrada Meta/WhatsApp, busca irrestrita de empresas ou treinamento dos pesos.
+
 ### Criação visual e composição de vídeo
 
 O formulário de imagem agora tem proporções vertical (512 × 768), horizontal (768 × 512) e quadrada (512 × 512), além de seed, passos de inferência e um campo opcional de prompt negativo de até 2.000 caracteres. O perfil aplica guidance padrão 7.5. O prompt negativo, as dimensões e o restante do perfil são validados, conferidos contra o limite do tokenizador e registrados na experiência para permitir comparação. O comportamento e o efeito do prompt negativo dependem do modelo e do pipeline escolhidos; os campos não garantem qualidade nem corrigem texto dentro da imagem.

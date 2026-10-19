@@ -101,6 +101,7 @@ class ShutdownTests(unittest.TestCase):
 
     def application(self):
         app = Application.__new__(Application)
+        app.lead_connections = SimpleNamespace(close=Mock())
         app.voice = SimpleNamespace(close=Mock())
         app.jobs = SimpleNamespace(close=Mock(return_value=True))
         app.browser = SimpleNamespace(close=Mock())
@@ -110,12 +111,21 @@ class ShutdownTests(unittest.TestCase):
     def test_application_stops_jobs_before_browser_and_models(self):
         app = self.application()
         sequence = []
+        app.lead_connections.close.side_effect = lambda: sequence.append("lead-sync")
         app.voice.close.side_effect = lambda: sequence.append("voice")
         app.jobs.close.side_effect = lambda: sequence.append("jobs") or True
         app.browser.close.side_effect = lambda: sequence.append("browser")
         app.chat.foundation.unload.side_effect = lambda: sequence.append("models")
         app.close()
-        self.assertEqual(sequence, ["voice", "jobs", "browser", "models"])
+        self.assertEqual(sequence, ["lead-sync", "voice", "jobs", "browser", "models"])
+
+    def test_active_lead_collector_prevents_resource_disposal(self):
+        app = self.application()
+        app.lead_connections.close.side_effect = PolicyError("Lead collector still active")
+        with self.assertRaises(PolicyError):app.close()
+        app.voice.close.assert_not_called()
+        app.jobs.close.assert_not_called()
+        app.chat.foundation.unload.assert_not_called()
 
     def test_active_voice_prevents_other_resources_from_disposal(self):
         app = self.application()

@@ -21,6 +21,7 @@ STATIC = {"/": "chat.html", "/advanced": "index.html", "/app.js": "app.js", "/st
           "/visual-studio.js": "visual-studio.js",
           "/business-tools.js": "business-tools.js",
           "/marketing": "marketing.html", "/marketing.js": "marketing.js", "/marketing.css": "marketing.css",
+          "/leads": "leads.html", "/leads.js": "leads.js", "/leads.css": "leads.css",
           "/workspace.css": "workspace.css", "/appearance.js": "appearance.js"}
 
 
@@ -36,6 +37,13 @@ def make_handler(app: Application, ui_path: Path):
         def log_message(self, format, *args):
             # Do not print bearer tokens, queries, private code, or full request bodies.
             pass
+
+        def handle(self):
+            try:
+                super().handle()
+            except (ConnectionResetError, BrokenPipeError):
+                # A peer can reset an idle keep-alive connection during gateway restart.
+                self.close_connection = True
 
         def _allowed_origin(self):
             port = self.server.server_port
@@ -124,6 +132,9 @@ def make_handler(app: Application, ui_path: Path):
                 self._send(500, {"error": "Erro interno. Consulte o console local; nenhum fallback externo foi utilizado."})
 
         def _route(self, method, path, q, body):
+            if path.startswith('/api/leads'):
+                from .lead_routes import route
+                return route(app, method, path, q, body)
             if method == "GET":
                 if path == '/api/marketing/campaigns': return app.marketing.list(q['project_id'])
                 if path == '/api/marketing/campaign': return app.marketing.get(q['project_id'],q['id'])

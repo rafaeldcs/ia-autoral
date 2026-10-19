@@ -29,6 +29,10 @@ class Application:
         self.marketing = MarketingWorkflow(self.store, self.research, self.chat.foundation, self.browser)
         from .foundation.marketing_channels import MarketingChannels
         self.marketing_channels = MarketingChannels(self.store, self.marketing, settings)
+        from .foundation.leads import LeadService
+        self.leads = LeadService(self.store, self.chat.foundation)
+        from .lead_connections import LeadConnections
+        self.lead_connections = LeadConnections(self.store, self.leads, settings)
         self.tasks = TaskService(self.store, settings)
         self.runner = SandboxRunner(settings, self.tasks)
         self.jobs = JobQueue(self.store, {
@@ -41,6 +45,7 @@ class Application:
             "marketing-generate": lambda p, c: self.marketing.generate(p['project_id'],p['id'],p['digest'],c),
             "marketing-plan": lambda p, c: self.marketing.plan_research(p['project_id'],p['id'],p['digest'],p['candidates'],c),
             "marketing-brand-analysis": lambda p, c: self.marketing.analyze_brand(p['project_id'],p['id'],p['digest'],p['browser_session'],c),
+            "lead-qualify": lambda p, c: self.leads.qualify(p['project_id'],p['id'],p['version'],p['context_digest'],c),
         })
 
     def _train(self, payload, cancel):
@@ -61,8 +66,10 @@ class Application:
 
     def start(self):
         self.jobs.start()
+        self.lead_connections.start()
 
     def close(self):
+        self.lead_connections.close()
         self.voice.close()
         # Stop the producer/consumer before disposing anything it can still use.
         if not self.jobs.close():

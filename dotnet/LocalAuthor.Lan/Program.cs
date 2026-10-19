@@ -79,6 +79,7 @@ try {
  var advertisedOrigin=$"https://{config.Bind}:{config.Port}";
  var staticPaths=new HashSet<string>{"/","/chat.js","/chat.css","/advanced","/app.js","/styles.css",
   "/marketing","/marketing.js","/marketing.css",
+  "/leads","/leads.js","/leads.css",
   "/foundation","/foundation.js","/foundation.css","/business-tools.js",
   "/workspace.css","/appearance.js"};
  app.Run(async context=>{

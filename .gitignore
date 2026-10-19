@@ -12,6 +12,7 @@ obj/
 .idea/
 .env
 .env.*
+*.env
 !settings.example.json
 api.token
 server.lock

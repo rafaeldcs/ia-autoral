@@ -1,0 +1,8 @@
+# Replace this hostname with the approved relay hostname and point its DNS here.
+# Keep this separate from the LAN application, discovery ports and local token.
+leads.exemplo.com {
+    request_body {
+        max_size 16KB
+    }
+    reverse_proxy 127.0.0.1:8848
+}

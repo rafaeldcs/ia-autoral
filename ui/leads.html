@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Leads · LocalAuthor</title>
+    <link rel="stylesheet" href="/leads.css" />
+    <script src="/appearance.js" defer></script>
+    <script src="/leads.js" defer></script>
+  </head>
+  <body>
+    <aside>
+      <a class="brand" href="/">LocalAuthor</a>
+      <nav aria-label="Navegação">
+        <a href="/">Conversas</a><a href="/marketing">Marketing</a
+        ><a href="/leads" aria-current="page">Leads e oportunidades</a>
+      </nav>
+      <label
+        >Aparência<select data-appearance>
+          <option value="system">Sistema</option>
+          <option value="light">Clara</option>
+          <option value="dark">Escura</option>
+        </select></label
+      >
+      <p class="muted">IA local · dados por projeto</p>
+    </aside>
+    <main>
+      <header>
+        <p class="eyebrow">RELACIONAMENTO COM CLIENTES</p>
+        <h1>Cada oportunidade, com contexto.</h1>
+        <p>
+          Entenda a necessidade, confira a análise e acompanhe o próximo passo.
+        </p>
+      </header>
+      <form id="login-form">
+        <label
+          >Token local<input
+            id="token"
+            type="password"
+            autocomplete="off"
+            required /></label
+        ><button>Entrar</button>
+      </form>
+      <p id="message" role="status" aria-live="polite"></p>
+      <div id="workspace" hidden>
+        <label class="project-label"
+          >Projeto<select id="project"></select
+        ></label>
+        <nav class="tabs" aria-label="Área de leads">
+          <button type="button" data-tab="inbox" aria-pressed="true">
+            Interessados</button
+          ><button type="button" data-tab="context" aria-pressed="false">
+            Contexto da empresa</button
+          ><button type="button" data-tab="intake" aria-pressed="false">
+            Adicionar contato</button
+          ><button type="button" data-tab="integration" aria-pressed="false">
+            Conectar site
+          </button>
+        </nav>
+        <section id="inbox">
+          <div id="metrics" class="metrics"></div>
+          <div class="toolbar">
+            <label
+              >Buscar<input
+                id="search"
+                type="search"
+                placeholder="Empresa ou contato" /></label
+            ><label
+              >Etapa<select id="filter">
+                <option value="">Todas</option>
+              </select></label
+            ><button id="refresh" class="secondary">Atualizar</button>
+          </div>
+          <div class="inbox-grid">
+            <div id="lead-list" aria-label="Interessados"></div>
+            <article id="detail">
+              <h2>Seu funil começa aqui</h2>
+              <p>
+                Adicione um interessado ou conecte a entrada do site. Para
+                analisar com a IA, configure primeiro o contexto da empresa.
+              </p>
+            </article>
+          </div>
+          <details>
+            <summary>Origem das oportunidades</summary>
+            <div id="campaigns"></div>
+            <p class="muted">
+              Etapas registradas pela equipe. Estes números não confirmam
+              faturamento ou atribuição externa.
+            </p>
+          </details>
+        </section>
+        <section id="context" hidden>
+          <h2>O que sua empresa vende?</h2>
+          <p>
+            A IA usa estes fatos e perguntas neste projeto. Atualize a
+            conferência das fontes a cada 30 dias.
+          </p>
+          <button id="shopair-example" type="button" class="secondary">
+            Preencher exemplo ShopAir
+          </button>
+          <form id="context-form">
+            <div class="grid">
+              <label
+                >Nome da empresa<input
+                  id="brand"
+                  maxlength="120"
+                  required /></label
+              ><label
+                >Público desejado<input id="audience" maxlength="300" required
+              /></label>
+            </div>
+            <label
+              >Apresentação aprovada<textarea
+                id="intro"
+                maxlength="300"
+                required
+                rows="2"
+              ></textarea></label
+            ><label
+              >Convite para o próximo passo<textarea
+                id="handoff"
+                maxlength="200"
+                required
+                rows="2"
+              ></textarea>
+            </label>
+            <label
+              >Fatos do produto — um por linha<textarea
+                id="facts"
+                maxlength="2500"
+                required
+                rows="5"
+                placeholder="O que oferece e o que não faz"
+              ></textarea>
+            </label>
+            <div class="grid">
+              <label
+                >Fonte dos fatos<input
+                  id="fact-url"
+                  type="url"
+                  required
+                  placeholder="https://suaempresa.com.br/" /></label
+              ><label
+                >Conferidos em<input id="fact-date" type="date" required
+              /></label>
+            </div>
+            <label
+              >Perguntas aprovadas — uma por linha<textarea
+                id="questions"
+                maxlength="1400"
+                required
+                rows="4"
+              ></textarea></label
+            ><button>Salvar contexto</button
+            ><span id="context-version" class="muted"></span>
+          </form>
+        </section>
+        <section id="intake" hidden>
+          <h2>Adicionar interessado ou empresa pesquisada</h2>
+          <p>
+            Uma empresa encontrada em pesquisa fica separada de quem pediu
+            atendimento.
+          </p>
+          <form id="intake-form">
+            <div class="grid">
+              <label>Empresa<input id="company" maxlength="160" /></label
+              ><label
+                >Pessoa de contato<input
+                  id="contact-name"
+                  maxlength="120" /></label
+              ><label
+                >E-mail<input id="email" type="email" maxlength="254" /></label
+              ><label
+                >Telefone com país e DDD<input
+                  id="phone"
+                  type="tel"
+                  maxlength="40"
+                  placeholder="+55 11 99999-9999"
+              /></label>
+            </div>
+            <div class="grid">
+              <label
+                >Origem<select id="source">
+                  <option value="manual">Registro pela equipe</option>
+                  <option value="website">
+                    Formulário do site informado pela equipe
+                  </option>
+                  <option value="research">
+                    Empresa encontrada em pesquisa
+                  </option>
+                </select></label
+              ><label
+                >Campanha<input
+                  id="campaign"
+                  maxlength="100"
+                  placeholder="Ex.: demonstração-outubro"
+              /></label>
+            </div>
+            <label
+              >Fonte pública, se for pesquisa<input
+                id="source-url"
+                type="url"
+                placeholder="https://empresa.com.br/" /></label
+            ><label
+              >Mensagem recebida ou observação da pesquisa<textarea
+                id="lead-message"
+                rows="4"
+                maxlength="1600"
+                required
+              ></textarea></label
+            ><label
+              >Preferência registrada<select id="permission">
+                <option value="unknown">Ainda não informada</option>
+                <option value="reply_requested">
+                  Solicitou resposta a este atendimento
+                </option>
+                <option value="marketing_opt_in">
+                  Autorizou contato de marketing
+                </option>
+                <option value="denied">Não quer receber contato</option>
+              </select></label
+            ><label class="check"
+              ><input id="opt-out" type="checkbox" /> Houve pedido explícito
+              para não receber contato</label
+            ><button>Registrar entrada</button>
+          </form>
+        </section>
+        <section id="integration" hidden>
+          <h2>Seu site conectado ao servidor local</h2>
+          <p>
+            O backend do site envia eventos autenticados para uma fila HTTPS.
+            Esta máquina busca os eventos e confirma o recebimento depois de
+            gravá-los. Não é necessário abrir o aplicativo local para a
+            internet.
+          </p>
+          <ol>
+            <li>Configure a fila no servidor do seu site, atrás de HTTPS.</li>
+            <li>
+              Mantenha as chaves de integração no backend, nunca no navegador do
+              visitante.
+            </li>
+            <li>
+              Ative o coletor local para este projeto. Ele pode permanecer
+              buscando eventos.
+            </li>
+          </ol>
+          <p>
+            Meta e WhatsApp precisam de adaptadores oficiais de entrada e
+            configuração de conta. Informar essas origens em um evento não
+            comprova uma conexão real.
+          </p>
+          <p>
+            Leia <strong>docs/LEADS_LOCAL.md</strong> no pacote instalado para
+            comandos, formato e teste da conexão. Nenhuma mensagem é enviada por
+            esta tela.
+          </p>
+          <label>ID deste projeto<input id="project-id" readonly /></label>
+          <form id="relay-form">
+            <h3>Conexão da fila deste projeto</h3>
+            <label
+              >Endereço público da fila<input
+                id="relay-url"
+                type="url"
+                required
+                placeholder="https://leads.suaempresa.com.br/" /></label
+            ><label
+              >Identidade da fila<input
+                id="relay-queue"
+                pattern="[a-f0-9]{32}"
+                minlength="32"
+                maxlength="32"
+                required /></label
+            ><label
+              >Chave de leitura<input
+                id="relay-key"
+                type="password"
+                autocomplete="off"
+                minlength="32"
+                maxlength="1000"
+                required /></label
+            ><label class="check"
+              ><input id="relay-enabled" type="checkbox" checked /> Buscar novos
+              eventos automaticamente com o servidor ligado</label
+            ><button>Salvar conexão no servidor</button
+            ><button id="relay-disable" type="button" class="secondary">
+              Pausar coleta
+            </button>
+            <p id="relay-status" role="status"></p>
+            <p class="muted">
+              A chave fica protegida no usuário Windows do servidor. Atualize
+              esta tela para conferir a última busca. Sem conexão configurada,
+              nenhum serviço externo é consultado.
+            </p>
+          </form>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
