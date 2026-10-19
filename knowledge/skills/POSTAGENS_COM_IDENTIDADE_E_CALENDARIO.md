@@ -22,6 +22,8 @@ Dividir o trabalho em peças pequenas com os fatos necessários a cada uma. Mist
 
 Cada peça precisa de situação cotidiana, benefício ligado a um recurso confirmado, uma ação e destino utilizável. Separar texto público de justificativa interna. Evitar garantias de venda, tempo, segurança ou facilidade sem evidência. Diferenciar módulo base, adicional e recurso não incluído. Não confundir vender a plataforma com vender os produtos dos clientes dela.
 
+Uma foto bonita de objetos não demonstra um catálogo de software. Quando faltar contexto, apresentar um exemplo identificado: nome da loja, produtos com nome e preço, e explicação do que a plataforma permite ao lojista. Conferir os dados na captura renderizada: exemplos dinâmicos podem diferir da leitura textual da página. Identificar marcas, produtos e valores demonstrativos; nunca apresentá-los como cliente real ou mensalidade da plataforma. Se recortes forem reorganizados, declarar que é composição, preservar a captura original e registrar qualquer ampliação; isso não comprova melhoria do modelo de imagem.
+
 Adaptar destino ao canal. URL no texto de imagem não é botão. Link em legenda de Instagram não deve ser tratado como clicável; confirmar/configurar bio ou outro destino suportado. Facebook pode usar URL direta. Não inventar perfil, telefone ou acesso a conta. Roteiros têm intervalos contínuos, duração total e fala compatível com cada cena; abrir com a situação, terminar com a ação.
 
 ## Calendário e medição
@@ -39,5 +41,7 @@ Reprovar afirmações sem fonte, CTA ausente, formato incorreto, roteiro excessi
 Se o modelo repetir no anúncio as promessas que o briefing proíbe, reduzir o contexto à evidência positiva e à tarefa concreta. Ainda assim, conferir a resposta: uma lista de proibições, instrução de contagem ou schema não impede invenção. Medir a fala por palavras e tempo disponível; uma resposta curta também pode deixar o roteiro incompleto. Não confundir entrega com aprovação do conteúdo.
 
 Se a rodada de correção continuar errada, reprovar e registrar a intervenção editorial humana. Não publicar a proposta incorreta nem atribuir ao modelo a correção escrita pelo revisor. Selecionar/editar propostas pode entregar uma campanha supervisionada, mas não homologa a IA como gestora autônoma.
+
+Na revisão por peça, vincular a decisão ao hash do arquivo exato. Preservar a arte aprovada e corrigir somente a que recebeu pedido de ajuste; uma nova arte não herda aprovação da anterior. Reduzir pedidos extensos em correções específicas quando o modelo exceder o espaço ou repetir afirmações sem fonte. Conferir texto final e exportação de decisões: aprovação visual não autoriza publicação nem treinamento. Guardar as tentativas reprovadas e o diálogo de correção no histórico do projeto, sem tratá-los como pesos treinados.
 
 Produzir documento com pesquisa, identidade, calendário, textos completos, slides/roteiros, orientação visual, motivo de cada peça, medição e pendências operacionais. Renderizar e ler todas as páginas. Informar o que foi escrito pela IA, o que foi corrigido/revisado e quem diagramou. Consulta e feedback não significam alteração dos pesos. Não qualificar autonomia geral com base em peças supervisionadas.
