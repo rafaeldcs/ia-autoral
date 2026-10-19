@@ -59,6 +59,9 @@ app.MapMethods("/api/{**path}", ["GET", "POST"], async (HttpContext context, IHt
     }
     using var request = new HttpRequestMessage(new HttpMethod(context.Request.Method), context.Request.Path.ToString() + context.Request.QueryString.ToString());
     request.Headers.Authorization = auth;
+    foreach (var header in new[] { "Cookie", "X-LocalAuthor-Profile" })
+        if (context.Request.Headers.TryGetValue(header, out var value))
+            request.Headers.TryAddWithoutValidation(header, value.ToArray());
     if (HttpMethods.IsPost(context.Request.Method))
     {
         if (!context.Request.HasJsonContentType())
@@ -82,6 +85,8 @@ app.MapMethods("/api/{**path}", ["GET", "POST"], async (HttpContext context, IHt
         using var response = await factory.CreateClient("local-core").SendAsync(request, HttpCompletionOption.ResponseHeadersRead, context.RequestAborted);
         context.Response.StatusCode = (int)response.StatusCode;
         context.Response.ContentType = response.Content.Headers.ContentType?.ToString() ?? "application/json";
+        if (response.Headers.TryGetValues("Set-Cookie", out var cookies))
+            foreach (var cookie in cookies) context.Response.Headers.Append("Set-Cookie", cookie);
         await response.Content.CopyToAsync(context.Response.Body, context.RequestAborted);
     }
     catch (HttpRequestException)

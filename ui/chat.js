@@ -3,6 +3,7 @@ const $ = id => document.getElementById(id);
 const state = { token: '', projects: [], project: null, conversation: null, busy: false, requestBusy: false, jobId: null };
 let voiceChat = null;
 let toastTimer;
+let conversationListVersion=0;
 function el(tag, text, cls) { const node = document.createElement(tag); node.textContent = text; if (cls)
     node.className = cls; return node; }
 function toast(message) { $('notification').textContent = message; $('notification').hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => $('notification').hidden = true, 6000); }
@@ -15,8 +16,15 @@ catch (error) {
     toast(error.message);
 } }; }
 function updateAvailability() {
-    const unavailable = !state.project || state.busy;
-    for (const node of document.querySelectorAll('#new-chat,#show-rules,#compose button,#compose select,#message-input,[data-prompt]')) node.disabled = unavailable;
+    const unavailable = !state.project || state.busy || state.project.access === 'reader';
+    for (const node of document.querySelectorAll('#new-chat,#compose button,#compose select,#message-input,[data-prompt]')) node.disabled = unavailable;
+    $('show-rules').disabled=!state.project||state.busy;
+    $('open-browser').disabled=!state.project||state.busy||state.project.access==='reader';
+    const readOnly=state.project?.access==='reader';
+    for(const id of ['method','wip','done','work-profile'])$(id).disabled=readOnly;
+    $('rules-form').querySelector('button.primary').disabled=readOnly;
+    $('project-sharing').hidden=state.project?.access!=='owner';
+    $('project-access-note').textContent=state.project?.access==='owner'?'Você é o proprietário. Somente você gerencia o compartilhamento.':readOnly?'Projeto compartilhado para consulta. Peça edição ao proprietário para enviar mensagens ou fazer alterações.':'Projeto compartilhado com edição. As pessoas com acesso podem consultar seu histórico e fontes.';
     $('send').disabled = unavailable || !$('message-input').value.trim();
     $('start-project').hidden = Boolean(state.project);
     $('suggestion-help').hidden = !state.project;
@@ -28,19 +36,24 @@ function updateAvailability() {
 function busy(value) { state.requestBusy = value; state.busy = value || Boolean(voiceChat?.active); $('busy').hidden = !value; for (const node of document.querySelectorAll('#studio button,#studio select'))
     node.disabled = state.busy; $('message-input').disabled = state.busy; updateAvailability(); }
 function resetChat() { state.conversation = null; $('messages').replaceChildren(); $('welcome').hidden = false; $('message-input').value = ''; updateInputCount(); updateAvailability(); renderConversations().catch(error => toast(error.message)); $('message-input').focus(); }
-function renderProjects() { const list = $('project-list'); list.replaceChildren(); for (const project of state.projects) {
+function renderProjects() { const list = $('project-list'); list.replaceChildren(); for (const [shared,label] of [[false,'Meus projetos'],[true,'Compartilhados comigo']]) {
+const projects=state.projects.filter(project=>Boolean(project.access&&project.access!=='owner')===shared);
+if(!projects.length)continue;list.append(el('p',label,'project-group'));
+for (const project of projects) {
     const node = el('button', project.name, project.id === state.project?.id ? 'active' : '');
     node.replaceChildren(el('span', project.name, 'nav-label'));
+    if(shared)node.append(el('span',(project.access==='reader'?'Leitura':'Edição')+' · '+project.owner_name,'nav-detail'));
     node.setAttribute('aria-current', project.id === state.project?.id ? 'true' : 'false');
     node.title = project.name;
     node.onclick = handle(() => selectProject(project));
     list.append(node);
-} }
+} } }
 async function renderConversations() { if (!state.project)
-    return; const project = state.project; const rows = await api('/api/conversations?project_id=' + project.id); if (state.project?.id !== project.id)
+    return; const project = state.project,version=++conversationListVersion; const rows = await api('/api/conversations?project_id=' + project.id+'&mine='+($('conversation-filter').value==='mine'?'1':'0')); if (state.project?.id !== project.id||version!==conversationListVersion)
     return; const list = $('conversation-list'); list.replaceChildren(); $('conversation-empty').hidden = rows.length > 0; for (const row of rows) {
     const node = el('button', row.title, row.id === state.conversation?.id ? 'active' : '');
     node.replaceChildren(el('span', row.title, 'nav-label'));
+    if(row.created_by&&row.created_by.user_id!==window.LocalAuthorIdentity?.user?.id)node.append(el('span',row.created_by.name,'nav-detail'));
     node.setAttribute('aria-current', row.id === state.conversation?.id ? 'true' : 'false');
     node.title = row.title;
     node.onclick = handle(async () => { const data = await api('/api/conversation?project_id=' + project.id + '&id=' + row.id); if (state.project?.id === project.id) {
@@ -57,7 +70,8 @@ function renderMessages() { const list = $('messages'); list.replaceChildren(); 
     const box = el('article', '', `message ${message.role}`);
     const names = { project_memory: 'Memória do projeto · preferência registrada', foundation_text: 'LocalAuthor · modelo local com contexto', project_guide: 'Guia do projeto · orientação estruturada', retrieval_only: 'Memória local · trechos recuperados', local_model: 'IA local · geração experimental', investigation_memory: 'Sistema investigado · evidências observadas', browser_session: 'Navegador da IA · sessão de investigação' };
     const code = message.metadata.format === 'code';
-    const label = message.role === 'user' ? 'Você' : message.metadata.qualification === 'scoped' ? 'IA local · correção avaliada em escopo limitado' : names[message.metadata.origin] || 'Assistente';
+    const person=message.metadata.author_id?(message.metadata.author_id===window.LocalAuthorIdentity?.user?.id?'Você':message.metadata.author_name||'Pessoa do projeto'):(window.LocalAuthorIdentity?.user?'Histórico anterior aos perfis':'Você');
+    const label = message.role === 'user' ? person : message.metadata.qualification === 'scoped' ? 'IA local · correção avaliada em escopo limitado' : names[message.metadata.origin] || 'Assistente';
     box.append(el('div', label, 'message-label'), el(code ? 'pre' : 'div', message.content, code ? 'message-content code-content' : 'message-content'));
     const copy = el('button', 'Copiar mensagem', 'copy-message');
     copy.type = 'button';
@@ -103,7 +117,10 @@ $('start-project').onclick = () => $('add-project').click();
 $('add-project').onclick = () => { $('project-dialog').showModal(); $('project-name').focus(); };
 for (const button of document.querySelectorAll('[data-close]'))
     button.onclick = () => $(button.dataset.close).close();
-$('project-create').onsubmit = handle(async () => { const project = await api('/api/projects', { name: $('project-name').value, root: $('project-root').value }); state.projects = await api('/api/projects'); $('project-dialog').close(); $('project-create').reset(); await selectProject(project); toast('Projeto adicionado. Sua pasta foi preservada.'); });
+$('project-existing').onchange=$('project-managed').onchange=()=>{const existing=$('project-existing').checked;$('project-root-field').hidden=!existing;$('project-root').required=existing;};
+$('conversation-filter').onchange=()=>renderConversations().catch(error=>toast(error.message));
+$('project-sharing').onclick=handle(()=>window.LocalAuthorIdentity.openSharing(state.project));
+$('project-create').onsubmit = handle(async () => { const managed=$('project-managed').checked;const project = await api('/api/projects', { name: $('project-name').value,...(managed?{managed:true}:{root:$('project-root').value}) }); state.projects = await api('/api/projects'); $('project-dialog').close(); $('project-create').reset();$('project-managed').onchange(); await selectProject(state.projects.find(p=>p.id===project.id)||project); toast(managed?'Projeto privado criado na sua pasta do servidor.':'Pasta vinculada ao seu projeto privado.'); });
 $('new-chat').onclick = handle(async () => { if (!state.project)
     throw Error('Adicione uma pasta de projeto primeiro.'); closeNavigation(); resetChat(); });
 for (const button of document.querySelectorAll('[data-prompt]'))
@@ -132,7 +149,7 @@ function updateInputCount() {
     input.classList.toggle('code-input', code);
     input.style.height = 'auto';
     input.style.height = Math.min(Math.max(input.scrollHeight, 52), Math.min(220, innerHeight * .28)) + 'px';
-    $('send').disabled = !state.project || state.busy || !value.trim();
+    $('send').disabled = !state.project || state.project.access === 'reader' || state.busy || !value.trim();
 }
 $('message-input').oninput = updateInputCount;
 // Compatibility with installed clients that restore draft format through this ID.
@@ -362,7 +379,7 @@ voiceChat = (() => {
     let source = null, sink = null, timer = null, request = null, abort = null, voice = null, resumeSpeech = null;
     const status = value => { phase = value; $('voice-status').textContent = value; };
     const syncControls = () => {
-        $('voice-start').disabled = !state.project || (state.busy && !active);
+        $('voice-start').disabled = !state.project || state.project.access==='reader' || (state.busy && !active);
         $('voice-start').setAttribute('aria-pressed', String(active));
         $('voice-start').title = active ? 'Encerrar conversa por voz' : 'Conversar por voz';
         $('voice-bar').hidden = !active;

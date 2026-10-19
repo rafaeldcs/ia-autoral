@@ -13,6 +13,8 @@ import sys
 import tempfile
 import threading
 import time
+from playwright.sync_api import sync_playwright
+from ui_profile_fixture import enter_profile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
@@ -22,11 +24,13 @@ from localauthor.server import create_server
 
 checks = []
 FLAGS = subprocess.CREATE_NO_WINDOW
+native_environment = None
 def check(name, result):
     assert result, name
     checks.append(name)
 def run(*args):
-    result = subprocess.run([str(a) for a in args], creationflags=FLAGS, capture_output=True, timeout=90)
+    result = subprocess.run([str(a) for a in args], creationflags=FLAGS, capture_output=True, timeout=90,
+                            env=native_environment if Path(str(args[0])).name=='LocalAuthor.Client.exe' else None)
     if result.returncode:
         raise RuntimeError(result.stderr.decode(errors='replace'))
     return result
@@ -50,6 +54,31 @@ version = ET.parse(ROOT/'dotnet/LocalAuthor.Client/LocalAuthor.Client.csproj').f
 broken = ROOT / 'build/update-failure/LocalAuthor.UpdateFailureFixture.exe'
 with tempfile.TemporaryDirectory(prefix='localauthor-update-check-') as temp:
     base = Path(temp)
+    # Drive the actual onboarding form in isolated native WebViews. No production
+    # auth bypass or test credential is built into the application. Debugging is
+    # enabled only for these disposable subprocesses, bound to loopback.
+    with socket.socket() as sock:
+        sock.bind(('127.0.0.1',0));debug_port=sock.getsockname()[1]
+    native_environment=dict(os.environ,WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=f'--remote-debugging-address=127.0.0.1 --remote-debugging-port={debug_port}')
+    profile_stop=threading.Event();profile_checks=[];profile_errors=[]
+    def drive_profiles():
+        while not profile_stop.is_set():
+            try:
+                # Reconnect after each observation: an update replaces the
+                # WebView process and its CDP target, even on the same port.
+                with sync_playwright() as playwright:
+                    browser=playwright.chromium.connect_over_cdp(f'http://127.0.0.1:{debug_port}',timeout=1000)
+                    for context in browser.contexts:
+                        for page in context.pages:
+                            if page.url!=f'https://127.0.0.1:{port}/':continue
+                            if page.locator('#identity-gate[open]:visible').count():
+                                try:
+                                    enter_profile(page);profile_checks.append('native form login')
+                                except Exception as exc:
+                                    if not page.is_closed():profile_errors.append(type(exc).__name__)
+            except Exception:
+                pass  # Native updater closes/reopens the WebView.
+            profile_stop.wait(.25)
     settings = Settings.load(base / 'backend')
     app = Application(settings)
     app.start()
@@ -100,7 +129,7 @@ with tempfile.TemporaryDirectory(prefix='localauthor-update-check-') as temp:
         sentinel = folder / 'connection-preserved.txt'
         sentinel.write_text('configuration untouched')
         report = folder / 'result.json'
-        parent = subprocess.run([str(executable), '--auto-update-smoke' if automatic else '--update-smoke', str(source), str(report), *extra_args], creationflags=FLAGS, timeout=90)
+        parent = subprocess.run([str(executable), '--auto-update-smoke' if automatic else '--update-smoke', str(source), str(report), *extra_args], creationflags=FLAGS, timeout=90,env=native_environment)
         if expected_success:
             check(name + ': old process exits for update', parent.returncode == 0)
             job = Path(Path(str(report) + '.job').read_text())
@@ -118,6 +147,7 @@ with tempfile.TemporaryDirectory(prefix='localauthor-update-check-') as temp:
         check(name + ': configuration preserved', sentinel.read_text() == 'configuration untouched')
         return executable, report, None, None
     try:
+        profile_thread=threading.Thread(target=drive_profiles,daemon=True);profile_thread.start()
         for _ in range(100):
             try:
                 if request('/api/health')[0] == 200: break
@@ -174,7 +204,10 @@ with tempfile.TemporaryDirectory(prefix='localauthor-update-check-') as temp:
         check('Broken release blocked from repeated automatic installation', blocked.exists())
         run(gateway, 'revoke', '--data', data, '--id', connection['DeviceId'])
         check('Revoked device cannot download updates', request('/api/client-update')[0] == 401)
+        check('Native profile onboarding and login use real forms',len(profile_checks)>=3 and not profile_errors)
     finally:
+        profile_stop.set();profile_thread.join(timeout=5)
+        (ROOT/'reports/client-update-profile-driver.json').write_text(json.dumps({'logins':len(profile_checks),'errors':profile_errors}),encoding='utf-8')
         process.terminate()
         process.wait(timeout=10)
         backend.shutdown()

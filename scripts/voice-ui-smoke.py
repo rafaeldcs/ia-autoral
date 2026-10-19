@@ -1,4 +1,5 @@
 """Actual Chromium microphone pipeline; explicit STT, TTS and LLM test doubles."""
+from ui_profile_fixture import enter_profile, existing_folder, launch_browser
 import json
 import math
 from pathlib import Path
@@ -57,7 +58,7 @@ def main():
         app.start(); worker.start()
         try:
             with sync_playwright() as pw:
-                browser = pw.chromium.launch(headless=True, executable_path=shutil.which('chromium') or None,
+                browser = launch_browser(pw.chromium,headless=True, executable_path=shutil.which('chromium') or None,
                     args=['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream', '--use-file-for-fake-audio-capture=' + str(audio)])
                 context = browser.new_context(viewport={'width': 1440, 'height': 900})
                 page = context.new_page(); page.on('pageerror', lambda error: report['errors'].append(str(error)))
@@ -75,7 +76,7 @@ def main():
                   }});
                 })()""")
                 page.goto(f'http://127.0.0.1:{server.server_port}'); page.locator('#local-token').fill(settings.token)
-                page.locator('#connect-form button').click(); expect(page.locator('#studio')).to_be_visible()
+                page.locator('#connect-form button').click(); enter_profile(page); expect(page.locator('#studio')).to_be_visible()
                 expect(page.locator('#project-heading')).to_have_text(project['name'])
                 page.locator('#voice-start').click(); expect(page.locator('#voice-dialog')).to_be_visible()
                 check('Opening voice explanation never starts microphone', page.evaluate('voiceTest.calls') == 0)

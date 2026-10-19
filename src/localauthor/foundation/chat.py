@@ -89,8 +89,9 @@ class FoundationChatService(ChatService):
                         raise PolicyError("Limite de armazenamento das conversas atingido.")
                     check_cancel(cancel)
                     now = utcnow()
+                    from ..identity_context import message_metadata
                     db.execute("INSERT INTO messages(conversation_id,role,content,metadata,created_at) VALUES(?,'user',?,?,?)",
-                        (conversation_id, message, json.dumps({"format": input_format}), now))
+                        (conversation_id, message, json.dumps(message_metadata(input_format)), now))
                     db.execute("INSERT INTO messages(conversation_id,role,content,metadata,created_at) VALUES(?,'assistant',?,?,?)",
                         (conversation_id, response["content"], metadata, now))
                     db.execute("UPDATE conversations SET updated_at=? WHERE id=?", (now, conversation_id))

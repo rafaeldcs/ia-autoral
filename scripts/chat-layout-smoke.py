@@ -1,4 +1,5 @@
 """Real browser checks of navigation, composer and responsive chat, temporary data only."""
+from ui_profile_fixture import enter_profile, existing_folder, launch_browser
 import json
 import shutil
 import sys
@@ -35,19 +36,21 @@ def main():
         worker.start()
         try:
             with sync_playwright() as pw:
-                browser = pw.chromium.launch(headless=True, executable_path=shutil.which('chromium') or None)
+                browser = launch_browser(pw.chromium,headless=True, executable_path=shutil.which('chromium') or None)
                 page = browser.new_page(viewport={'width': 1440, 'height': 900})
                 page.on('pageerror', lambda error: report['errors'].append(str(error)))
                 url = f'http://127.0.0.1:{server.server_port}'
                 page.goto(url)
                 page.locator('#local-token').fill(settings.token)
                 page.locator('#connect-form button').click()
+                enter_profile(page)
                 expect(page.locator('#studio')).to_be_visible()
                 check('Login clears credential and never stores it', page.locator('#local-token').input_value() == '' and page.evaluate('localStorage.length + sessionStorage.length') == 0)
                 expect(page.locator('#send')).to_be_disabled()
                 expect(page.locator('#new-chat')).to_be_disabled()
                 page.locator('#start-project').click()
                 page.locator('#project-name').fill('Projeto de demonstração')
+                existing_folder(page)
                 page.locator('#project-root').fill(str(project))
                 page.locator('#project-create button.primary').click()
                 expect(page.locator('#project-heading')).to_have_text('Projeto de demonstração')
@@ -62,7 +65,7 @@ def main():
                 for index in range(20):
                     extra = base / f'project-{index}'
                     extra.mkdir()
-                    app.store.add_project(f'Outro projeto {index:02d}', str(extra))
+                    app.store.add_project(f'Outro projeto {index:02d}', str(extra),owner_id=page.evaluate('window.LocalAuthorIdentity.user.id'))
                 page.evaluate("async () => { state.projects = await api('/api/projects'); renderProjects(); }")
                 expect(page.locator('#project-list button')).to_have_count(21)
                 check('Many projects keep conversation navigation visible', page.locator('.conversation-rail').bounding_box()['y'] < 500 and page.locator('.conversation-rail').bounding_box()['y'] + page.locator('.conversation-rail').bounding_box()['height'] <= 900)
@@ -174,6 +177,7 @@ def main():
                 page.goto(url)
                 page.locator('#local-token').fill(settings.token)
                 page.locator('#connect-form button').click()
+                enter_profile(page)
                 expect(page.locator('#studio')).to_be_visible()
                 page.locator('#project-list button').filter(has_text='Projeto de demonstração').click()
                 page.locator('#new-chat').click()

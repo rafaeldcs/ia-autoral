@@ -77,8 +77,9 @@ class ConversationMemoryMixin:
                 if conversation_bytes(db) + size + (len(content.encode("utf-8")) if operation == "remember" and not existing else 0) > min(self.settings.max_store_bytes, 32_000_000):
                     raise PolicyError("Limite de armazenamento das conversas atingido.")
                 self._check_memory_cancel(cancel)
+                from .identity_context import message_metadata
                 source = db.execute("INSERT INTO messages(conversation_id,role,content,metadata,created_at) VALUES(?,'user',?,?,?)",
-                    (conversation_id, message, json.dumps({"format": input_format}), now)).lastrowid
+                    (conversation_id, message, json.dumps(message_metadata(input_format)), now)).lastrowid
                 if operation == "remember" and (not existing or not existing["active"]):
                     db.execute("INSERT INTO conversation_memory VALUES(?,?,?,1,?,NULL,?) "
                         "ON CONFLICT(project_id,content) DO UPDATE SET active=1,source_message_id=excluded.source_message_id,forgotten_message_id=NULL,updated_at=excluded.updated_at",

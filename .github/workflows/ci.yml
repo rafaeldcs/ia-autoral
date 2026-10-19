@@ -71,6 +71,7 @@ jobs:
           node-version: '22'
       - run: node --check ui/foundation.js
       - run: node --check ui/chat.js
+      - run: node --check ui/identity.js
       - run: node --check ui/appearance.js
       - run: node --check ui/business-tools.js
       - run: node --check ui/marketing.js
@@ -84,6 +85,7 @@ jobs:
       - run: python scripts/voice-ui-smoke.py
       - run: python scripts/marketing-ui-smoke.py
       - run: python scripts/leads-ui-smoke.py
+      - run: python scripts/identity-ui-smoke.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -109,6 +111,10 @@ jobs:
             reports/leads-ui-smoke.json
             reports/leads-desktop.png
             reports/leads-mobile.png
+            reports/identity-ui-smoke.json
+            reports/identity-people-desktop.png
+            reports/identity-sharing-desktop.png
+            reports/identity-mobile.png
             reports/work-profile-mobile.png
             reports/business-metrics-desktop.png
             reports/business-metrics-mobile.png

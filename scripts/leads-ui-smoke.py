@@ -1,4 +1,5 @@
 """Real browser + HTTP + persistence; inference fixture is not model qualification."""
+from ui_profile_fixture import enter_profile, existing_folder, launch_browser
 import argparse
 import json
 from pathlib import Path
@@ -38,11 +39,12 @@ def main():
         server = create_server(app, ROOT/'ui', port=0);thread = threading.Thread(target=server.serve_forever, daemon=True);thread.start()
         try:
             with sync_playwright() as p:
-                browser = p.chromium.launch(headless=True, **({'channel':args.browser_channel} if args.browser_channel else {}))
+                browser = launch_browser(p.chromium,headless=True, **({'channel':args.browser_channel} if args.browser_channel else {}))
                 page = browser.new_page(viewport={'width':1440,'height':1000})
                 page.on('pageerror', lambda error:report['errors'].append(str(error)))
                 page.goto(f'http://127.0.0.1:{server.server_port}/leads')
                 page.locator('#token').fill(settings.token);page.locator('#login-form button').click()
+                enter_profile(page)
                 page.locator('#project').select_option(first['id'])
                 page.locator('[data-tab=context]').click();page.locator('#shopair-example').click()
                 page.locator('#context-form button').click();expect(page.locator('#message')).to_contain_text('Contexto salvo')

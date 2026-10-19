@@ -211,6 +211,9 @@ def restore_home(archive_path: Path, destination: Path, *, server_profile: bool 
                         raise PolicyError('Banco restaurado corrompido.')
                     if db.execute('SELECT version FROM schema_version').fetchall() != [(1,)]:
                         raise PolicyError('Versão de banco não suportada.')
+                    if db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='profile_sessions'").fetchone():
+                        db.execute('DELETE FROM profile_sessions')
+                        db.commit()
                 config = read_json(staged / 'settings.json')
                 if not isinstance(config, dict):
                     raise PolicyError('Configuração do backup inválida.')

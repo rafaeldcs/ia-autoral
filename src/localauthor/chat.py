@@ -86,6 +86,9 @@ class ChatService(ConversationMemoryMixin):
             if db.execute("SELECT count(*) FROM conversations WHERE project_id=?", (project_id,)).fetchone()[0] >= 200:
                 raise PolicyError("Limite de 200 conversas neste projeto.")
             db.execute("INSERT INTO conversations VALUES(:id,:project_id,:title,:created_at,:updated_at)", result)
+            from .identity_context import current_actor
+            if current_actor.get():
+                db.execute('INSERT INTO profile_conversations VALUES(?,?)',(result['id'],current_actor.get()))
         return result
 
     def get(self, project_id, conversation_id):
@@ -156,7 +159,8 @@ class ChatService(ConversationMemoryMixin):
                 used = conversation_bytes(db)
                 if used + len((message + response["content"] + metadata).encode()) > min(self.settings.max_store_bytes, 32_000_000):
                     raise PolicyError("Limite de armazenamento das conversas atingido.")
-                db.execute("INSERT INTO messages(conversation_id,role,content,metadata,created_at) VALUES(?, 'user', ?, ?, ?)", (conversation_id, message, json.dumps({"format": input_format}), now))
+                from .identity_context import message_metadata
+                db.execute("INSERT INTO messages(conversation_id,role,content,metadata,created_at) VALUES(?, 'user', ?, ?, ?)", (conversation_id, message, json.dumps(message_metadata(input_format)), now))
                 db.execute("INSERT INTO messages(conversation_id,role,content,metadata,created_at) VALUES(?, 'assistant', ?, ?, ?)", (conversation_id, response["content"], metadata, now))
                 db.execute("UPDATE conversations SET updated_at=? WHERE id=?", (now, conversation_id))
             return self.get(project_id, conversation_id)

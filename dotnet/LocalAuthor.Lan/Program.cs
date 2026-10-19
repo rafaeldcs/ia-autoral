@@ -74,14 +74,14 @@ try {
  var discoveryTask=config.AutoDiscover?LanDiscovery.RespondAsync(config.CertificateSha256,config.Port,config.DiscoveryPort,discoveryCancel.Token):Task.CompletedTask;
  app.Lifetime.ApplicationStopping.Register(()=>discoveryCancel.Cancel());
  _=discoveryTask.ContinueWith(t=>{if(t.IsFaulted){Console.Error.WriteLine("Descoberta indisponível; verifique a porta UDP.");app.Lifetime.StopApplication();}},TaskScheduler.Default);
- using var client=new HttpClient(new HttpClientHandler {AllowAutoRedirect=false,UseProxy=false}) {BaseAddress=new Uri($"http://127.0.0.1:{config.BackendPort}"),Timeout=TimeSpan.FromSeconds(120)};
+ using var client=new HttpClient(new HttpClientHandler {AllowAutoRedirect=false,UseProxy=false,UseCookies=false}) {BaseAddress=new Uri($"http://127.0.0.1:{config.BackendPort}"),Timeout=TimeSpan.FromSeconds(120)};
  using var concurrency=new SemaphoreSlim(4,4);
  var advertisedOrigin=$"https://{config.Bind}:{config.Port}";
  var staticPaths=new HashSet<string>{"/","/chat.js","/chat.css","/advanced","/app.js","/styles.css",
   "/marketing","/marketing.js","/marketing.css",
   "/leads","/leads.js","/leads.css",
   "/foundation","/foundation.js","/foundation.css","/business-tools.js",
-  "/workspace.css","/appearance.js"};
+  "/workspace.css","/appearance.js","/identity.js","/identity.css"};
  app.Run(async context=>{
   context.Response.Headers.CacheControl="no-store";context.Response.Headers.XContentTypeOptions="nosniff";
   async Task Error(int code,string message){context.Response.StatusCode=code;await context.Response.WriteAsJsonAsync(new{error=message});}
@@ -170,6 +170,12 @@ try {
    }
    using var request=new HttpRequestMessage(new HttpMethod(context.Request.Method),path+context.Request.QueryString);
    request.Headers.Authorization=new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer",upstreamToken);
+   // Gateway-owned provenance: never trust client-supplied identity or device headers.
+   var serverDevice=IPAddress.IsLoopback(remote)||remote.Equals(local)||remote.Equals(address);
+   request.Headers.TryAddWithoutValidation("X-LocalAuthor-Gateway",serverDevice?"server":"lan");
+   if(authenticated!=null)request.Headers.TryAddWithoutValidation("X-LocalAuthor-Device",authenticated.Id);
+   if(context.Request.Headers.TryGetValue("Cookie",out var profileCookie))request.Headers.TryAddWithoutValidation("Cookie",profileCookie.ToString());
+   if(context.Request.Headers.TryGetValue("X-LocalAuthor-Profile",out var expectedProfile))request.Headers.TryAddWithoutValidation("X-LocalAuthor-Profile",expectedProfile.ToString());
    if(context.Request.Method=="POST") {
     if(context.Request.ContentLength is null or >2_500_000 || context.Request.ContentLength<=0 || context.Request.ContentType?.Split(';')[0]!="application/json") {await Error(400,"Envie JSON com tamanho válido.");return;}
     using var reader=new StreamReader(context.Request.Body,Encoding.UTF8,false,4096,true);var body=await reader.ReadToEndAsync(context.RequestAborted);
@@ -178,7 +184,7 @@ try {
    }
    using var response=await client.SendAsync(request,HttpCompletionOption.ResponseHeadersRead,context.RequestAborted);
    context.Response.StatusCode=(int)response.StatusCode;
-   foreach(var name in new[]{"Content-Security-Policy","Referrer-Policy","X-Content-Type-Options"})
+   foreach(var name in new[]{"Content-Security-Policy","Referrer-Policy","X-Content-Type-Options","Set-Cookie"})
     if(response.Headers.TryGetValues(name,out var values)) context.Response.Headers[name]=values.ToArray();
    context.Response.ContentType=response.Content.Headers.ContentType?.ToString() ?? "application/json";
    await response.Content.CopyToAsync(context.Response.Body,context.RequestAborted);

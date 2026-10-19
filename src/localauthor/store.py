@@ -71,7 +71,7 @@ class Store:
         with self.connect() as db:
             return [dict(r) for r in db.execute("SELECT * FROM projects ORDER BY created_at DESC")]
 
-    def add_project(self, name: str, root: str) -> dict:
+    def add_project(self, name: str, root: str, *, owner_id: str | None = None) -> dict:
         if not isinstance(name, str) or not name.strip() or len(name) > 120:
             raise PolicyError("Nome do projeto inválido.")
         policy = PathPolicy(Path(root))
@@ -84,7 +84,19 @@ class Store:
         item = dict(id=uuid.uuid4().hex, name=name.strip(), root=str(root_path), created_at=utcnow())
         try:
             with self.connect() as db:
+                db.execute('BEGIN IMMEDIATE')
+                profiles = db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='profile_users'").fetchone()
+                enabled = profiles and db.execute('SELECT 1 FROM profile_users LIMIT 1').fetchone()
+                if enabled:
+                    if not owner_id or not db.execute('SELECT 1 FROM profile_users WHERE id=? AND active=1',(owner_id,)).fetchone():
+                        raise PolicyError('Selecione um perfil ativo para cadastrar o projeto.')
+                    for existing in db.execute('SELECT root FROM projects'):
+                        other=Path(existing['root']).resolve()
+                        if root_path.is_relative_to(other) or other.is_relative_to(root_path):
+                            raise PolicyError('Pasta já vinculada ou sobreposta a outro projeto. Use o compartilhamento.')
                 db.execute("INSERT INTO projects VALUES(:id,:name,:root,:created_at)", item)
+                if enabled:
+                    db.execute('INSERT INTO project_owners VALUES(?,?)',(item['id'],owner_id))
         except sqlite3.IntegrityError as exc:
             raise PolicyError("Essa pasta já está cadastrada.") from exc
         self.audit("project.registered", {"id": item["id"]})

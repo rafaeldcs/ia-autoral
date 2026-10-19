@@ -19,6 +19,8 @@ class Application:
     def __init__(self, settings: Settings):
         self.settings = settings
         self.store = Store(settings.home / "memory.sqlite3", settings.max_store_bytes)
+        from .identity import IdentityService
+        self.identity = IdentityService(self.store, settings.home)
         self.knowledge = KnowledgeService(self.store, settings)
         self.chat = ChatService(self.store, settings, self.knowledge)
         self.voice = VoiceService(settings.home, self.store)
@@ -47,6 +49,19 @@ class Application:
             "marketing-brand-analysis": lambda p, c: self.marketing.analyze_brand(p['project_id'],p['id'],p['digest'],p['browser_session'],c),
             "lead-qualify": lambda p, c: self.leads.qualify(p['project_id'],p['id'],p['version'],p['context_digest'],c),
         })
+        self.jobs.handlers = {kind:self._with_identity(handler) for kind,handler in self.jobs.handlers.items()}
+
+    def _with_identity(self, handler):
+        def run(payload, cancel):
+            from .access import check_queued_job
+            from .identity_context import current_actor, current_author
+            user=check_queued_job(self,payload)
+            actor=current_actor.set(user['id'] if user else None)
+            author=current_author.set(user['name'] if user else None)
+            try:return handler(payload,cancel)
+            finally:
+                current_author.reset(author);current_actor.reset(actor)
+        return run
 
     def _train(self, payload, cancel):
         try:

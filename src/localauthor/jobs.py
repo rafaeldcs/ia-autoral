@@ -32,6 +32,9 @@ class JobQueue:
     def submit(self, kind: str, payload: dict) -> dict:
         if kind not in self.handlers:
             raise PolicyError("Tipo de job não permitido.")
+        from .identity_context import current_actor
+        if current_actor.get() is not None:
+            payload = {**payload, '_actor_id': current_actor.get()}
         raw = json.dumps(payload, ensure_ascii=False)
         if len(raw) > 20_000:
             raise PolicyError("Payload grande demais.")

@@ -20,10 +20,10 @@ try {
     if (-not $backend -or $backend.Name -ne 'python.exe' -or $backend.CommandLine -notmatch '\-m localauthor .* serve(\s|$)' -or
         $backend.CommandLine -notlike ('*'+$config.BackendHome+'*')) { throw 'Backend identity was not verified.' }
     if (-not $supervisor -or $supervisor.CommandLine -notmatch 'Start-Server\.ps1.*-Supervise') { throw 'Supervisor identity was not verified.' }
-    $headers = @{Authorization='Bearer '+(Get-Content -LiteralPath (Join-Path $config.BackendHome 'api.token') -Raw).Trim()}
-    $jobs = Invoke-RestMethod -Uri ('http://127.0.0.1:'+$config.BackendPort+'/api/jobs') -Headers $headers -TimeoutSec 8
-    if (@($jobs | Where-Object { $_.state -in @('running','queued') }).Count -ne 0) { throw 'Finish or cancel queued/running work before maintenance.' }
-    $headers.Clear()
+    # OS-operator maintenance must also work after personal login is enabled.
+    # Read the queue locally without a browser cookie or an HTTP auth exception.
+    & $runtime.Python (Join-Path $PSScriptRoot 'check-maintenance-queue.py') (Join-Path $config.BackendHome 'memory.sqlite3')
+    if ($LASTEXITCODE -ne 0) { throw 'Queue is busy or unavailable; no process stopped.' }
     Add-Type -TypeDefinition @'
 using System;
 using System.Runtime.InteropServices;
@@ -42,9 +42,9 @@ public static class LocalAuthorMaintenanceConsole {
     $count = [LocalAuthorMaintenanceConsole]::GetConsoleProcessList($consoleIds,32)
     if ($count -lt 1 -or $count -gt 32) { throw 'Console inventory unavailable or excessive.' }
     $members = @($consoleIds[0..($count-1)])
+    $record.console_members = $members
     $allowed = @([uint32]$PID,[uint32]$BackendPid,[uint32]$backend.ParentProcessId)
     if (@($members | Where-Object { $_ -notin $allowed }).Count -ne 0 -or [uint32]$BackendPid -notin $members) { throw 'Shared console contains another process; no signal sent.' }
-    $record.console_members = $members
     if ($CheckOnly) { $record.status='check-passed-no-process-stopped' }
     else {
         # Supervisor writes no application DB. Recheck identity before stopping

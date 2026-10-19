@@ -11,7 +11,7 @@ from urllib.parse import urlsplit, parse_qs
 from .application import Application
 from .code_tools import symbols
 from .diagnostics import diagnose
-from .errors import LocalAIError, PolicyError, ConflictError, NotFoundError
+from .errors import LocalAIError, PolicyError, ConflictError, NotFoundError, AuthenticationError, AccessDeniedError, RateLimitError
 from .safety import PathPolicy
 from .util import read_json, write_json, sha256
 
@@ -23,6 +23,7 @@ STATIC = {"/": "chat.html", "/advanced": "index.html", "/app.js": "app.js", "/st
           "/marketing": "marketing.html", "/marketing.js": "marketing.js", "/marketing.css": "marketing.css",
           "/leads": "leads.html", "/leads.js": "leads.js", "/leads.css": "leads.css",
           "/workspace.css": "workspace.css", "/appearance.js": "appearance.js"}
+STATIC.update({"/identity.js":"identity.js", "/identity.css":"identity.css"})
 
 
 def make_handler(app: Application, ui_path: Path):
@@ -41,7 +42,7 @@ def make_handler(app: Application, ui_path: Path):
         def handle(self):
             try:
                 super().handle()
-            except (ConnectionResetError, BrokenPipeError):
+            except (ConnectionResetError, ConnectionAbortedError, BrokenPipeError):
                 # A peer can reset an idle keep-alive connection during gateway restart.
                 self.close_connection = True
 
@@ -74,11 +75,13 @@ def make_handler(app: Application, ui_path: Path):
             self.send_header("Cache-Control", "no-store")
             self.send_header("X-Content-Type-Options", "nosniff")
             self.send_header("Referrer-Policy", "no-referrer")
+            if getattr(self, '_profile_cookie', None):
+                self.send_header('Set-Cookie', self._profile_cookie)
             self.send_header("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
             self.end_headers()
             try:
                 self.wfile.write(raw)
-            except (BrokenPipeError, ConnectionResetError):
+            except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
                 pass
 
         def _body(self):
@@ -103,6 +106,7 @@ def make_handler(app: Application, ui_path: Path):
             return data
 
         def _dispatch(self, method):
+            self._profile_cookie = None
             try:
                 self._allowed_origin()
                 parsed = urlsplit(self.path)
@@ -116,8 +120,41 @@ def make_handler(app: Application, ui_path: Path):
                     return
                 if not self._authenticate(): return
                 body = self._body() if method == "POST" else {}
-                result = self._route(method, path, q, body)
+                from . import identity_http
+                handled,result,self._profile_cookie = identity_http.route(app,method,path,q,body,self.headers)
+                if not handled:
+                    gateway,_=identity_http.transport(self.headers)
+                    user=None
+                    # Native discovery, the supervisor and older installed clients
+                    # probe health before personal login. Expose readiness only;
+                    # project statistics still require a valid personal session.
+                    if method=='GET' and path=='/api/health' and (app.identity.enabled or gateway=='lan'):
+                        if app.identity.current(identity_http.cookie_token(self.headers)) is None:
+                            self._send(200,{'status':'ok','profile_required':True})
+                            return
+                    if app.identity.enabled:
+                        user=identity_http.require_user(app,self.headers)
+                    elif gateway=='lan':
+                        raise AuthenticationError('Configure os perfis primeiro no aplicativo da máquina servidor.')
+                    from .identity_context import current_actor, current_author
+                    actor=current_actor.set(user['id'] if user else None)
+                    author=current_author.set(user['name'] if user else None)
+                    try:
+                        if user:
+                            from .access import ProjectAccess
+                            result=ProjectAccess(app,user).dispatch(method,path,q,body,self._route)
+                        else:result=self._route(method,path,q,body)
+                    finally:
+                        current_author.reset(author);current_actor.reset(actor)
                 self._send(200, result)
+            except AuthenticationError as exc:
+                from .identity_http import session_cookie
+                self._profile_cookie=session_cookie(None,self.headers)
+                self._send(401, {'error':str(exc),'identity_required':True})
+            except AccessDeniedError as exc:
+                self._send(403, {'error':str(exc)})
+            except RateLimitError as exc:
+                self._send(429, {'error':str(exc)})
             except NotFoundError as exc:
                 self._send(404, {"error": str(exc)})
             except ConflictError as exc:
@@ -125,7 +162,7 @@ def make_handler(app: Application, ui_path: Path):
             except (PolicyError, ValueError, KeyError, TypeError, UnicodeError) as exc:
                 self.close_connection = True
                 self._send(400, {"error": str(exc)[:1000]})
-            except (BrokenPipeError, ConnectionResetError, TimeoutError):
+            except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError, TimeoutError):
                 self.close_connection = True
             except Exception:
                 logging.exception("Falha interna do servidor local")

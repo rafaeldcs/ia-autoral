@@ -155,7 +155,7 @@ sealed class ClientForm : Form {
  async Task<bool> SafeToRestart(){
   if(browser?.CoreWebView2==null||connecting)return false;
   // Only restart from an idle chat. Other screens may contain unsaved forms.
-  return await browser.CoreWebView2.ExecuteScriptAsync("Boolean(document.getElementById('studio')&&!document.getElementById('studio').hidden&&typeof state!=='undefined'&&!state.busy&&!document.getElementById('message-input').value&&!window.__localAuthorUpdateDirty)")=="true";
+  return await browser.CoreWebView2.ExecuteScriptAsync("Boolean(document.getElementById('studio')&&!document.getElementById('studio').hidden&&!document.body.classList.contains('identity-locked')&&!document.querySelector('dialog[open]')&&typeof state!=='undefined'&&!state.busy&&!document.getElementById('message-input').value&&!window.__localAuthorUpdateDirty)")=="true";
  }
  async Task CheckForUpdates(){
   if(connection==null||checkingUpdate||connecting||publishing||reportFile!=null||DateTime.UtcNow<nextUpdate)return;
@@ -203,7 +203,7 @@ sealed class ClientForm : Form {
    if(browser!=null)browser.Enabled=false;
    string? draft=null;
    if(browser?.CoreWebView2!=null&&connection?.CertificateSha256==selected.CertificateSha256){
-    draft=await browser.CoreWebView2.ExecuteScriptAsync("(()=>{const input=document.getElementById('message-input');return input&&input.value&&typeof state!=='undefined'?{message:input.value,project:state.project?.id,conversation:state.conversation?.id,format:document.getElementById('input-format').value,mode:document.getElementById('response-mode').value}:null;})()");
+    draft=await browser.CoreWebView2.ExecuteScriptAsync("(()=>{const input=document.getElementById('message-input');return input&&input.value&&typeof state!=='undefined'?{message:input.value,profile:window.LocalAuthorIdentity?.user?.id||null,project:state.project?.id,conversation:state.conversation?.id,format:document.getElementById('input-format').value,mode:document.getElementById('response-mode').value}:null;})()");
     if(draft=="null")draft=null;
    }
    connection=selected;
@@ -220,7 +220,7 @@ sealed class ClientForm : Form {
    await browser.EnsureCoreWebView2Async(environment);
    var web=browser.CoreWebView2;
    web.WebMessageReceived+=(_,e)=>{try{if(DesktopShell.Accepts(e.Source,uri,e.TryGetWebMessageAsString()))ShowSettings();}catch(Exception error) when(error is ArgumentException or InvalidOperationException or System.Runtime.InteropServices.COMException){ /* Ignore non-string messages. */ }};
-   await web.AddScriptToExecuteOnDocumentCreatedAsync("window.__localAuthorUpdateDirty=false;document.addEventListener('input',e=>{if(!e.target.matches('#message-input,#local-token,#response-mode,#input-format,[data-appearance]'))window.__localAuthorUpdateDirty=true;},true);");
+   await web.AddScriptToExecuteOnDocumentCreatedAsync("window.__localAuthorUpdateDirty=false;document.addEventListener('input',e=>{if(!e.target.matches('#message-input,#local-token,#response-mode,#input-format,#identity-name,#identity-username,#identity-password,#identity-confirm,[data-appearance]'))window.__localAuthorUpdateDirty=true;},true);");
    web.Settings.AreDevToolsEnabled=false;web.Settings.AreHostObjectsAllowed=false;web.Settings.IsPasswordAutosaveEnabled=false;web.Settings.IsGeneralAutofillEnabled=false;web.Settings.AreDefaultContextMenusEnabled=true;
    bool SameOrigin(string value) => Uri.TryCreate(value,UriKind.Absolute,out var target)&&target.Scheme==uri.Scheme&&target.Host==uri.Host&&target.Port==uri.Port;
    web.ServerCertificateErrorDetected+=(_,e)=>{
@@ -236,7 +236,7 @@ sealed class ClientForm : Form {
     await web.ExecuteScriptAsync("(()=>{const f=document.getElementById('connect-form')||document.getElementById('login-form');const t=document.getElementById('local-token')||document.getElementById('token');if(f&&t){t.value='dispositivo-pareado';f.requestSubmit();}const logout=document.getElementById('logout');if(logout)logout.hidden=true;})()");
     if(draft!=null){
      // Keep the original project and conversation when restoring an unsent draft.
-     var restore="(async()=>{const draft="+draft+";for(let i=0;i<80;i++){if(typeof state!=='undefined'&&state.project){const project=state.projects.find(p=>p.id===draft.project);if(!project)return;await selectProject(project);if(draft.conversation){try{state.conversation=await api('/api/conversation?project_id='+project.id+'&id='+draft.conversation);renderMessages();await renderConversations();}catch{}}document.getElementById('message-input').value=draft.message;document.getElementById('input-format').value=draft.format;document.getElementById('input-format').dispatchEvent(new Event('change'));document.getElementById('response-mode').value=draft.mode;modeNotice();updateInputCount();return;}await new Promise(r=>setTimeout(r,100));}})()";
+     var restore="(async()=>{const draft="+draft+";for(let i=0;i<80;i++){if(typeof state!=='undefined'&&state.project){const project=state.projects.find(p=>p.id===draft.project);if(!project)return;const profile=window.LocalAuthorIdentity?.user?.id||null;if((draft.profile||null)!==profile&&(draft.profile||!profile||project.owner_id!==profile))return;await selectProject(project);if(draft.conversation){try{state.conversation=await api('/api/conversation?project_id='+project.id+'&id='+draft.conversation);renderMessages();await renderConversations();}catch{}}document.getElementById('message-input').value=draft.message;document.getElementById('input-format').value=draft.format;document.getElementById('input-format').dispatchEvent(new Event('change'));document.getElementById('response-mode').value=draft.mode;modeNotice();updateInputCount();return;}await new Promise(r=>setTimeout(r,100));}})()";
      await web.ExecuteScriptAsync(restore);
     }
    };

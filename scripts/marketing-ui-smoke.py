@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Actual browser/API integration; explicit model/collector doubles, no Meta calls."""
+from ui_profile_fixture import enter_profile, existing_folder, launch_browser
 import json
 from pathlib import Path
 import shutil
@@ -31,11 +32,12 @@ def main():
         thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
         try:
             with sync_playwright() as p:
-                browser=p.chromium.launch(headless=True,executable_path=shutil.which('chromium') or None)
+                browser=launch_browser(p.chromium,headless=True,executable_path=shutil.which('chromium') or None)
                 page=browser.new_page(viewport={'width':1440,'height':1000})
                 page.on('pageerror',lambda e:report['errors'].append(str(e)))
                 page.goto(f'http://127.0.0.1:{server.server_port}/marketing')
                 page.locator('#token').fill(settings.token);page.locator('#login-form button').click()
+                enter_profile(page)
                 expect(page.locator('#workspace')).to_be_visible();page.locator('#project').select_option(first['id'])
                 page.locator('#brand').fill('Marca sintética');page.locator('#destination').fill('https://example.com/contact')
                 page.locator('#brief button').click();expect(page.locator('#brand-section')).to_be_visible()

@@ -4,6 +4,7 @@
   let token = '', busy = false, activeJob = null, renderVersion = 0, selectionVersion = 0;
   const say = text => { $('status').textContent = text; };
   async function api(path, body) {
+    if(window.LocalAuthorIdentity)await window.LocalAuthorIdentity.ensure({Authorization:`Bearer ${token}`});
     const response = await fetch(path, {method: body === undefined ? 'GET' : 'POST',
       headers: {Authorization: `Bearer ${token}`, ...(body === undefined ? {} : {'Content-Type': 'application/json'})},
       ...(body === undefined ? {} : {body: JSON.stringify(body)}), cache: 'no-store', signal: AbortSignal.timeout(15000)});

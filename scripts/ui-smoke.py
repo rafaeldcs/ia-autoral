@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Optional browser smoke test. Requires a locally installed Playwright + Chromium."""
+from ui_profile_fixture import enter_profile, existing_folder, launch_browser
 import json
 import argparse
 import re
@@ -16,7 +17,7 @@ from localauthor.server import create_server
 
 def main(args):
     from playwright.sync_api import sync_playwright, expect
-    report={'browser':args.browser_channel or 'Chromium','platform':sys.platform,'flows':[],'errors':[],'success':False,'scope':'temporary local project, no user repositories'}
+    report={'browser':args.browser_channel or ('msedge' if sys.platform=='win32' else 'Chromium'),'platform':sys.platform,'flows':[],'errors':[],'success':False,'scope':'temporary local project, no user repositories'}
     with tempfile.TemporaryDirectory() as tmp:
         base=Path(tmp); project=base/'project'; project.mkdir()
         original='public class Stock { public int Count = 1; }\n'
@@ -26,7 +27,7 @@ def main(args):
         thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
         try:
             with sync_playwright() as playwright:
-                browser=playwright.chromium.launch(headless=True,channel=args.browser_channel,
+                browser=launch_browser(playwright.chromium,headless=True,channel=args.browser_channel,
                     executable_path=None if args.browser_channel else shutil.which('chromium') or None)
                 page=browser.new_page(viewport={'width':1440,'height':1050},device_scale_factor=1)
                 page.on('pageerror',lambda error:report['errors'].append(str(error)))
@@ -38,6 +39,7 @@ def main(args):
                 report['flows'].append('invalid token rejected without opening workspace')
                 page.locator('#token').fill(settings.token)
                 page.locator('#login-form button').click()
+                enter_profile(page)
                 page.locator('#workspace').wait_for(state='visible')
                 assert page.locator('#token').input_value() == ''
                 assert page.evaluate('localStorage.length + sessionStorage.length') == 0
@@ -54,6 +56,7 @@ def main(args):
                 page.screenshot(path=str(args.report.parent/'ui-desktop.png'),full_page=True)
                 page.locator('[data-tab="projects"]').click()
                 page.locator('#project-name').fill('Laboratório local')
+                existing_folder(page)
                 page.locator('#project-root').fill(str(project))
                 page.locator('#project-form button').click()
                 page.locator('#projects h3').first.wait_for()

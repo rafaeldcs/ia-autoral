@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Browser integration with explicit doubles, NEVER a real-model benchmark."""
+from ui_profile_fixture import enter_profile, existing_folder, launch_browser
 import json
 import argparse
 import io
@@ -179,7 +180,7 @@ def main(browser_channel=None):
             thread = threading.Thread(target=server.serve_forever, daemon=True); thread.start()
             try:
                 with sync_playwright() as playwright:
-                    browser = playwright.chromium.launch(headless=True, channel=browser_channel,
+                    browser = launch_browser(playwright.chromium,headless=True, channel=browser_channel,
                         executable_path=None if browser_channel else shutil.which("chromium") or None)
                     page = browser.new_page(viewport={"width": 1440, "height": 1000})
                     page.on("pageerror", lambda error: report["errors"].append(str(error)))
@@ -190,6 +191,7 @@ def main(browser_channel=None):
                     assert page.locator("#workspace").is_hidden()
                     page.locator("#token").fill(settings.token)
                     page.locator("#connect button").click()
+                    enter_profile(page)
                     expect(page.locator("#workspace")).to_be_visible()
                     page.locator("#project").select_option(item["id"])
                     expect(page.locator("#conversation")).to_have_value("")
@@ -271,6 +273,7 @@ def main(browser_channel=None):
                     page.goto(f"http://127.0.0.1:{server.server_port}/")
                     page.locator("#local-token").fill(settings.token)
                     page.locator("#connect-form button").click()
+                    enter_profile(page)
                     expect(page.locator("#studio")).to_be_visible()
                     page.locator("#open-menu").click()
                     page.locator("#project-list button").filter(has_text="Marketing de laboratório").click()
@@ -298,6 +301,7 @@ def main(browser_channel=None):
                     page.reload()
                     page.locator("#local-token").fill(settings.token)
                     page.locator("#connect-form button").click()
+                    enter_profile(page)
                     expect(page.locator("#studio")).to_be_visible()
                     assert app.chat.preferences(second["id"])["work_profile"] == "marketing"
                     report["flows"].append("project work profiles persist independently; mobile guidance dialog")

@@ -9,3 +9,12 @@ class ConflictError(LocalAIError):
 
 class NotFoundError(LocalAIError):
     pass
+
+class AuthenticationError(LocalAIError):
+    pass
+
+class AccessDeniedError(LocalAIError):
+    pass
+
+class RateLimitError(LocalAIError):
+    pass
