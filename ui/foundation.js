@@ -14,7 +14,7 @@
   function setBusy(value) {
     busy = value;
     for (const id of ['send', 'project', 'conversation', 'mode', 'new-conversation', 'marketing-use', 'business-use']) $(id).disabled = value;
-    for (const id of ['image-size', 'image-steps', 'image-seed']) $(id).disabled = value;
+    for (const id of ['image-size', 'image-steps', 'image-seed', 'image-negative']) $(id).disabled = value;
     $('cancel').hidden = !value; $('cancel').disabled = false;
   }
   function addOption(select, value, label) {
@@ -52,7 +52,8 @@
             if (version !== renderVersion) return;
             if (!/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(result.data || '')) throw new Error('Imagem inválida.');
             const image = document.createElement('img'); image.alt = 'Imagem gerada pelo modelo visual local'; image.width = meta.width || 512; image.height = meta.height || 512; image.src = result.data;
-            article.append(image); button.remove();
+            const save = document.createElement('a'); save.href = result.data; save.download = `localauthor-${meta.artifact_id}.png`; save.textContent = 'Baixar PNG'; save.className = 'download-artifact';
+            article.append(image, save); button.remove();
           } catch (error) { say(error.message); button.disabled = false; }
         });
       }
@@ -143,8 +144,9 @@
       if (!conversation) throw new Error('A seleção de projeto mudou.');
       const result = await api('/api/chat', {project_id: project, conversation_id: conversation, message: prompt,
         mode: $('mode').value === 'image' ? 'image' : 'foundation', input_format: 'auto',
-        ...($('mode').value === 'image' ? {image_options: {width: Number($('image-size').value), height: Number($('image-size').value),
-          seed: Number($('image-seed').value), steps: Number($('image-steps').value)}} : {})});
+        ...($('mode').value === 'image' ? {image_options: {width: $('image-size').value === 'portrait' ? 512 : $('image-size').value === 'landscape' ? 768 : 512,
+          height: $('image-size').value === 'portrait' ? 768 : $('image-size').value === 'landscape' ? 512 : 512,
+          seed: Number($('image-seed').value), steps: Number($('image-steps').value), negative_prompt: $('image-negative').value}} : {})});
       activeJob = {id: result.job.id, prompt, project}; await poll();
     } catch (error) {
       if (!activeJob) setBusy(false);

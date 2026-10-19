@@ -14,7 +14,8 @@ class VisualProfileTests(WorkspaceCase):
     def test_options_are_bounded_typed_and_finite(self):
         self.assertEqual(ImageOptions.parse().metadata()["seed"], 31)
         for value in ({"width": 255}, {"height": True}, {"steps": 0}, {"steps": 51}, {"seed": -1},
-                      {"guidance_scale": float("nan")}, {"guidance_scale": 16}, {"unknown": 3}):
+                      {"guidance_scale": float("nan")}, {"guidance_scale": 16}, {"negative_prompt": 9},
+                      {"negative_prompt": "x" * 2001}, {"unknown": 3}):
             with self.subTest(value=value), self.assertRaises(PolicyError): ImageOptions.parse(value)
 
     def test_png_requires_valid_crc_pixels_end_and_dimensions(self):
@@ -36,8 +37,10 @@ class VisualProfileTests(WorkspaceCase):
                 kwargs["callback_on_step_end"](self, 0, 0, {})
                 return SimpleNamespace(images=[DummyImageArtifact()], nsfw_content_detected=[False])
         runtime.pipeline = StableDiffusionPipeline()
-        runtime.generate("fixture", options={"width": 256, "height": 512, "steps": 8, "seed": 17})
+        runtime.generate("fixture", options={"width": 256, "height": 512, "steps": 8, "seed": 17,
+                                               "guidance_scale": 6.5, "negative_prompt": "texto distorcido"})
         self.assertEqual((received["width"], received["height"], received["num_inference_steps"]), (256, 512, 8))
+        self.assertEqual((received["guidance_scale"], received["negative_prompt"]), (6.5, "texto distorcido"))
         generator.manual_seed.assert_called_once_with(17)
 
     def test_service_stores_options_and_recovers_valid_png(self):

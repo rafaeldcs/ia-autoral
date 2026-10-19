@@ -18,6 +18,7 @@ from .util import read_json, write_json, sha256
 MAX_BODY = 2_500_000
 STATIC = {"/": "chat.html", "/advanced": "index.html", "/app.js": "app.js", "/styles.css": "styles.css", "/chat.js": "chat.js", "/chat.css": "chat.css",
           "/foundation": "foundation.html", "/foundation.js": "foundation.js", "/foundation.css": "foundation.css",
+          "/visual-studio.js": "visual-studio.js",
           "/business-tools.js": "business-tools.js",
           "/marketing": "marketing.html", "/marketing.js": "marketing.js", "/marketing.css": "marketing.css",
           "/workspace.css": "workspace.css", "/appearance.js": "appearance.js"}

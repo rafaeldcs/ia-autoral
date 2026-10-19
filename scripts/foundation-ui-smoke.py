@@ -2,6 +2,7 @@
 """Browser integration with explicit doubles, NEVER a real-model benchmark."""
 import json
 import argparse
+import io
 from pathlib import Path
 import re
 import shutil
@@ -123,6 +124,32 @@ def check_business_tools(page, report, project, other, reports):
     report['flows'].append('business result: stale edit/project response discarded, project cleanup, inert malicious text')
 
 
+def check_visual_studio(page, report):
+    """Exercise local still-image composition in Chromium; not AI video inference."""
+    from playwright.sync_api import expect
+    from tests.test_foundation import DummyImageArtifact
+    output = io.BytesIO(); DummyImageArtifact().save(output, 'PNG')
+    png = output.getvalue()
+    page.locator('#video-images').set_input_files([
+        {'name': 'scene-one.png', 'mimeType': 'image/png', 'buffer': png},
+        {'name': 'scene-two.png', 'mimeType': 'image/png', 'buffer': png},
+    ])
+    expect(page.locator('.video-scene')).to_have_count(2)
+    page.locator('.video-scene').nth(0).get_by_role('button', name='↓ Descer').click()
+    expect(page.locator('.video-scene').nth(0).locator('strong')).to_contain_text('scene-two.png')
+    page.locator('.video-scene').nth(0).locator('input').fill('Primeira cena')
+    page.locator('#video-title').fill('Demonstração local')
+    page.locator('#video-duration').select_option('2')
+    expect(page.locator('#video-export')).to_be_enabled()
+    with page.expect_download(timeout=20000) as download_info:
+        page.locator('#video-export').click()
+    download = download_info.value
+    path = download.path()
+    assert path and Path(path).read_bytes().startswith(bytes.fromhex('1a45dfa3')), 'Expected a WebM/EBML file'
+    expect(page.locator('#video-status')).to_contain_text('Vídeo WebM exportado')
+    report['flows'].append('local canvas video composition: bounded PNG inputs, reorder, captions, 720p WebM download; still-image motion only, no AI video claim')
+
+
 def main(browser_channel=None):
     from playwright.sync_api import sync_playwright, expect
     report = {"success": False, "model_inference": "test doubles only", "flows": [], "errors": []}
@@ -200,6 +227,8 @@ def main(browser_channel=None):
                     expect(page.locator("#image-options")).to_be_visible()
                     page.locator("#image-seed").fill("17")
                     page.locator("#image-steps").select_option("5")
+                    page.locator("#image-size").select_option("portrait")
+                    page.locator("#image-negative").fill("sem marcas d'água")
                     page.locator("#prompt").fill("Um quadrado cinza")
                     page.locator("#send").click()
                     expect(page.locator("#messages article")).to_have_count(6, timeout=15000)
@@ -208,12 +237,14 @@ def main(browser_channel=None):
                     expect(page.locator("#messages img")).to_have_js_property("naturalWidth", 512)
                     saved = app.chat.get(item["id"], page.locator("#conversation").input_value())
                     meta = saved["messages"][-1]["metadata"]
-                    assert (meta["seed"], meta["steps"], meta["width"]) == (17, 5, 512)
+                    assert (meta["seed"], meta["steps"], meta["width"], meta["height"], meta["negative_prompt"]) == (17, 5, 512, 768, "sem marcas d'água")
+                    expect(page.get_by_role('link', name='Baixar PNG')).to_have_attribute('download', f"localauthor-{meta['artifact_id']}.png")
                     report["flows"].append("visual job and authenticated PNG retrieval, fixture pixels only")
-                    report["flows"].append("image controls reach the job and recorded artifact metadata")
+                    report["flows"].append("image aspect ratio, negative prompt and seed/steps reach generation and artifact metadata")
                     page.screenshot(path=str(reports / "foundation-desktop.png"), full_page=True)
                     page.locator("#mode").select_option("text")
                     expect(page.locator("#image-options")).not_to_be_visible()
+                    check_visual_studio(page, report)
                     page.locator("#prompt").fill("aguardar cancelamento")
                     page.locator("#send").click()
                     expect(page.locator("#status")).to_contain_text("Gerando", timeout=10000)

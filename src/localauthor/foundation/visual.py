@@ -14,6 +14,7 @@ class ImageOptions:
     seed: int = 31
     steps: int = 20
     guidance_scale: float = 7.5
+    negative_prompt: str = ""
 
     @classmethod
     def parse(cls, value=None):
@@ -30,6 +31,8 @@ class ImageOptions:
         if (type(option.guidance_scale) not in (int, float) or not math.isfinite(option.guidance_scale)
                 or not 1 <= option.guidance_scale <= 15):
             raise PolicyError("Guidance visual: 1 a 15.")
+        if not isinstance(option.negative_prompt, str) or len(option.negative_prompt) > 2000:
+            raise PolicyError("A lista do que evitar deve ter até 2.000 caracteres.")
         return option
 
     def metadata(self):

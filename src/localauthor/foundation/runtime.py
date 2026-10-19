@@ -128,9 +128,12 @@ class ImageRuntime:
             tokenizer = getattr(self.pipeline, name, None)
             if tokenizer is not None:
                 limit = getattr(tokenizer, "model_max_length", 0)
-                count = len(tokenizer(prompt, truncation=False)["input_ids"])
-                if isinstance(limit, int) and 0 < limit < 1000000 and count > limit:
-                    raise PolicyError("Descrição excede o tokenizador visual; reduza o briefing. Nada foi truncado silenciosamente.")
+                for description in (prompt, profile.negative_prompt):
+                    if not description:
+                        continue
+                    count = len(tokenizer(description, truncation=False)["input_ids"])
+                    if isinstance(limit, int) and 0 < limit < 1000000 and count > limit:
+                        raise PolicyError("Descrição ou itens a evitar excedem o tokenizador visual; reduza o briefing. Nada foi truncado silenciosamente.")
         deadline = time.monotonic() + self.spec.generation_seconds
 
         def callback(pipe, step, timestep, kwargs):
@@ -140,9 +143,9 @@ class ImageRuntime:
         generator = self.torch.Generator(device=self.spec.device).manual_seed(profile.seed)
         with self.torch.inference_mode():
             kwargs = dict(prompt=prompt, width=profile.width, height=profile.height,
+                          negative_prompt=profile.negative_prompt or None,
+                          guidance_scale=profile.guidance_scale,
                           num_inference_steps=profile.steps, generator=generator, callback_on_step_end=callback)
-            if options is not None:
-                kwargs["guidance_scale"] = profile.guidance_scale
             result = self.pipeline(**kwargs)
         check_cancel(cancel, deadline)
         flagged = getattr(result, "nsfw_content_detected", None)

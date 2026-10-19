@@ -59,15 +59,17 @@ class DummyText:
 
 
 class DummyImageArtifact:
-    size = (512, 512)
+    def __init__(self, width=512, height=512):
+        self.size = (width, height)
 
     def save(self, stream, format):
         if format != "PNG":
             raise AssertionError("PNG expected")
         def chunk(kind, value):
             return struct.pack(">I", len(value)) + kind + value + struct.pack(">I", zlib.crc32(kind + value) & 0xffffffff)
-        stream.write(b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">2I5B", 512, 512, 8, 2, 0, 0, 0))
-                     + chunk(b"IDAT", zlib.compress((b"\0" + b"\x80\x80\x80" * 512) * 512)) + chunk(b"IEND", b""))
+        width, height = self.size
+        stream.write(b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">2I5B", width, height, 8, 2, 0, 0, 0))
+                     + chunk(b"IDAT", zlib.compress((b"\0" + b"\x80\x80\x80" * width) * height)) + chunk(b"IEND", b""))
 
 
 class DummyImage:
@@ -76,7 +78,7 @@ class DummyImage:
 
     def generate(self, prompt, cancel=None, *, options=None):
         check_cancel(cancel)
-        return DummyImageArtifact()
+        return DummyImageArtifact((options or {}).get("width", 512), (options or {}).get("height", 512))
 
 
 class FoundationModelTests(WorkspaceCase):
