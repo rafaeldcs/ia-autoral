@@ -13,13 +13,15 @@
       : $('video-format').value === 'square' ? [720, 720] : [720, 1280];
   }
   function update() {
+    for (const id of ['video-images', 'video-format', 'video-duration', 'video-title']) $(id).disabled = working;
     list.replaceChildren();
     scenes.forEach((scene, index) => {
       const row = document.createElement('div'); row.className = 'video-scene';
-      const preview = document.createElement('img'); preview.src = scene.url; preview.alt = `Prévia da cena ${index + 1}`;
+      const preview = document.createElement('img'); preview.src = scene.thumbnail; preview.alt = `Prévia da cena ${index + 1}`;
       const label = document.createElement('strong'); label.textContent = `Cena ${index + 1} · ${scene.file.name}`;
       const captionLabel = document.createElement('label'); captionLabel.textContent = 'Legenda desta cena';
       const caption = document.createElement('input'); caption.type = 'text'; caption.maxLength = 120; caption.value = scene.caption;
+      caption.id = `video-caption-${index}`; captionLabel.htmlFor = caption.id; caption.disabled = working;
       caption.addEventListener('input', () => { scene.caption = caption.value; });
       const actions = document.createElement('div'); actions.className = 'toolbar';
       for (const [text, delta] of [['↑ Subir', -1], ['↓ Descer', 1]]) {
@@ -29,50 +31,61 @@
         actions.append(button);
       }
       const remove = document.createElement('button'); remove.type = 'button'; remove.textContent = 'Remover'; remove.disabled = working;
-      remove.addEventListener('click', () => { URL.revokeObjectURL(scene.url); scene.bitmap.close(); scenes.splice(index, 1); update(); }); actions.append(remove);
+      remove.addEventListener('click', () => { scene.bitmap.close(); scenes.splice(index, 1); update(); }); actions.append(remove);
       row.append(preview, label, captionLabel, caption, actions); list.append(row);
     });
     exportButton.disabled = working || !scenes.length || typeof HTMLCanvasElement.prototype.captureStream !== 'function' || typeof MediaRecorder === 'undefined';
     if (scenes.length && exportButton.disabled && !working) notice('Este navegador não oferece gravação de vídeo pelo canvas. Abra o LocalAuthor em uma versão atual do Edge ou Chrome.');
   }
 
+  function thumbnail(image) {
+    const canvas = document.createElement('canvas'), scale = Math.min(160 / image.width, 120 / image.height, 1);
+    canvas.width = Math.max(1, Math.round(image.width * scale)); canvas.height = Math.max(1, Math.round(image.height * scale));
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Não foi possível criar a miniatura.');
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    // Small data URLs match the existing CSP; no blob-image permission required.
+    return canvas.toDataURL('image/png');
+  }
+
   input.addEventListener('change', async () => {
     if (working) return;
     const files = [...input.files]; input.value = '';
     if (!files.length) return;
-    let totalBytes = scenes.reduce((sum, row) => sum + row.file.size, 0);
+    const totalBytes = scenes.reduce((sum, row) => sum + row.file.size, 0);
     if (scenes.length + files.length > MAX_FILES || files.some(file => !['image/png', 'image/jpeg', 'image/webp'].includes(file.type)
       || file.size <= 0 || file.size > MAX_FILE_BYTES) || files.reduce((sum, file) => sum + file.size, totalBytes) > MAX_TOTAL_BYTES) {
       notice('Selecione até 12 PNG/JPEG/WebP, com até 20 MB por arquivo e 80 MB no total.'); return;
     }
-    const added = [];
+    const added = []; working = true; update();
     try {
       for (const file of files) {
         const bitmap = await createImageBitmap(file), pixels = bitmap.width * bitmap.height;
-        totalBytes += file.size;
         if (!bitmap.width || !bitmap.height || pixels > MAX_IMAGE_PIXELS || scenes.reduce((sum, row) => sum + row.bitmap.width * row.bitmap.height, 0)
           + added.reduce((sum, row) => sum + row.bitmap.width * row.bitmap.height, 0) + pixels > MAX_TOTAL_PIXELS) {
           bitmap.close(); throw new Error('As dimensões das imagens excedem o limite local de segurança.');
         }
-        added.push({file, bitmap, url: URL.createObjectURL(file), caption: ''});
+        try { added.push({file, bitmap, thumbnail: thumbnail(bitmap), caption: ''}); }
+        catch (error) { bitmap.close(); throw error; }
       }
       scenes.push(...added); notice(`${scenes.length} cena(s) pronta(s). Reordene e adicione legendas antes de exportar.`);
     } catch (error) {
-      for (const scene of added) { URL.revokeObjectURL(scene.url); scene.bitmap.close(); }
+      for (const scene of added) scene.bitmap.close();
       notice(error.message || 'Não foi possível ler uma das imagens.');
+    } finally {
+      working = false; update();
     }
-    update();
   });
 
-  function paintImage(ctx, image, progress, alpha = 1) {
-    const [width, height] = dimensions(), cover = Math.max(width / image.width, height / image.height);
+  function paintImage(ctx, image, progress, alpha, size) {
+    const [width, height] = size, cover = Math.max(width / image.width, height / image.height);
     const scale = cover * (1.015 + 0.035 * progress), drawW = image.width * scale, drawH = image.height * scale;
     ctx.save(); ctx.globalAlpha = alpha;
     ctx.drawImage(image, (width - drawW) / 2, (height - drawH) / 2, drawW, drawH);
     ctx.restore();
   }
-  function paintText(ctx, title, caption) {
-    const [width, height] = dimensions(), titleText = title.trim(), captionText = caption.trim();
+  function paintText(ctx, title, caption, size) {
+    const [width, height] = size, titleText = title.trim(), captionText = caption.trim();
     if (!titleText && !captionText) return;
     const bandHeight = Math.min(height * .27, 240), gradient = ctx.createLinearGradient(0, height - bandHeight, 0, height);
     gradient.addColorStop(0, 'rgba(5,10,18,0)'); gradient.addColorStop(.35, 'rgba(5,10,18,.66)'); gradient.addColorStop(1, 'rgba(5,10,18,.86)');
@@ -96,7 +109,8 @@
     if (!Number.isInteger(seconds) || seconds < 2 || seconds > 5 || scenes.length * seconds > 60) {
       notice('O vídeo deve ter até 60 segundos. Reduza a duração ou o número de cenas.'); return;
     }
-    const [width, height] = dimensions(), canvas = document.createElement('canvas');
+    const size = dimensions(), [width, height] = size, frames = scenes.map(scene => ({bitmap: scene.bitmap, caption: scene.caption}));
+    const canvas = document.createElement('canvas');
     canvas.width = width; canvas.height = height;
     const ctx = canvas.getContext('2d', {alpha: false});
     if (!ctx) { notice('Não foi possível criar a tela de composição.'); return; }
@@ -108,36 +122,44 @@
     working = true; update(); $('video-progress').hidden = false; $('video-progress').value = 0; notice('Compondo vídeo localmente…');
     recorder.addEventListener('dataavailable', event => { if (event.data?.size) chunks.push(event.data); });
     const stopped = new Promise((resolve, reject) => { recorder.addEventListener('stop', resolve, {once: true}); recorder.addEventListener('error', event => reject(event.error || new Error('Falha na gravação WebM.')), {once: true}); });
+    stopped.catch(() => {}); // An early encoder error is awaited below, never unhandled.
+    let startedRecorder = false, animationId = null, stopTimer;
     try {
-      recorder.start(500);
-      const fadeSeconds = Math.min(.6, seconds / 4), total = scenes.length * seconds, started = performance.now();
+      recorder.start(500); startedRecorder = true;
+      const fadeSeconds = Math.min(.6, seconds / 4), total = frames.length * seconds, started = performance.now();
+      let rejectFrame;
+      const frameFailed = new Promise((_, reject) => { rejectFrame = reject; });
       const frame = () => {
-        const elapsed = (performance.now() - started) / 1000, bounded = Math.min(elapsed, total - .001);
-        const index = Math.min(Math.floor(bounded / seconds), scenes.length - 1), local = bounded - index * seconds;
-        ctx.fillStyle = '#0a0e14'; ctx.fillRect(0, 0, width, height);
-        paintImage(ctx, scenes[index].bitmap, local / seconds);
-        if (index + 1 < scenes.length && local > seconds - fadeSeconds) {
-          const progress = Math.max(0, Math.min(1, (local - seconds + fadeSeconds) / fadeSeconds));
-          paintImage(ctx, scenes[index + 1].bitmap, 0, progress);
-        }
-        paintText(ctx, title, scenes[index].caption);
-        $('video-progress').value = Math.min(99, Math.floor(bounded / total * 100));
-        if (elapsed < total) requestAnimationFrame(frame);
+        try {
+          const elapsed = (performance.now() - started) / 1000, bounded = Math.min(elapsed, total - .001);
+          const index = Math.min(Math.floor(bounded / seconds), frames.length - 1), local = bounded - index * seconds;
+          ctx.fillStyle = '#0a0e14'; ctx.fillRect(0, 0, width, height);
+          paintImage(ctx, frames[index].bitmap, local / seconds, 1, size);
+          if (index + 1 < frames.length && local > seconds - fadeSeconds) {
+            const progress = Math.max(0, Math.min(1, (local - seconds + fadeSeconds) / fadeSeconds));
+            paintImage(ctx, frames[index + 1].bitmap, 0, progress, size);
+          }
+          paintText(ctx, title, frames[index].caption, size);
+          $('video-progress').value = Math.min(99, Math.floor(bounded / total * 100));
+          if (elapsed < total) animationId = requestAnimationFrame(frame);
+        } catch (error) { rejectFrame(error); }
       };
       frame();
-      await new Promise(resolve => setTimeout(resolve, total * 1000 + 500));
+      await Promise.race([new Promise(resolve => { stopTimer = setTimeout(resolve, total * 1000 + 500); }), frameFailed,
+        stopped.then(() => { throw new Error('O codificador encerrou antes de terminar as cenas.'); })]);
       if (recorder.state !== 'inactive') recorder.stop();
       await stopped;
       if (!chunks.length) throw new Error('O navegador terminou sem gerar quadros de vídeo.');
       const blob = new Blob(chunks, {type: mimeType}), url = URL.createObjectURL(blob), link = document.createElement('a');
       link.href = url; link.download = `localauthor-video-${new Date().toISOString().replace(/[:.]/g, '-')}.webm`;
       document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 60_000);
-      $('video-progress').value = 100; notice(`Vídeo WebM exportado (${width} × ${height}, ${scenes.length} cenas, ${total}s). O arquivo foi salvo pelo navegador.`);
+      $('video-progress').value = 100; notice(`Vídeo WebM exportado (${width} × ${height}, ${frames.length} cenas, ${total}s). O arquivo foi salvo pelo navegador.`);
     } catch (error) {
       if (recorder.state !== 'inactive') recorder.stop();
-      try { await stopped; } catch { /* retain the original error */ }
+      if (startedRecorder) { try { await stopped; } catch { /* retain the original error */ } }
       notice(`Exportação interrompida: ${error.message}`);
     } finally {
+      clearTimeout(stopTimer); if (animationId !== null) cancelAnimationFrame(animationId);
       stream.getTracks().forEach(track => track.stop()); working = false; update();
     }
   });

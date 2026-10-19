@@ -43,6 +43,17 @@ class VisualProfileTests(WorkspaceCase):
         self.assertEqual((received["guidance_scale"], received["negative_prompt"]), (6.5, "texto distorcido"))
         generator.manual_seed.assert_called_once_with(17)
 
+    def test_negative_prompt_cannot_be_silently_truncated(self):
+        runtime = ImageRuntime.__new__(ImageRuntime)
+        runtime.spec = SimpleNamespace(device='cpu', generation_seconds=300)
+        class StableDiffusionPipeline:
+            tokenizer = Mock(model_max_length=4, side_effect=lambda text, **kwargs: {'input_ids': [1] * len(text.split())})
+            def __call__(self, **kwargs):
+                raise AssertionError('Oversized negative prompt reached generation')
+        runtime.pipeline = StableDiffusionPipeline()
+        with self.assertRaisesRegex(PolicyError, 'tokenizador visual'):
+            runtime.generate('cup', options={'negative_prompt': 'one two three four five'})
+
     def test_service_stores_options_and_recovers_valid_png(self):
         register_fixture(self.settings.home, self.root / "visual-model", "image")
         service = FoundationService(self.settings.home, image_factory=DummyImage)

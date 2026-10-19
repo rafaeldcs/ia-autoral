@@ -135,6 +135,7 @@ def check_visual_studio(page, report):
         {'name': 'scene-two.png', 'mimeType': 'image/png', 'buffer': png},
     ])
     expect(page.locator('.video-scene')).to_have_count(2)
+    page.wait_for_function("() => [...document.querySelectorAll('.video-scene img')].every(i => i.complete && i.naturalWidth > 0)")
     page.locator('.video-scene').nth(0).get_by_role('button', name='↓ Descer').click()
     expect(page.locator('.video-scene').nth(0).locator('strong')).to_contain_text('scene-two.png')
     page.locator('.video-scene').nth(0).locator('input').fill('Primeira cena')
@@ -143,10 +144,14 @@ def check_visual_studio(page, report):
     expect(page.locator('#video-export')).to_be_enabled()
     with page.expect_download(timeout=20000) as download_info:
         page.locator('#video-export').click()
+        expect(page.locator('#video-format')).to_be_disabled()
+        expect(page.locator('#video-images')).to_be_disabled()
+        expect(page.locator('.video-scene input').first).to_be_disabled()
     download = download_info.value
     path = download.path()
     assert path and Path(path).read_bytes().startswith(bytes.fromhex('1a45dfa3')), 'Expected a WebM/EBML file'
     expect(page.locator('#video-status')).to_contain_text('Vídeo WebM exportado')
+    expect(page.locator('#video-format')).to_be_enabled()
     report['flows'].append('local canvas video composition: bounded PNG inputs, reorder, captions, 720p WebM download; still-image motion only, no AI video claim')
 
 

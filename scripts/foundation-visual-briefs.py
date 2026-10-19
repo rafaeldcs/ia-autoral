@@ -78,7 +78,7 @@ def main():
         report.update(error_type=type(exc).__name__, error=str(exc))
         raise
     finally:
-        for kind in tuple(service._cache): service._evict(kind)
+        service.close()
         write_new(args.output / "report.json", report)
     print(json.dumps({"delivered": report["delivered"], "total": report["total"], "quality_qualified": False}))
     return 0 if report["delivered"] == report["total"] else 1
