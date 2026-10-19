@@ -61,6 +61,8 @@ Um PNG retrato realmente gerado na GPU também foi importado, sem regeneração,
 
 ## Evidências e aprovação
 
+Atualização posterior: o proprietário enviou suas preferências e apontou problemas de leitura. A [revisão supervisionada de texto/logo e fotografia](SHOPAIR_REVISAO_LEITURA_20261019.md) registra as novas tentativas reais e preserva a separação entre preferência, aprovação, publicação e treinamento. Ela não altera os resultados congelados deste benchmark.
+
 O pacote privado contém PNGs originais com hashes, seis relatórios completos de inferência, logs, inspeções da sandbox, galeria antes/candidata/controle, vídeos nos três formatos e capturas desktop/móvel. A galeria permite registrar preferência por caso e exportar uma avaliação JSON. Nenhuma escolha vem marcada; seu download não publica mídia, não envia decisões ao servidor e não autoriza treinamento.
 
 As falhas iniciais também foram preservadas: Docker indisponível por socket temporário, compartilhamento Windows sem os arquivos esperados, aquecimento de cinco passos bloqueado pelo verificador e extração recusada por divergência de caminho virtualizado. Nenhuma delas foi transformada em teste aprovado nem levou à desativação do verificador. A execução final usou cópias de fonte/entradas verificadas e um aquecimento separado com briefing já conhecido; as sementes dos 19 casos avaliados não foram trocadas para procurar acertos.
