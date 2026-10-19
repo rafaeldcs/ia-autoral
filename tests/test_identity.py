@@ -133,9 +133,9 @@ class IdentityTests(WorkspaceCase):
 class IdentityHttpTests(WorkspaceCase):
     def setUp(self):
         super().setUp();self.app=Application(self.settings)
-        self.owner,self.owner_token=self.app.identity.bootstrap('owner','Owner',FIXTURE_PASSPHRASE,local=True)
-        self.dev=self.app.identity.create_user(self.owner,'developer','Developer',FIXTURE_PASSPHRASE)
-        _,self.dev_token=self.app.identity.login('developer',FIXTURE_PASSPHRASE,'fixture-device')
+        self.owner,self.owner_token=self.app.identity.identify('Owner',local=True)
+        self.dev=self.app.identity.create_named_user(self.owner,'Developer')
+        _,self.dev_token=self.app.identity.identify('Developer',local=False)
         self.private=self.app.identity.add_project(self.dev,'Developer private',managed=True)
         self.server=create_server(self.app,Path(__file__).resolve().parents[1]/'ui',port=0)
         self.thread=threading.Thread(target=self.server.serve_forever,daemon=True);self.thread.start()
@@ -161,7 +161,7 @@ class IdentityHttpTests(WorkspaceCase):
         self.assertEqual(self.request('GET','/api/health',extra={'Authorization':'Bearer invalid'})[0],401)
         status,_,data=self.request('GET','/api/identity/status')
         self.assertEqual(status,200);self.assertIsNone(data['user'])
-        status,headers,data=self.request('POST','/api/identity/login',{'username':'owner','password':FIXTURE_PASSPHRASE},extra={'X-LocalAuthor-Gateway':'lan','X-LocalAuthor-Device':'a'*32})
+        status,headers,data=self.request('POST','/api/identity/identify',{'name':'Owner'},extra={'X-LocalAuthor-Gateway':'lan','X-LocalAuthor-Device':'a'*32})
         self.assertEqual(status,200)
         for flag in ('HttpOnly','SameSite=Strict','Secure'):self.assertIn(flag,headers['Set-Cookie'])
         self.assertNotIn(FIXTURE_PASSPHRASE,json.dumps(data));self.assertNotIn('password_hash',json.dumps(data))
@@ -225,3 +225,68 @@ class IdentityHttpTests(WorkspaceCase):
         self.assertEqual(status,401);self.assertTrue(data['identity_required'])
         self.assertEqual(self.request('GET','/api/projects',token=self.dev_token,extra={'Cookie':COOKIE_NAME+'='+self.dev_token+'; '+COOKIE_NAME+'='+self.owner_token})[0],401)
         self.assertIsNone(current_actor.get())
+
+    def test_name_selection_is_explicitly_not_password_authentication(self):
+        status,_,data=self.request('GET','/api/identity/status')
+        self.assertEqual(status,200);self.assertEqual(data['identification'],'name')
+        self.assertEqual({p['name'] for p in data['profiles']},{'Owner','Developer'})
+        status,headers,data=self.request('POST','/api/identity/identify',{'name':' owner '})
+        self.assertEqual(status,200);self.assertEqual(data['user']['id'],self.owner['id'])
+        self.assertIn('HttpOnly',headers['Set-Cookie'])
+        self.assertEqual(self.request('POST','/api/identity/identify',{'name':'Owner'},extra={'Authorization':'Bearer invalid'})[0],401)
+        status,_,data=self.request('POST','/api/identity/identify',{'name':'New person'})
+        self.assertEqual(status,200);self.assertEqual(data['user']['role'],'user')
+        session=self.app.identity.identify('New person',local=False)[1]
+        self.assertEqual(self.request('GET','/api/projects',token=session)[2],[])
+
+
+class NamedProfileTests(WorkspaceCase):
+    def setUp(self):
+        super().setUp();self.app=Application(self.settings);self.identity=self.app.identity
+
+    def tearDown(self):
+        self.app.close();super().tearDown()
+
+    def test_first_name_requires_server_claims_history_and_has_no_password(self):
+        conversation=self.app.chat.create(self.project['id'],'Existing history')
+        with self.assertRaises(AccessDeniedError):self.identity.identify('Rafa fixture',local=False)
+        owner,session=self.identity.identify('Rafa fixture',local=True)
+        self.assertEqual(owner['role'],'admin');self.assertEqual(self.identity.current(session)['id'],owner['id'])
+        self.assertEqual(self.identity.projects(owner)[0]['id'],self.project['id'])
+        with self.app.store.connect() as db:
+            row=db.execute('SELECT salt,password_hash FROM profile_users').fetchone()
+            self.assertEqual(tuple(row),('',''))
+            self.assertEqual(db.execute('SELECT user_id FROM profile_conversations WHERE conversation_id=?',(conversation['id'],)).fetchone()[0],owner['id'])
+
+    def test_name_matching_prevents_accidental_duplicates_and_rejects_disabled_profiles(self):
+        first,_=self.identity.identify('João  Silva',local=True)
+        again,token=self.identity.identify('  JOÃO Silva ',local=False)
+        self.assertEqual(first['id'],again['id'])
+        self.assertEqual(len(self.identity.public_profiles()),1)
+        other,_=self.identity.identify('Ana fixture',local=False)
+        with self.assertRaises(ConflictError):self.identity.create_named_user(first,'joão silva')
+        with self.assertRaises(ConflictError):self.identity.update_user(first,other['id'],'JOÃO SILVA','user',True)
+        self.identity.update_user(first,other['id'],other['name'],'user',False)
+        with self.assertRaises(AccessDeniedError):self.identity.identify('Ana fixture',local=False)
+        self.assertEqual(len(self.identity.public_profiles()),1)
+        for invalid in ('','   ','x'*81,'Name\nOther',None,{},23):
+            with self.assertRaises(PolicyError):self.identity.identify(invalid,local=True)
+
+    def test_new_names_have_separate_workspaces_and_can_deliberately_select_existing_names(self):
+        owner,_=self.identity.identify('Owner fixture',local=True)
+        person,_=self.identity.identify('Person fixture',local=False)
+        project=self.identity.add_project(person,'Personal project',managed=True)
+        self.assertEqual(person['role'],'user');self.assertEqual(self.identity.projects(owner)[0]['id'],self.project['id'])
+        self.assertNotIn(project['id'],[p['id'] for p in self.identity.projects(owner)])
+        selected,_=self.identity.identify('Person fixture',local=False)
+        self.assertEqual(self.identity.projects(selected)[0]['id'],project['id'])
+        self.assertNotEqual(self.identity.workspace(owner),self.identity.workspace(person))
+
+    def test_initial_selection_waits_for_queue_and_old_password_profiles_can_use_names(self):
+        self.app.jobs.submit('index',{'project_id':self.project['id']})
+        with self.assertRaises(ConflictError):self.identity.identify('Owner fixture',local=True)
+        self.assertFalse(self.identity.enabled)
+        with self.app.store.connect() as db:db.execute("UPDATE jobs SET state='cancelled'")
+        owner,_=self.identity.bootstrap('legacy-owner','Legacy Owner',FIXTURE_PASSPHRASE,local=True)
+        selected,_=self.identity.identify('legacy owner',local=False)
+        self.assertEqual(owner['id'],selected['id'])

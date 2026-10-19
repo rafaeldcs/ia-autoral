@@ -16,16 +16,13 @@ from localauthor.application import Application
 from localauthor.config import Settings
 from localauthor.server import create_server
 
-PASSPHRASE='Disposable TLS laboratory passphrase 123'
-
-
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--gateway',type=Path,required=True);parser.add_argument('--report',type=Path,required=True);args=parser.parse_args()
     checks=[]
     with tempfile.TemporaryDirectory() as temporary:
         root=Path(temporary);settings=Settings.load(root/'home');app=Application(settings)
-        owner,_=app.identity.bootstrap('owner','Owner fixture',PASSPHRASE,local=True)
-        person=app.identity.create_user(owner,'person','Person fixture',PASSPHRASE)
+        owner,_=app.identity.identify('Owner fixture',local=True)
+        person=app.identity.create_named_user(owner,'Person fixture')
         first=app.identity.add_project(owner,'Owner project',managed=True)
         second=app.identity.add_project(person,'Person project',managed=True)
         backend=create_server(app,ROOT/'ui',port=0);thread=threading.Thread(target=backend.serve_forever,daemon=True);thread.start()
@@ -58,14 +55,14 @@ def main():
                     time.sleep(.2)
             checks.append('TLS certificate and both paired device credentials are real')
             def login(device,username):
-                status,headers,raw=request('/api/identity/login',device,payload={'username':username,'password':PASSPHRASE})
+                status,headers,raw=request('/api/identity/identify',device,payload={'name':username})
                 assert status==200,(status,raw)
                 cookie=headers['Set-Cookie'];assert 'HttpOnly' in cookie and 'Secure' in cookie and 'SameSite=Strict' in cookie
                 assert 'la_profile' not in raw.decode()
                 return cookie.split(';',1)[0]
-            a=login(0,'owner')
+            a=login(0,'Owner fixture')
             assert request('/api/projects',1)[0]==401
-            b=login(1,'person')
+            b=login(1,'Person fixture')
             for device,cookie,expected in ((0,a,first['id']),(1,b,second['id'])):
                 status,_,raw=request('/api/projects',device,cookie);assert status==200
                 assert [p['id'] for p in json.loads(raw)]==[expected]

@@ -264,7 +264,10 @@ def main(browser_channel=None):
                     page.set_viewport_size({"width": 390, "height": 844})
                     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), "Foundation mobile horizontal overflow"
                     page.screenshot(path=str(reports / "foundation-mobile.png"), full_page=True)
-                    page.locator("#logout").click()
+                    # Profile logout revokes the selection and reloads the page.
+                    # Wait for that navigation before opening another workspace.
+                    with page.expect_navigation(wait_until='load'):
+                        page.locator("#logout").click()
                     expect(page.locator("#login")).to_be_visible()
                     assert page.locator("#messages").inner_text() == ""
                     assert page.locator('#business-result').inner_text() == ''

@@ -47,7 +47,13 @@ def route(app, method, path, q, body, headers):
     if method=='GET' and path=='/api/identity/status':
         user=identity.current(token)
         return True,{'configured':identity.enabled,'can_setup':gateway!='lan',
+                     'identification':'name','profiles':identity.public_profiles(),
                      'user':identity.public_user(user) if user else None},None
+    if method=='POST' and path=='/api/identity/identify':
+        fields({'name'})
+        user,session=identity.identify(body['name'],local=gateway!='lan')
+        identity.logout(token)
+        return True,{'user':identity.public_user(user)},session_cookie(session,headers)
     if method=='POST' and path=='/api/identity/setup':
         fields({'username','name','password'})
         user,session=identity.bootstrap(body['username'],body['name'],body['password'],local=gateway!='lan')
@@ -64,6 +70,8 @@ def route(app, method, path, q, body, headers):
     if method=='GET' and path=='/api/identity/directory':return True,identity.users(actor,directory=True),None
     if method=='GET' and path=='/api/identity/users':return True,identity.users(actor),None
     if method=='POST' and path=='/api/identity/users':
+        if set(body)=={'name','role'}:
+            return True,identity.create_named_user(actor,body['name'],body['role']),None
         fields({'username','name','password','role'})
         return True,identity.create_user(actor,body['username'],body['name'],body['password'],body['role']),None
     if method=='POST' and path=='/api/identity/users/update':

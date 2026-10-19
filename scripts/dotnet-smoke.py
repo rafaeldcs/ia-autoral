@@ -95,7 +95,7 @@ def main(args):
             check('post_forwarded_with_content_length', request('/api/import', {'title': 'Teste .NET', 'content': 'Estoque preservado com revisão humana.'})[0] == 200)
             status, _, answer = request('/api/consult', {'query': 'estoque'})
             check('retrieval_via_facade', status == 200 and len(answer['evidence']) == 1)
-            status, headers, profile = request('/api/identity/setup', {'username':'facade-owner','name':'Facade fixture','password':'Disposable facade passphrase 123'})
+            status, headers, profile = request('/api/identity/identify', {'name':'Facade fixture'})
             cookie = headers.get('Set-Cookie','').split(';',1)[0]
             check('profile_setup_cookie_forwarded', status == 200 and cookie.startswith('la_profile='))
             check('profile_is_required_for_projects', request('/api/projects')[0] == 401)

@@ -24,7 +24,7 @@
       headers:{...auth,...(user?{"X-LocalAuthor-Profile":user.id}:{}),...(body===undefined?{}:{"Content-Type":"application/json"})},
       ...(body===undefined?{}:{body:JSON.stringify(body)})});
     const data=await response.json();if(!response.ok){
-      if(data.identity_required&&!['/api/identity/status','/api/identity/login','/api/identity/setup'].includes(path)){lock();changed();location.reload();}
+      if(data.identity_required&&!['/api/identity/status','/api/identity/login','/api/identity/setup','/api/identity/identify'].includes(path)){lock();changed();location.reload();}
       const error=Error(data.error||"Não foi possível concluir.");error.status=response.status;error.identity=data.identity_required;throw error;
     }return data;
   }
@@ -35,40 +35,40 @@
     if(!control){control=node("button",null,"identity-menu");control.id="identity-menu";control.type="button";
       (document.querySelector(".sidebar-bottom")||document.querySelector("header")||document.body).prepend(control);
       control.onclick=()=>account().catch(error=>window.alert(error.message));}
-    control.textContent=user.name+" · Minha conta";control.title="Perfil: "+user.username;
+    control.textContent=user.name+" · Meu perfil";control.title="Trocar ou organizar seu perfil";
     document.dispatchEvent(new CustomEvent("localauthor-profile",{detail:user}));
   }
   async function promptIdentity(status) {
     const previousDirty=Boolean(window.__localAuthorUpdateDirty);
     lock();document.querySelectorAll("dialog[open]").forEach(d=>d.close());
-    gate=dialog(status.configured?"Entre no seu perfil":"Organize o acesso da sua equipe","identity-gate");
+    gate=dialog("Quem está usando a LocalAuthor?","identity-gate");
     gate.addEventListener("cancel",e=>e.preventDefault());
     if(!status.configured&&!status.can_setup){
-      gate.append(node("p","O administrador precisa criar o primeiro perfil no aplicativo da máquina servidor. Depois, entre aqui com seu usuário e senha."));
+      gate.append(node("p","Crie o primeiro perfil no aplicativo da máquina servidor. Depois, cada pessoa poderá escolher ou informar seu nome aqui."));
       button(gate,"Verificar novamente",()=>location.reload());gate.showModal();return new Promise(()=>{});
     }
     const setup=!status.configured;
-    gate.append(node("p",setup?"Crie seu perfil de administrador. Os projetos e históricos existentes ficarão no seu espaço. Novos perfis começam sem acesso a eles.":"Cada pessoa tem seus projetos privados. O acesso a projetos da equipe precisa ser compartilhado pelo proprietário."));
+    gate.append(node("p",setup?"Informe seu nome para organizar seus projetos. Os projetos e históricos existentes ficarão no primeiro perfil.":"Escolha seu nome ou informe um novo para criar seu espaço de projetos e conversas."));
+    gate.append(node("p","Sem senha: os perfis organizam o trabalho. Quem usa este aplicativo pode escolher outro perfil.","identity-hint"));
     const form=node("form");gate.append(form);
-    let name=null;if(setup)name=field(form,"Seu nome","identity-name");
-    const username=field(form,"Usuário","identity-username");username.maxLength=32;username.autocomplete="username";username.pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]{2,31}";
-    const password=field(form,setup?"Crie uma senha":"Senha","identity-password","password");password.autocomplete=setup?"new-password":"current-password";if(setup)password.minLength=12;
-    let confirm=null;if(setup){confirm=field(form,"Confirme a senha","identity-confirm","password");confirm.autocomplete="new-password";confirm.minLength=12;}
-    const submit=node("button",setup?"Criar meu perfil":"Entrar","primary");submit.id="identity-submit";form.append(submit);const notice=message(form);
-    gate.dataset.setup=String(setup);gate.showModal();username.focus();
+    const profiles=status.profiles||[];
+    let selected=null;
+    if(profiles.length){selected=select(form,"Perfis deste servidor",[["","Escolher meu nome"],...profiles.map(p=>[p.id,p.name])],"");selected.id="identity-profile";}
+    const name=field(form,"Seu nome","identity-name");name.autocomplete="name";name.placeholder="Use nome e sobrenome para evitar confusão";
+    if(selected)selected.onchange=()=>{name.value=profiles.find(p=>p.id===selected.value)?.name||"";name.focus();};
+    const submit=node("button",setup?"Criar meu perfil":"Continuar","primary");submit.id="identity-submit";form.append(submit);const notice=message(form);
+    gate.dataset.setup=String(setup);gate.showModal();(selected||name).focus();
     return new Promise(resolve=>{
       form.onsubmit=async event=>{
         event.preventDefault();if(submit.disabled)return;
-        if(confirm&&confirm.value!==password.value){notice.textContent="As senhas precisam ser iguais.";return;}
-        submit.disabled=true;notice.textContent=setup?"Criando perfil e preservando seus projetos…":"Entrando…";
+        submit.disabled=true;notice.textContent=setup?"Criando perfil e preservando seus projetos…":"Abrindo seu perfil…";
         try{
-          const result=await request(setup?"/api/identity/setup":"/api/identity/login",{username:username.value,password:password.value,...(setup?{name:name.value}:{})});
-          password.value="";if(confirm)confirm.value="";gate.close();gate.remove();gate=null;document.body.classList.remove("identity-locked");
-          // Older native clients mark every login keystroke as an edited form.
-          // Restore the pre-login state so authentication does not block updates.
+          const result=await request("/api/identity/identify",{name:name.value});
+          gate.close();gate.remove();gate=null;document.body.classList.remove("identity-locked");
+          // Older native clients mark profile selection as an edited form.
           window.__localAuthorUpdateDirty=previousDirty;
           changed(result.user.id);resolve(result.user);
-        }catch(error){notice.textContent=error.message;if(setup&&error.status===409){button(form,"Abrir entrada de perfil",()=>location.reload());}}
+        }catch(error){notice.textContent=error.message;}
         finally{submit.disabled=false;}
       };
     });
@@ -89,36 +89,29 @@
       try{notice.textContent="Salvando…";await fn();}catch(error){notice.textContent=error.message;}finally{b.disabled=false;}};
   }
   async function account() {
-    const d=dialog("Minha conta","identity-account");button(d,"Fechar",()=>d.close());
-    d.append(node("p",user.name+" · "+user.username));
+    const d=dialog("Meu perfil","identity-account");button(d,"Fechar",()=>d.close());
+    d.append(node("p",user.name));
     const folder=node("details");folder.append(node("summary","Minha pasta no servidor"),node("p",user.workspace));d.append(folder);
-    button(d,"Sair ou trocar de perfil",()=>logout().catch(error=>window.alert(error.message)));
-    const pass=node("form");pass.append(node("h3","Alterar minha senha"));d.append(pass);
-    const old=field(pass,"Senha atual","identity-old-password","password");old.autocomplete="current-password";
-    const fresh=field(pass,"Nova senha","identity-new-password","password");fresh.minLength=12;fresh.autocomplete="new-password";
-    const confirm=field(pass,"Confirme a nova senha","identity-new-confirm","password");confirm.minLength=12;
-    pass.append(node("button","Salvar nova senha"));const notice=message(pass);
-    formAction(pass,notice,async()=>{if(fresh.value!==confirm.value)throw Error("As senhas precisam ser iguais.");await request("/api/identity/password",{current_password:old.value,new_password:fresh.value});old.value=fresh.value=confirm.value="";lock();changed();location.reload();});
+    button(d,"Trocar perfil",()=>logout().catch(error=>window.alert(error.message)));
+    d.append(node("p","Os perfis organizam projetos e conversas por nome. Eles não têm senha nem impedem que outra pessoa escolha seu perfil.","identity-hint"));
     if(user.role==="admin"){
-      const section=node("section");section.id="identity-admin";section.append(node("h3","Pessoas da equipe"),node("p","O administrador cadastra perfis. Os projetos continuam privados até o proprietário compartilhar."));d.append(section);
+      const section=node("section");section.id="identity-admin";section.append(node("h3","Pessoas da equipe"),node("p","Você pode preparar os perfis da equipe aqui. Cada pessoa também pode informar seu nome na entrada e criar o próprio espaço."));d.append(section);
       const create=node("form");create.id="identity-create-user";section.append(create);
-      const name=field(create,"Nome da pessoa","identity-user-name"),login=field(create,"Usuário","identity-user-login");login.maxLength=32;
-      const secret=field(create,"Senha inicial","identity-user-password","password");secret.minLength=12;secret.autocomplete="new-password";
+      const name=field(create,"Nome da pessoa","identity-user-name");
       const role=select(create,"Permissão no servidor",[["user","Pessoa da equipe"],["admin","Administrador"]],"user");
       create.append(node("button","Adicionar pessoa"));const state=message(create),list=node("div");list.id="identity-users";section.append(list);
       async function renderUsers(){
         const users=await request("/api/identity/users");list.replaceChildren();
         for(const person of users){
           const row=node("form",null,"identity-user-row");row.dataset.userId=person.id;
-          row.append(node("strong",person.username));const name=field(row,"Nome","profile-name-"+person.id);name.value=person.name;
+          row.append(node("strong",person.name));const name=field(row,"Nome","profile-name-"+person.id);name.value=person.name;
           const role=select(row,"Permissão",[["user","Pessoa da equipe"],["admin","Administrador"]],person.role);
           const enabled=field(row,"Perfil ativo","profile-active-"+person.id,"checkbox",false);enabled.checked=Boolean(person.active);
-          const secret=field(row,"Nova senha (preencha somente para redefinir)","profile-reset-"+person.id,"password",false);secret.minLength=12;secret.autocomplete="new-password";
           row.append(node("button","Salvar perfil"));const status=message(row);list.append(row);
-          formAction(row,status,async()=>{await request("/api/identity/users/update",{id:person.id,name:name.value,role:role.value,active:enabled.checked,...(secret.value?{password:secret.value}:{})});secret.value="";status.textContent="Perfil atualizado.";});
+          formAction(row,status,async()=>{await request("/api/identity/users/update",{id:person.id,name:name.value,role:role.value,active:enabled.checked});status.textContent="Perfil atualizado.";});
         }
       }
-      formAction(create,state,async()=>{await request("/api/identity/users",{username:login.value,name:name.value,password:secret.value,role:role.value});create.reset();secret.value="";state.textContent="Pessoa cadastrada. Ela já pode entrar com seu usuário e senha.";await renderUsers();});
+      formAction(create,state,async()=>{await request("/api/identity/users",{name:name.value,role:role.value});create.reset();state.textContent="Pessoa cadastrada. Ela já pode escolher seu nome ao abrir a LocalAuthor.";await renderUsers();});
       await renderUsers();
     }
     d.showModal();
@@ -127,7 +120,7 @@
     const d=dialog("Compartilhar projeto","identity-sharing");button(d,"Fechar",()=>d.close());
     d.append(node("h3",project.name),node("p","Compartilhar dá acesso ao histórico e às fontes deste projeto. Leitura permite consultar; edição também permite conversar e alterar o conteúdo. Somente o proprietário gerencia os acessos."));
     const form=node("form");d.append(form);const people=await request("/api/identity/directory");
-    const who=select(form,"Pessoa",people.filter(p=>p.id!==user.id).map(p=>[p.id,p.name+" ("+p.username+")"]),"");who.id="identity-share-user";who.required=true;
+    const who=select(form,"Pessoa",people.filter(p=>p.id!==user.id).map(p=>[p.id,p.name]),"");who.id="identity-share-user";who.required=true;
     const role=select(form,"Acesso",[["reader","Somente leitura"],["editor","Pode editar"]],"reader");role.id="identity-share-role";
     form.append(node("button","Compartilhar"));const status=message(form),list=node("div");list.id="identity-members";d.append(list);
     async function members(){

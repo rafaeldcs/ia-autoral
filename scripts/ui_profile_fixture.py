@@ -1,5 +1,4 @@
-"""Actual onboarding for disposable browser-test identities, not an auth bypass."""
-FIXTURE_PASSPHRASE = 'Disposable browser profile passphrase 123'
+"""Actual name selection for disposable browser-test profiles."""
 
 
 def launch_browser(chromium, **options):
@@ -11,15 +10,17 @@ def launch_browser(chromium, **options):
 
 
 def enter_profile(page):
-    page.locator('#identity-gate[open]:visible, #identity-menu:visible').first.wait_for(state='visible')
+    try:
+        # On mobile the account control is inside the collapsed sidebar. Its
+        # presence still proves profile initialization; visibility does not.
+        page.locator('#identity-gate[open], #identity-menu').first.wait_for(state='attached')
+    except Exception as exc:
+        state=page.evaluate("({path:location.pathname,navigation:performance.getEntriesByType('navigation')[0]?.type,identityLoaded:!!window.LocalAuthorIdentity,locked:document.body.classList.contains('identity-locked'),connectBound:!!document.querySelector('#connect-form')?.onsubmit,transportInputLength:document.querySelector('#local-token')?.value.length,notice:document.querySelector('#notification')?.textContent})")
+        raise RuntimeError('Profile chooser did not open: '+str(state)) from exc
     if page.evaluate('Boolean(window.LocalAuthorIdentity.user)'):
         return
     gate=page.locator('#identity-gate')
-    if gate.get_attribute('data-setup')=='true':
-        page.locator('#identity-name').fill('Browser laboratory')
-        page.locator('#identity-confirm').fill(FIXTURE_PASSPHRASE)
-    page.locator('#identity-username').fill('browser-lab')
-    page.locator('#identity-password').fill(FIXTURE_PASSPHRASE)
+    page.locator('#identity-name').fill('Browser laboratory')
     page.locator('#identity-submit').click()
     gate.wait_for(state='hidden')
 

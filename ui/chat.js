@@ -120,7 +120,7 @@ for (const button of document.querySelectorAll('[data-close]'))
 $('project-existing').onchange=$('project-managed').onchange=()=>{const existing=$('project-existing').checked;$('project-root-field').hidden=!existing;$('project-root').required=existing;};
 $('conversation-filter').onchange=()=>renderConversations().catch(error=>toast(error.message));
 $('project-sharing').onclick=handle(()=>window.LocalAuthorIdentity.openSharing(state.project));
-$('project-create').onsubmit = handle(async () => { const managed=$('project-managed').checked;const project = await api('/api/projects', { name: $('project-name').value,...(managed?{managed:true}:{root:$('project-root').value}) }); state.projects = await api('/api/projects'); $('project-dialog').close(); $('project-create').reset();$('project-managed').onchange(); await selectProject(state.projects.find(p=>p.id===project.id)||project); toast(managed?'Projeto privado criado na sua pasta do servidor.':'Pasta vinculada ao seu projeto privado.'); });
+$('project-create').onsubmit = handle(async () => { const managed=$('project-managed').checked;const project = await api('/api/projects', { name: $('project-name').value,...(managed?{managed:true}:{root:$('project-root').value}) }); state.projects = await api('/api/projects'); $('project-dialog').close(); $('project-create').reset();$('project-managed').onchange(); await selectProject(state.projects.find(p=>p.id===project.id)||project); toast(managed?'Projeto criado na sua pasta do servidor.':'Pasta vinculada ao seu projeto.'); });
 $('new-chat').onclick = handle(async () => { if (!state.project)
     throw Error('Adicione uma pasta de projeto primeiro.'); closeNavigation(); resetChat(); });
 for (const button of document.querySelectorAll('[data-prompt]'))

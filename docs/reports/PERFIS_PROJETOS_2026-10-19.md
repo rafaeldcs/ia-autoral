@@ -1,4 +1,6 @@
-# Perfis pessoais e projetos privados — validação de 19/10/2026
+# Perfis pessoais e projetos privados — validação inicial de 19/10/2026
+
+> Registro histórico da primeira entrega, substituída depois pelo pedido de identificação somente por nome. A versão atual não pede usuário/senha e não oferece sigilo entre pessoas que podem selecionar o perfil de outra. Consulte [o guia atual](../PERFIS_E_PROJETOS.md). Os testes abaixo descrevem aquela primeira revisão, não certificam autenticação pessoal na versão por nome.
 
 Solicitação: organizar o uso da mesma LocalAuthor por várias pessoas. Decisão do proprietário: projetos privados por padrão, com compartilhamento explícito. A entrega preserva uma única instalação de modelos no servidor e acrescenta identidade pessoal, propriedade de projetos e autorização na API.
 

@@ -1,7 +1,8 @@
-"""People, private project ownership and opaque, revocable browser sessions.
+"""Named profiles, project organization and revocable browser selections.
 
-The LAN/device bearer remains a transport credential, never a person's identity.
-Passwords and session secrets are not job payloads, model context or audit data.
+Names are not authentication: any paired device may choose another active name.
+Legacy password helpers remain compatible with existing backups/integrations;
+they do not make name-selectable profiles private from another application user.
 """
 from __future__ import annotations
 
@@ -66,6 +67,11 @@ def _username(value):
     return value.strip().casefold()
 
 
+def _profile_name(value):
+    label=' '.join(_name(value).split())
+    return label,unicodedata.normalize('NFKC',label).casefold()
+
+
 class IdentityService:
     def __init__(self, store, home):
         self.store, self.home = store, Path(home)
@@ -94,6 +100,57 @@ class IdentityService:
 
     def public_user(self, user):
         return {**{k:user[k] for k in ('id','username','name','role','active')}, 'workspace':str(self.workspace(user))}
+
+    def public_profiles(self):
+        with self.store.connect() as db:
+            return [dict(row) for row in db.execute('SELECT id,name FROM profile_users WHERE active=1 ORDER BY name')]
+
+    def _named_profile(self, db, name, *, role='user'):
+        label,key=_profile_name(name)
+        for row in db.execute('SELECT id,name FROM profile_users'):
+            if _profile_name(row['name'])[1]==key:
+                raise ConflictError('Já existe um perfil com este nome. Escolha-o na lista ou use nome e sobrenome.')
+        if db.execute('SELECT count(*) FROM profile_users').fetchone()[0]>=50:
+            raise PolicyError('O servidor atingiu o limite de 50 perfis.')
+        ident=uuid.uuid4().hex
+        # Legacy columns remain for compatible backups. Named profiles have no
+        # password; their opaque internal username is never requested in the UI.
+        db.execute("INSERT INTO profile_users VALUES(?,?,?,?,1,'','',?)",(ident,'profile-'+ident[:16],label,role,utcnow()))
+        return ident
+
+    def identify(self, name, *, local):
+        label,key=_profile_name(name)
+        created=False;first=False
+        with self.lock,self.store.connect() as db:
+            db.execute('BEGIN IMMEDIATE')
+            rows=db.execute('SELECT id,name,active FROM profile_users').fetchall()
+            matches=[row for row in rows if _profile_name(row['name'])[1]==key]
+            if len(matches)>1:
+                raise ConflictError('Há perfis antigos com o mesmo nome. Peça ao administrador para diferenciá-los.')
+            if matches:
+                if not matches[0]['active']:raise AccessDeniedError('Este perfil está desativado. Fale com o administrador.')
+                ident=matches[0]['id']
+            else:
+                first=not rows
+                if first:
+                    if not local:raise AccessDeniedError('Crie o primeiro perfil nesta máquina servidor.')
+                    if db.execute("SELECT 1 FROM jobs WHERE state IN ('queued','running') LIMIT 1").fetchone():
+                        raise ConflictError('Aguarde as tarefas atuais terminarem antes de configurar os perfis.')
+                ident=self._named_profile(db,label,role='admin' if first else 'user');created=True
+                if first:
+                    db.execute('INSERT INTO project_owners SELECT id,? FROM projects',(ident,))
+                    db.execute('INSERT INTO profile_conversations SELECT id,? FROM conversations',(ident,))
+            token=self._issue(db,ident)
+        if created:self.store.audit('identity.configured' if first else 'identity.named-profile-created',{'user_id':ident})
+        return self.user(ident),token
+
+    def create_named_user(self, actor, name, role='user'):
+        self.require_admin(actor)
+        if role not in ('admin','user'):raise PolicyError('Permissão inválida.')
+        with self.lock,self.store.connect() as db:
+            db.execute('BEGIN IMMEDIATE');ident=self._named_profile(db,name,role=role)
+        self.store.audit('identity.named-profile-created',{'actor_id':actor['id'],'user_id':ident})
+        return self.public_user(self.user(ident))
 
     def require_admin(self, user):
         if self.user(user['id'])['role'] != 'admin':
@@ -206,6 +263,8 @@ class IdentityService:
             db.execute('BEGIN IMMEDIATE')
             old=db.execute('SELECT * FROM profile_users WHERE id=?',(ident,)).fetchone()
             if old is None:raise NotFoundError('Perfil não encontrado.')
+            if any(_profile_name(row['name'])[1]==_profile_name(name)[1] for row in db.execute('SELECT name FROM profile_users WHERE id<>?',(ident,))):
+                raise ConflictError('Já existe um perfil com este nome. Use nome e sobrenome para diferenciar.')
             if old['role']=='admin' and old['active'] and (role!='admin' or not active):
                 if db.execute("SELECT count(*) FROM profile_users WHERE role='admin' AND active=1").fetchone()[0]<=1:
                     raise PolicyError('Mantenha pelo menos um administrador ativo.')

@@ -88,7 +88,7 @@ Documentos de histórico e operação:
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/API.md`](docs/API.md), [`docs/DATASET.md`](docs/DATASET.md) e [`docs/ORIGINAL_PLAN.md`](docs/ORIGINAL_PLAN.md): arquitetura e plano original; afirmações antigas sobre ausência de pesos prontos referem-se ao laboratório legado, não à camada opcional.
 - [`docs/PROGRESS_WINDOWS.md`](docs/PROGRESS_WINDOWS.md), [`docs/WRITING_AND_CODE.md`](docs/WRITING_AND_CODE.md), [`docs/PROJECT_CHAT.md`](docs/PROJECT_CHAT.md), [`docs/USABILITY_LEARNING.md`](docs/USABILITY_LEARNING.md): avaliações históricas, não resultados do checkpoint atual.
 - [`docs/LAN_INSTALL.md`](docs/LAN_INSTALL.md), [`docs/LAN_VALIDATION.md`](docs/LAN_VALIDATION.md): cliente Windows e host de rede. A nova interface deve ser validada separadamente em cada instalação/proxy.
-- [`docs/PERFIS_E_PROJETOS.md`](docs/PERFIS_E_PROJETOS.md): perfis pessoais, projetos privados por padrão e compartilhamento explícito na mesma IA da rede local.
+- [`docs/PERFIS_E_PROJETOS.md`](docs/PERFIS_E_PROJETOS.md): espaços separados por nome, sem senha de perfil, e compartilhamento na mesma IA da rede local.
 
 O repositório remoto é `rafaeldcs/ia-autoral`. Não execute o bootstrap de publicação sobre esse remoto existente. GitHub/Actions são ferramentas de desenvolvimento, não dependências da inferência local. O estado de publicação e os resultados são os do commit e do workflow consultados.
 
