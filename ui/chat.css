@@ -1,13 +1,16 @@
 :root {
   color-scheme:light;
-  --text:#242424;
-  --muted:#686868;
-  --line:#e8e8e8;
-  --accent:#5142ba;
-  --surface:#f7f7f7;
+  --text:#2c2734;
+  --muted:#6c6472;
+  --line:#e6e0e9;
+  --accent:#6950a3;
+  --accent-soft:#eee8f7;
+  --warm:#d29a72;
+  --canvas:#fffcf9;
+  --surface:#f5f1f6;
   font:14px/1.6 'Segoe UI',system-ui,sans-serif;
   color:var(--text);
-  background:#fff;
+  background:var(--canvas);
 }
 * {
   box-sizing:border-box;
@@ -49,14 +52,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   outline-offset:3px;
 }
 .primary {
-  background:#242424;
+  background:var(--accent);
   color:#fff;
   border-radius:10px;
   padding:10px 18px;
   font-weight:600;
 }
 .primary:hover {
-  background:#444;
+  background:#58418b;
 }
 .brand {
   display:flex;
@@ -67,7 +70,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   letter-spacing:-.4px;
 }
 .logo {
-  background:#242424;
+  background:linear-gradient(145deg,#8464bb,#5f458f);
   color:#fff;
   width:27px;
   height:29px;
@@ -191,9 +194,10 @@ textarea {
   letter-spacing:0;
 }
 .sidebar nav button.active {
-  background:#e7e7e7;
+  background:var(--accent-soft);
   font-weight:600;
-  color:#242424;
+  color:var(--accent);
+  box-shadow:inset 2px 0 var(--accent);
 }
 .nav-label {
   min-width:0;
@@ -421,12 +425,20 @@ textarea {
   padding:clamp(28px,8vh,86px) 32px 24px;
 }
 .welcome-mark {
-  font-size:31px;
-  color:#363636;
+  display:grid;
+  place-items:center;
+  width:72px;
+  height:72px;
+  border-radius:24px;
+  color:var(--accent);
+  background:var(--accent-soft);
+  transform:rotate(-5deg);
 }
+.welcome-mark svg { transform:rotate(5deg); }
+.welcome .eyebrow { color:var(--accent); margin-top:24px; }
 .welcome h1 {
   font-size:32px;
-  font-weight:600;
+  font-weight:550;
   letter-spacing:-1px;
   line-height:1.25;
   margin:14px 0;
@@ -456,8 +468,8 @@ textarea {
   background:white;
 }
 .suggestions button:hover {
-  background:var(--surface);
-  border-color:#bdbdbd;
+  background:var(--accent-soft);
+  border-color:var(--accent);
 }
 #start-project {
   margin-top:16px;
@@ -490,12 +502,27 @@ textarea {
 }
 .message.user {
   margin-left:18%;
-  background:#f3f3f3;
+  background:var(--surface);
   border-radius:16px;
   padding:16px 20px;
 }
 .message.assistant {
   padding:8px 0;
+}
+.message.assistant .message-label { color:var(--accent); }
+.message.assistant .message-label::before { content:'✦'; margin-right:6px; }
+.response-details {
+  margin-top:12px;
+  color:var(--muted);
+  font-size:11px;
+}
+.response-details summary { cursor:pointer; width:fit-content; }
+.response-details small { margin-top:8px; }
+.response-warning {
+  color:var(--text);
+  border-left:3px solid var(--warm);
+  padding-left:10px;
+  font-size:12px;
 }
 .message small {
   display:block;
@@ -546,7 +573,8 @@ textarea {
   box-shadow:0 3px 15px #00000005;
 }
 .composer:focus-within {
-  border-color:#9f9f9f;
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-soft);
 }
 .composer textarea {
   border:0;
@@ -1041,21 +1069,25 @@ dialog ul {
 /* Appearance preferences contain no authentication or conversation data. */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --text: #ececec;
-  --muted: #b0b0b0;
-  --line: #393939;
-  --accent: #b5a8ff;
-  --surface: #242424;
-  background: #1b1b1b;
+  --text: #f0eaf5;
+  --muted: #b8afc1;
+  --line: #3c3743;
+  --accent: #c1abeb;
+  --accent-soft: #382f47;
+  --warm: #dfac85;
+  --canvas: #1e1c22;
+  --surface: #26232b;
+  background:var(--canvas);
 }
-:root[data-theme="dark"] body { background: #1b1b1b; }
-:root[data-theme="dark"] :is(input,select,textarea,dialog,.connect-card,.composer,.new-chat,.suggestions button,.browser-panel button) { background: #272727; border-color: #474747; color: var(--text); }
-:root[data-theme="dark"] :is(.sidebar nav button.active,.message.user) { background: #343434; color: var(--text); }
-:root[data-theme="dark"] :is(.welcome-mark,.logo) { color: #eee; }
-:root[data-theme="dark"] .browser-panel { background: #242424; }
+:root[data-theme="dark"] body { background:var(--canvas); }
+:root[data-theme="dark"] :is(input,select,textarea,dialog,.connect-card,.composer,.new-chat,.suggestions button,.browser-panel button) { background: #2b2731; border-color: #494151; color: var(--text); }
+:root[data-theme="dark"] .sidebar nav button.active { background:var(--accent-soft); color:var(--text); }
+:root[data-theme="dark"] .message.user { background: #302b37; color:var(--text); }
+:root[data-theme="dark"] .logo { color: #fff; }
+:root[data-theme="dark"] .browser-panel { background:var(--surface); }
 :root[data-theme="dark"] :is(button:hover,.tool-links a:hover) { background: #383838; }
-:root[data-theme="dark"] .primary { background: #ececec; color: #202020; border-color: #ececec; }
-:root[data-theme="dark"] .primary:hover { background: #d1d1d1; }
+:root[data-theme="dark"] .primary { background:var(--accent); color:#241c30; border-color:var(--accent); }
+:root[data-theme="dark"] .primary:hover { background:#d4c3f2; }
 .appearance-control { margin-top: 20px; }
 .chat-recovery{display:flex;align-items:center;justify-content:space-between;gap:6px 16px;flex-wrap:wrap;font-size:12px;line-height:1.5;color:var(--muted,#666);padding:8px 4px;min-width:0}
 .chat-recovery[hidden]{display:none}.recovery-actions{display:flex;gap:6px;flex-wrap:wrap}.chat-recovery button{background:transparent;color:inherit;border:1px solid var(--line,#ddd);border-radius:7px;padding:5px 8px;font:inherit;cursor:pointer}.recovery-dialog{box-sizing:border-box;width:min(650px,calc(100vw - 28px));max-height:90dvh;overflow:auto;border:1px solid var(--line,#ddd);border-radius:16px;padding:24px;background:var(--bg,#fff);color:var(--text,#222)}.recovery-dialog::backdrop{background:#0006}.recovery-dialog textarea{display:block;box-sizing:border-box;width:100%;resize:vertical;padding:12px;margin:10px 0;font:13px/1.5 Consolas,monospace;background:var(--panel,#f7f7f7);color:inherit;border:1px solid var(--line,#ddd);border-radius:8px}.recovery-dialog button{padding:8px 12px;margin:6px 6px 12px 0;cursor:pointer}

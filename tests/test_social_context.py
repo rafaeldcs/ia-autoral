@@ -42,3 +42,14 @@ class SocialContextTests(unittest.TestCase):
         self.assertEqual(len(context.evidence),1)
         self.assertIn('Instagram',context.messages[0]['content'])
         self.assertIn('orientacao_do_projeto',json.loads(context.messages[-1]['content']))
+
+    def test_social_style_examples_do_not_leak_into_campaigns_or_mixed_requests(self):
+        thanks=self.context('Obrigado, ajudou muito!')
+        self.assertIn('bom trabalho por aí',thanks.messages[0]['content'])
+        for message in ['Crie um anúncio para solicitar uma demonstração.',
+                        'Obrigado! Agora escreva um anúncio para solicitar uma demonstração.']:
+            with self.subTest(message=message):
+                context=self.context(message)
+                self.assertNotIn('bom trabalho por aí',context.messages[0]['content'])
+                self.assertIn('não executa ferramentas',context.messages[0]['content'])
+                self.assertIn('condições comerciais desconhecidas',context.messages[0]['content'])

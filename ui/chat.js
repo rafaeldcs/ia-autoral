@@ -44,7 +44,7 @@ function updateAvailability() {
     $('suggestion-help').hidden = !state.project;
     document.querySelector('.suggestions').hidden = !state.project;
     $('compose').setAttribute('aria-busy', String(state.busy));
-    $('message-input').placeholder = state.project ? 'Descreva uma ideia, uma dúvida ou o próximo passo…' : 'Adicione um projeto para começar a conversar.';
+    $('message-input').placeholder = state.project ? 'Conte o que você tem em mente…' : 'Adicione um projeto para começar a conversar.';
     voiceChat?.syncControls();
 }
 function busy(value) { state.requestBusy = value; state.busy = value || Boolean(voiceChat?.active); $('busy').hidden = !value; for (const node of document.querySelectorAll('#studio button,#studio select'))
@@ -113,7 +113,7 @@ async function selectProject(project,conversation='') {
         const selected=conversation?await api('/api/conversation?project_id='+project.id+'&id='+conversation):null;
         hideBrowserPanel();state.project=project;state.conversation=selected;
         $('project-heading').textContent=project.name;$('project-heading').title=project.name;$('folder-path').textContent=project.root;
-        $('welcome-copy').textContent='Converse sobre '+project.name+'. Comece com o problema, combine o critério de pronto e planeje como testar.';
+        $('welcome-copy').textContent='Este é o espaço de '+project.name+'. Traga uma ideia, uma dúvida ou aquele ponto que travou. Vamos organizar o próximo passo.';
         closeNavigation();renderProjects();await recovery.open(project.id,conversation);renderMessages();await renderConversations();
     }finally{busy(false);}
     if(recovery.pending)await recoverRequest();
@@ -121,7 +121,7 @@ async function selectProject(project,conversation='') {
 }
 function renderMessages() { const list = $('messages'); list.replaceChildren(); const messages = state.conversation?.messages || []; $('welcome').hidden = messages.length > 0; for (const message of messages) {
     const box = el('article', '', `message ${message.role}`);
-    const names = { application_support:'LocalAuthor · aplicativo',web_research:'LocalAuthor · fontes consultadas', project_memory: 'Memória do projeto · preferência registrada', foundation_text: 'LocalAuthor · modelo local com contexto', project_guide: 'Guia do projeto · orientação estruturada', retrieval_only: 'Memória local · trechos recuperados', local_model: 'IA local · geração experimental', investigation_memory: 'Sistema investigado · evidências observadas', browser_session: 'Navegador da IA · sessão de investigação' };
+    const names = { application_support:'LocalAuthor · aplicativo',web_research:'LocalAuthor · fontes consultadas', project_memory: 'Memória do projeto · preferência registrada', foundation_text: 'LocalAuthor', project_guide: 'Guia do projeto · orientação estruturada', retrieval_only: 'Memória local · trechos recuperados', local_model: 'IA local · geração experimental', investigation_memory: 'Sistema investigado · evidências observadas', browser_session: 'Navegador da IA · sessão de investigação' };
     const code = message.metadata.format === 'code';
     const person=message.metadata.author_id?(message.metadata.author_id===window.LocalAuthorIdentity?.user?.id?'Você':message.metadata.author_name||'Pessoa do projeto'):(window.LocalAuthorIdentity?.user?'Histórico anterior aos perfis':'Você');
     const label = message.role === 'user' ? person : message.metadata.qualification === 'scoped' ? 'IA local · correção avaliada em escopo limitado' : names[message.metadata.origin] || 'Assistente';
@@ -160,8 +160,17 @@ function renderMessages() { const list = $('messages'); list.replaceChildren(); 
     }
     if (Array.isArray(message.metadata.memory_used) && (message.metadata.memory_used.length || message.metadata.omitted_memory))
         box.append(el('small', `Memórias usadas: ${message.metadata.memory_used.length}. Fora do contexto: ${message.metadata.omitted_memory || 0}.`));
-    if (message.metadata.notice)
-        box.append(el('small', message.metadata.notice));
+    if (message.metadata.notice) {
+        if(message.metadata.origin==='foundation_text') {
+            const details=el('details','','response-details');
+            details.append(el('summary','Sobre esta resposta'),el('small',message.metadata.notice));
+            box.append(details);
+        } else box.append(el('small', message.metadata.notice));
+    }
+    if(message.metadata.possibly_truncated) {
+        const warning=el('p','A resposta pode estar incompleta porque atingiu o limite de tamanho.','response-warning');
+        warning.setAttribute('role','status');box.append(warning);
+    }
     list.append(box);
 } list.scrollTop = list.scrollHeight; }
 $('connect-form').onsubmit = handle(async () => { state.token = $('local-token').value.trim(); await api('/api/health'); state.projects = await api('/api/projects'); renderProjects(); updateAvailability(); if (state.projects.length){
