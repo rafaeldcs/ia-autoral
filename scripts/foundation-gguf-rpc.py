@@ -38,9 +38,10 @@ def main():
     parser.add_argument("--tokens", type=int, required=True)
     parser.add_argument("--reasoning-budget", type=int, default=0)
     parser.add_argument("--gpu", action="store_true")
+    parser.add_argument("--json-output", action="store_true")
     args = parser.parse_args()
     runtime = GgufLabRuntime(args.weights, args.sha256, Path("/tmp/gguf-engine.log"), context=args.context,
-                             output=args.tokens, gpu=args.gpu, reasoning_budget=args.reasoning_budget)
+                             output=args.tokens, gpu=args.gpu, reasoning_budget=args.reasoning_budget,json_output=args.json_output)
     try:
         emit({"ready": True, "compute": runtime.compute, "isolation": runtime.isolation})
         for _ in range(10000):

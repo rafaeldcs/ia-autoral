@@ -46,8 +46,9 @@ def verify_sandbox(info, spec):
 
 
 class DockerGgufRuntime:
-    def __init__(self, spec, *, diagnostics=None):
+    def __init__(self, spec, *, diagnostics=None, json_output=False):
         if spec.backend != "gguf-docker": raise PolicyError("Backend incompatível.")
+        if type(json_output) is not bool:raise PolicyError("Modo JSON precisa ser explícito.")
         self.spec = spec
         self.container = None
         self.process = None
@@ -76,6 +77,7 @@ class DockerGgufRuntime:
             "--context", str(spec.context_tokens), "--tokens", str(spec.output_tokens),
             "--reasoning-budget", str(spec.runtime_profile["reasoning_budget"])]
         if spec.device == "cuda": command += ["--gpu"]
+        if json_output:command += ["--json-output"]
         try:
             ident = self.docker(command).decode("ascii").strip()
             if not re.fullmatch(r"[a-f0-9]{64}", ident): raise PolicyError("Docker não retornou identidade válida.")

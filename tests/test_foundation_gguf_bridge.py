@@ -101,6 +101,15 @@ class GgufBridgeTests(unittest.TestCase):
             with self.assertRaises(PolicyError): DockerGgufRuntime(self.model, diagnostics=self.root / "diagnostics")
             start.assert_not_called(); close.assert_called_once()
 
+    def test_structured_decoding_is_opt_in_and_does_not_bypass_sandbox_checks(self):
+        for structured in [False,True]:
+            bad=self.sandbox();bad['HostConfig']['NetworkMode']='bridge'
+            with self.subTest(structured=structured),patch.object(DockerGgufRuntime,'docker',side_effect=[b'a'*64,json.dumps([bad]).encode()]) as commands, \
+                 patch.object(DockerGgufRuntime,'close'),patch('localauthor.foundation.gguf_bridge.subprocess.Popen') as start:
+                with self.assertRaises(PolicyError):DockerGgufRuntime(self.model,diagnostics=self.root/('structured-'+str(structured)),json_output=structured)
+                self.assertEqual('--json-output' in commands.call_args_list[0].args[0],structured)
+                start.assert_not_called()
+
     def engine(self):
         engine = object.__new__(DockerGgufRuntime)
         engine.closed = False; engine.lock = threading.RLock(); engine.frames = queue.Queue()

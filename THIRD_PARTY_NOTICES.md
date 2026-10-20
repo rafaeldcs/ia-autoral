@@ -1,5 +1,9 @@
 # Autoria, infraestrutura e dependências
 
+## Harvey LAB opcional — 20/10/2026
+
+A avaliação opcional usa `lab-core` 1.2.0 do projeto Harvey LAB, revisão `97810facfd447317b57f6dd02a1469561c573d79`, sob MIT, copyright 2026 Harvey AI: https://github.com/harveyai/harvey-labs/blob/97810facfd447317b57f6dd02a1469561c573d79/LICENSE . O aviso MIT é copiado integralmente para a imagem de avaliação junto ao núcleo original. Código, documentos e modelos do benchmark não são incorporados ao treinamento por esta integração. O host não ganha dependências Python obrigatórias; o worker Docker inclui as dependências de documentos declaradas pelo upstream e o SDK `anthropic` importado pelo scorer, mas não configura clientes de IA externos. O transporte do modelo, o juiz e o fallback de nomes de arquivos são locais. A imagem e seus pesos existentes não são enviados a um registro remoto. Infraestrutura, adaptações, execução e limites: [HARVEY_LOCAL.md](docs/HARVEY_LOCAL.md).
+
 ## Senha de publicação — 0.3.2
 
 O gateway acrescenta Microsoft.Data.Sqlite 10.0.12 e suas dependências SQLitePCLRaw/SQLite para um banco local de autorização de publicação, sem serviço externo. O hash utiliza PBKDF2-HMAC-SHA256 da biblioteca padrão .NET, salt aleatório e 600.000 iterações. A senha original não é persistida. Referência do pacote: https://www.nuget.org/packages/Microsoft.Data.Sqlite/10.0.12 . O banco fica fora do repositório, separado dos projetos e dos modelos existentes.
