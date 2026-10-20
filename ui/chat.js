@@ -119,13 +119,55 @@ async function selectProject(project,conversation='') {
     if(recovery.pending)await recoverRequest();
     $('message-input').focus();
 }
+function messageContent(message) {
+    const value = message.content;
+    if (message.role !== 'assistant')
+        return el(message.metadata.format === 'code' ? 'pre' : 'div', value, message.metadata.format === 'code' ? 'message-content code-content' : 'message-content');
+    const content = el('div', '', 'message-content rich-content');
+    const fence = /^ {0,3}(`{3,}|~{3,})([^\r\n]*)(?:\r?\n|$)/gm;
+    const languages = {csharp:'C#',cs:'C#',tsx:'TSX',typescript:'TypeScript',ts:'TypeScript',javascript:'JavaScript',js:'JavaScript',sql:'SQL',python:'Python',py:'Python',json:'JSON',html:'HTML',css:'CSS',bash:'Shell',sh:'Shell'};
+    function block(code, info, incomplete = false) {
+        const token = info.trim().split(/\s/)[0];
+        const language = languages[token.toLowerCase()] || (/^[\w+#.-]{1,24}$/.test(token) ? token : 'Código');
+        const section = el('section', '', 'code-block');
+        section.setAttribute('aria-label', `Bloco de código ${language}`);
+        const toolbar = el('div', '', 'code-toolbar');
+        toolbar.append(el('span', language, 'code-language'));
+        const copy = el('button', 'Copiar código', 'copy-code');
+        copy.type = 'button'; copy.setAttribute('aria-label', `Copiar código ${language}`);
+        copy.onclick = handle(async () => { await navigator.clipboard.writeText(code); toast('Código copiado sem alterar o texto.'); });
+        toolbar.append(copy);
+        const pre = el('pre', '', 'fenced-code'); pre.tabIndex = 0;
+        pre.setAttribute('aria-label', `Código ${language}`);
+        pre.append(el('code', code));
+        section.append(toolbar, pre);
+        if (incomplete) { const warning=el('small', 'Bloco de código sem fechamento na resposta.', 'code-incomplete'); warning.setAttribute('role','status'); section.append(warning); }
+        content.append(section);
+    }
+    let position = 0, opening;
+    while ((opening = fence.exec(value)) !== null) {
+        // Backticks in a backtick fence's info string are ordinary text.
+        if (opening[1][0] === '`' && opening[2].includes('`')) continue;
+        if (opening.index > position) content.append(el('div', value.slice(position, opening.index), 'message-prose'));
+        const start = fence.lastIndex;
+        const closing = new RegExp('^ {0,3}' + opening[1][0] + '{' + opening[1].length + ',}[ \\t]*(?:\\r?\\n|$)', 'gm');
+        closing.lastIndex = start;
+        const end = closing.exec(value);
+        block(value.slice(start, end ? end.index : value.length), opening[2], !end);
+        position = end ? closing.lastIndex : value.length;
+        fence.lastIndex = position;
+        if (!end || position === value.length) break;
+    }
+    if (!position) return el(message.metadata.format === 'code' ? 'pre' : 'div', value, message.metadata.format === 'code' ? 'message-content code-content' : 'message-content');
+    if (position < value.length) content.append(el('div', value.slice(position), 'message-prose'));
+    return content;
+}
 function renderMessages() { const list = $('messages'); list.replaceChildren(); const messages = state.conversation?.messages || []; $('welcome').hidden = messages.length > 0; for (const message of messages) {
     const box = el('article', '', `message ${message.role}`);
     const names = { application_support:'LocalAuthor · aplicativo',web_research:'LocalAuthor · fontes consultadas', project_memory: 'Memória do projeto · preferência registrada', foundation_text: 'LocalAuthor', project_guide: 'Guia do projeto · orientação estruturada', retrieval_only: 'Memória local · trechos recuperados', local_model: 'IA local · geração experimental', investigation_memory: 'Sistema investigado · evidências observadas', browser_session: 'Navegador da IA · sessão de investigação' };
-    const code = message.metadata.format === 'code';
     const person=message.metadata.author_id?(message.metadata.author_id===window.LocalAuthorIdentity?.user?.id?'Você':message.metadata.author_name||'Pessoa do projeto'):(window.LocalAuthorIdentity?.user?'Histórico anterior aos perfis':'Você');
     const label = message.role === 'user' ? person : message.metadata.qualification === 'scoped' ? 'IA local · correção avaliada em escopo limitado' : names[message.metadata.origin] || 'Assistente';
-    box.append(el('div', label, 'message-label'), el(code ? 'pre' : 'div', message.content, code ? 'message-content code-content' : 'message-content'));
+    box.append(el('div', label, 'message-label'), messageContent(message));
     const copy = el('button', 'Copiar mensagem', 'copy-message');
     copy.type = 'button';
     copy.onclick = handle(async () => {
@@ -169,6 +211,10 @@ function renderMessages() { const list = $('messages'); list.replaceChildren(); 
     }
     if(message.metadata.possibly_truncated) {
         const warning=el('p','A resposta pode estar incompleta porque atingiu o limite de tamanho.','response-warning');
+        warning.setAttribute('role','status');box.append(warning);
+    }
+    if(message.metadata.instruction_review?.violations?.length) {
+        const warning=el('p','A resposta ainda não atende a estes critérios: '+message.metadata.instruction_review.violations.join(' '),'response-warning');
         warning.setAttribute('role','status');box.append(warning);
     }
     list.append(box);

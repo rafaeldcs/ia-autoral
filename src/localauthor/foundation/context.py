@@ -25,6 +25,14 @@ SOCIAL_STYLE = (
     "Exemplos de tom para esta interação social, não bordões: "
     "'Valeu!' → 'Disponha, bom trabalho por aí!'; 'Até amanhã!' → 'Até amanhã!'. "
 )
+INSTRUCTION_FOLLOWING = (
+    "Priorize o pedido atual sobre exemplos anteriores. Antes de entregar, confira cada requisito, "
+    "proibição, formato e limite. Uma correção substitui o padrão rejeitado: não o reintroduza. "
+    "Código completo inclui imports e tipos usados; não suponha arquivos ou bibliotecas ausentes. "
+    "Preserve tipos e assinaturas do contexto. Proibições valem também para CSS, imports e exemplos. "
+    "Não substitua a tecnologia pedida por outra semelhante. Use blocos cercados com a linguagem do código. "
+    "Se não puder cumprir um requisito, explique a restrição em vez de afirmar que cumpriu. "
+)
 
 SYSTEM = (
     "Você é o LocalAuthor, um sistema local com modelos de origem registrada. "
@@ -121,6 +129,9 @@ def build_context(message: str, history: list[dict], evidence: list[dict], *,
     budget = context_tokens - output_tokens
     if not isinstance(message, str) or not message.strip() or len(message) > 8000:
         raise PolicyError("Pedido vazio ou excessivo.")
+    from ..message_format import detect_message_format
+    coding = not social and (work_profile == 'developer' or detect_message_format(message) == 'code'
+        or bool(re.search(r'c[oó]digo|\bc#|\b(?:csharp|tsx|typescript|javascript|react|xunit|sql|postgresql|python|imports?|css|tailwind)\b|next\.?js',message,re.I)))
     pairs = []
     for i in range(0, len(history) - 1, 2):
         a, b = history[i:i + 2]
@@ -145,7 +156,7 @@ def build_context(message: str, history: list[dict], evidence: list[dict], *,
         payload = {"pedido_atual": message, "fontes_nao_confiaveis": selected}
         if project_guidance is not None and not social: payload["orientacao_do_projeto"] = project_guidance
         if memories: payload["memorias_do_projeto"] = selected_memory
-        return [{"role": "system", "content": SYSTEM + (SOCIAL_STYLE if social else "") + (" " + rules if rules else "")}, *chosen_history,
+        return [{"role": "system", "content": SYSTEM + (INSTRUCTION_FOLLOWING if coding else "") + (SOCIAL_STYLE if social else "") + (" " + rules if rules else "")}, *chosen_history,
                 {"role": "user", "content": json.dumps(payload, ensure_ascii=False)}]
 
     if count(assemble()) > budget:

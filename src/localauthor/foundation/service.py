@@ -16,6 +16,7 @@ from .context import build_context, markdown_evidence
 from .experience import ExperienceStore
 from .models import ModelSpec, child, identifier, local_path
 from .runtime import ImageRuntime, TextRuntime, check_cancel
+from .instruction_review import review_code_request
 
 MAX_ARTIFACT_BYTES = 256_000_000
 
@@ -118,6 +119,27 @@ class FoundationService:
             check_cancel(cancel)
             if not isinstance(content, str) or not content.strip():
                 raise PolicyError("O modelo local não produziu conteúdo válido.")
+            review=review_code_request(message,content)
+            attempts=[{'content':content,'possibly_truncated':truncated,'review':review}]
+            if review['violations'] and not truncated:
+                correction=message+'\n\nRevisão automática de critérios explícitos:\n'+'\n'.join(review['violations'])+'\nGere a resposta completa novamente, obedecendo ao pedido original e às correções. Entregue o código, sem afirmar que foi executado.'
+                try:
+                    revised_context=build_context(correction,history,[*evidence,*notes],scope=project_id,
+                        count=engine.count,context_tokens=spec.context_tokens,output_tokens=spec.output_tokens,
+                        work_profile=work_profile,project_guidance=project_guidance,project_memory=project_memory)
+                except PolicyError:
+                    # Never truncate requirements to fit an automatic retry.
+                    revised_context=None
+                if revised_context is not None:
+                    revised,revised_truncated=engine.generate(revised_context.messages,cancel)
+                    check_cancel(cancel)
+                    if isinstance(revised,str) and revised.strip():
+                        content,truncated,context=revised,revised_truncated,revised_context
+                        previous_checks=review['checked']
+                        review=review_code_request(message,content)
+                        if not review['checked']:
+                            review={'checked':previous_checks,'violations':['A revisão não entregou um bloco de código verificável para os critérios pedidos.']}
+                        attempts.append({'content':content,'possibly_truncated':truncated,'review':review})
             result = {"origin": "foundation_text", "content": content, "sources": [],
                 "model": spec.provenance(), "evidence": context.evidence,
                 "input_tokens": context.input_tokens, "history_used": bool(context.history_used),
@@ -128,10 +150,13 @@ class FoundationService:
                 "work_profile": work_profile,
                 "notice": "Modelo local de origem registrada. Código não executado nem aplicado. "
                           "Memória não é treinamento; nenhuma experiência foi autorizada para treino automaticamente."}
+            if review['checked']:
+                result['instruction_review']={'scope':'explicit_code_constraints_only','attempts':len(attempts),**review}
             if truncated:
                 result["notice"] += " Saída possivelmente incompleta: limite de tokens atingido."
             metadata = {k: v for k, v in result.items() if k != "content"}
             metadata["generation_context"] = context.messages
+            if len(attempts)>1:metadata['generation_attempts']=attempts
             result["experience_id"] = ExperienceStore(self.home).record(project_id,
                 "code" if input_format == "code" else "text", message, content, metadata)
             return result

@@ -558,6 +558,13 @@ textarea {
   padding:16px;
   font-size:12px;
 }
+.rich-content { white-space:normal; }
+.message-prose { white-space:pre-wrap; }
+.code-block { min-width:0; max-width:100%; overflow:hidden; margin:14px 0; border:1px solid var(--line); border-radius:12px; background:var(--surface); }
+.code-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:6px 14px; border-bottom:1px solid var(--line); color:var(--muted); font-size:12px; }
+.copy-code { font-size:12px; padding:4px 8px; border-radius:6px; flex-shrink:0; }
+.fenced-code { margin:0; padding:16px; max-width:100%; overflow:auto; font:13px/1.65 Consolas,monospace; white-space:pre; tab-size:4; overflow-wrap:normal; }
+.code-incomplete { padding:0 16px 12px; }
 .compose-wrap {
   width:100%;
   padding:12px var(--chat-gutter) 16px;
