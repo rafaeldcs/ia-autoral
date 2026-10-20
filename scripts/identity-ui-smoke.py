@@ -88,7 +88,11 @@ def main():
                 check('Credentials are absent from web storage',owner.evaluate('localStorage.length+sessionStorage.length')==0 and person.evaluate('localStorage.length+sessionStorage.length')==0)
                 check('Profile session is HttpOnly',COOKIE_NOT_VISIBLE(person))
                 second_tab=person_context.new_page();connect(second_tab,'Developer fixture')
-                person.locator('#identity-menu').click();person.get_by_role('button',name='Trocar perfil',exact=True).click()
+                person.locator('#identity-menu').click()
+                # Logout intentionally reloads this tab and broadcasts to its
+                # sibling. Do not fill a form in either outgoing document.
+                with person.expect_navigation(wait_until='load'),second_tab.expect_navigation(wait_until='load'):
+                    person.get_by_role('button',name='Trocar perfil',exact=True).click()
                 for tab in (person,second_tab):
                     tab.locator('#local-token').fill(settings.token);tab.locator('#connect-form button').click();expect(tab.locator('#identity-gate')).to_be_visible()
                 check('Logout clears authenticated views in all tabs of the same browser')

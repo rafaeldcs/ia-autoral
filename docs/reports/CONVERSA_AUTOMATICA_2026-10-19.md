@@ -28,3 +28,5 @@ Foi feito backup SQLite íntegro e reinício cooperativo, preservando **13 proje
 Uma pergunta comum foi executada em seguida pela rota automática e respondida pelo modelo real local `gguf-docker`, com origem `foundation_text`. Isso confirma a chamada desse recurso no servidor; uma resposta não qualifica inteligência geral nem qualquer outra capacidade. Conversa completa, metadados, relatórios, imagens, recibos e artefatos permanecem privados.
 
 A mudança é de orquestração e interface, sem treino dos pesos. Não concede publicação, deploy, execução arbitrária ou acesso a outros projetos. Não houve ensaio em segundo computador físico. O CI deve ser conferido no SHA exato publicado desta revisão.
+
+O primeiro CI (`bfe056d`) passou em .NET e Python/Linux, mas encontrou uma espera incorreta no ensaio de troca de perfis: o teste preenchia o formulário enquanto as duas abas ainda eram recarregadas pelo logout. O ensaio agora aguarda a navegação real das duas abas antes de preencher o próximo formulário. As verificações de saída, cookies, perfis e projetos permanecem; nenhuma autenticação foi contornada. A conclusão exige conferir o CI da revisão corrigida.
