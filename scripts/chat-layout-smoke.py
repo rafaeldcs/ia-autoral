@@ -27,6 +27,20 @@ def main():
         assert value, name
         report['checks'].append(name)
 
+    def check_chat_space(page, name, content):
+        # Measure usable edges, not CSS declarations: no centered narrow column,
+        # no overlap with the sidebar/panel, and aligned welcome/history/editor.
+        metrics = page.evaluate('''(selector) => {
+            const chat = document.querySelector('.chat').getBoundingClientRect();
+            const composer = document.querySelector('#compose').getBoundingClientRect();
+            const content = document.querySelector(selector).getBoundingClientRect();
+            return {left:composer.left-chat.left,right:chat.right-composer.right,
+                width:chat.width,aligned:Math.abs(content.left-composer.left),
+                overflow:document.documentElement.scrollWidth>innerWidth};
+        }''', content)
+        check(name, 12 <= metrics['left'] <= 40 and 12 <= metrics['right'] <= 40
+              and metrics['aligned'] <= 2 and not metrics['overflow'])
+
     with tempfile.TemporaryDirectory() as tmp:
         base = Path(tmp)
         project = base / 'project'
@@ -67,6 +81,10 @@ def main():
                 check('Chat width is not consumed by a second navigation rail', page.locator('.chat').bounding_box()['width'] > 1000)
                 check('Neither format nor response mode requires a composer choice', page.locator('#input-format').get_attribute('type') == 'hidden' and page.locator('#compose select:visible').count() == 0)
                 check('Empty composer is compact and send is disabled', page.locator('#compose').bounding_box()['height'] < 150 and page.locator('#send').is_disabled() and page.locator('#input-count').is_hidden())
+                for width in (1440, 1920):
+                    page.set_viewport_size({'width': width, 'height': 1080})
+                    check_chat_space(page, f'Welcome and composer use the full main area at {width}', '.suggestions')
+                page.set_viewport_size({'width': 1440, 'height': 900})
                 formats = json.loads((ROOT / 'tests/fixtures/message_formats.json').read_text(encoding='utf-8'))
                 for sample in formats:
                     detected = page.evaluate('(value) => looksLikeCode(value)', sample['message'])
@@ -117,6 +135,7 @@ def main():
                 expect(page.locator('#sidebar')).not_to_be_visible()
                 expect(page.locator('#open-menu')).to_be_focused()
                 check('Collapsed navigation preserves draft', page.locator('#message-input').input_value() == draft)
+                check_chat_space(page, 'Collapsing the sidebar expands welcome and composer', '.suggestions')
                 page.locator('#open-menu').click()
                 expect(page.locator('#sidebar')).to_be_visible()
                 page.locator('#show-rules').click()
@@ -145,12 +164,21 @@ def main():
                 expect(page.locator('#conversation-list button')).to_be_in_viewport()
                 check('Saved conversation remains in view with twenty-one projects')
                 expect(page.locator('#notification')).to_be_hidden(timeout=10000)
+                for width in (1440, 1920):
+                    page.set_viewport_size({'width': width, 'height': 1080})
+                    check_chat_space(page, f'History and composer use the full main area at {width}', '.message.assistant')
+                page.screenshot(path=str(art / 'chat-layout-wide-history.png'))
+                page.set_viewport_size({'width': 1440, 'height': 900})
                 page.screenshot(path=str(art / 'chat-layout-desktop.png'))
                 page.locator('#new-chat').click()
                 expect(page.locator('#welcome')).to_be_visible()
                 expect(page.locator('#welcome h1')).to_have_text('Vamos dar forma à sua ideia?')
                 check('Friendly welcome still identifies the selected project', 'Projeto de demonstração' in page.locator('#welcome-copy').inner_text())
                 page.screenshot(path=str(art / 'chat-layout-welcome.png'))
+                page.set_viewport_size({'width': 1920, 'height': 1080})
+                check_chat_space(page, 'Wide welcome remains aligned with the composer', '.suggestions')
+                page.screenshot(path=str(art / 'chat-layout-wide-welcome.png'))
+                page.set_viewport_size({'width': 1440, 'height': 900})
                 page.locator('#conversation-list button').click()
                 expect(page.locator('.message.assistant')).to_have_count(1)
                 check('New conversation and persisted history remain reachable')
@@ -171,6 +199,11 @@ def main():
                 expect(page.locator('#browser-panel')).to_be_visible()
                 expect(page.locator('#browser-url')).to_be_visible()
                 check('Evidence and chat do not overlap', page.locator('.main').bounding_box()['x'] + page.locator('.main').bounding_box()['width'] <= page.locator('#browser-panel').bounding_box()['x'] + 1)
+                for width in (1440, 1024):
+                    page.set_viewport_size({'width': width, 'height': 900})
+                    check_chat_space(page, f'History and composer fit beside investigation at {width}', '.message.assistant')
+                page.screenshot(path=str(art / 'chat-layout-investigation.png'))
+                page.set_viewport_size({'width': 1440, 'height': 900})
                 page.keyboard.press('Escape')
                 expect(page.locator('#browser-panel')).not_to_be_visible()
                 expect(page.locator('#open-browser')).to_be_focused()
@@ -186,6 +219,7 @@ def main():
                     check(f'No horizontal overflow at {width}x{height}', page.evaluate('document.documentElement.scrollWidth <= innerWidth'))
                     box = page.locator('#send').bounding_box()
                     check(f'Composer stays inside viewport at {width}x{height}', box is not None and box['y'] >= 0 and box['y'] + box['height'] <= height)
+                    check_chat_space(page, f'History and composer share usable edges at {width}x{height}', '.message.assistant')
                 page.set_viewport_size({'width': 390, 'height': 844})
                 page.locator('#open-menu').click()
                 expect(page.locator('#sidebar-scrim')).to_be_visible()

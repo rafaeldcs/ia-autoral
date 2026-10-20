@@ -23,6 +23,12 @@ O filtro **Minhas / Todas** fica junto ao título das conversas e se aplica some
 
 Os ensaios de navegador usam 21 projetos e 34 conversas descartáveis, temas claro/escuro, seleção fora da prévia, teclado, recolhimento e larguras de 320 a 1440 pixels. Não exigem modelos reais nem qualificam sua inteligência. Esta mudança é web: reabrir a interface carrega os arquivos do servidor, sem reinstalar o cliente Windows.
 
+### Chat com largura disponível — 20/10/2026
+
+Boas-vindas, histórico e caixa de mensagem usam toda a área à direita da lateral, com margens alinhadas de 20 a 32 pixels no desktop e 14 pixels no celular. O texto introdutório mantém um limite de leitura; os contêineres da conversa e do editor não ficam presos a uma coluna central. Recolher a lateral amplia o conteúdo; abrir a investigação redistribui a área disponível sem sobrepor o chat. No celular, a investigação continua abrindo em tela inteira.
+
+O ensaio de layout também confere alinhamento e aproveitamento da largura em janelas de até 1920 pixels, com lateral recolhida e investigação aberta. As capturas usam projetos temporários e um dublê explícito de geração. Esta alteração é servida pela interface web: reabrir o aplicativo carrega os arquivos atuais do servidor, sem reinstalação.
+
 ### Identidade e jeito de conversar — 20/10/2026
 
 A LocalAuthor adota um tom próximo, curioso e prático. Vai ao ponto, usa exemplos simples e pode ter humor leve quando o contexto permitir. A orientação evita bordões, bajulação, intimidade forçada e perguntas automáticas no fim de toda resposta. Agradecimentos e despedidas pedem respostas breves; frustração pede acolhimento e ajuda concreta. Um pedido de linguagem formal ou de outro idioma continua tendo prioridade sobre o estilo habitual.
@@ -41,7 +47,7 @@ A caixa de mensagem tem uma linha de controles e cresce automaticamente conforme
 
 O campo de formato não é exibido. Um identificador oculto foi preservado para compatibilidade com clientes instalados que restauram rascunhos; o chat web envia sempre `input_format=auto`. A API também identifica o formato quando esse campo é omitido, mantendo suporte às indicações explícitas de clientes anteriores. Na área Modelos locais, conversar e criar imagem permanecem funções distintas; analisar código não exige mais um modo separado.
 
-`scripts/chat-layout-smoke.py` executa verificações reais de navegador usando apenas projetos temporários, um dublê explícito de geração e respostas dos guias estruturados. Verifica persistência das preferências, histórico, texto inerte, preservação de rascunhos, foco, ferramentas, painel de investigação e dimensões de 320 a 1440 pixels. Não mede a inteligência do modelo.
+`scripts/chat-layout-smoke.py` executa verificações reais de navegador usando apenas projetos temporários, um dublê explícito de geração e respostas dos guias estruturados. Verifica persistência das preferências, histórico, texto inerte, preservação de rascunhos, foco, ferramentas, painel de investigação e dimensões de 320 a 1920 pixels. Não mede a inteligência do modelo.
 
 O CI também executa as suítes existentes de Python, navegação avançada e foundation, e compila o cliente Windows. `scripts/chat-smoke.py` e `scripts/code-repair-chat-smoke.py` mantêm seus testes de modelos reais; agora abrem Ferramentas para acessar os exemplos.
 
