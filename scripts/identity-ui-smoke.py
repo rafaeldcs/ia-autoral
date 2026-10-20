@@ -168,6 +168,16 @@ def main():
                 expect(person.locator('#studio')).to_be_visible();expect(person.locator('#project-list')).not_to_contain_text('Projeto privado pessoal')
                 check('Switching profiles does not retain the previous private project list')
                 owner.set_viewport_size({'width':1440,'height':960})
+                owner.goto(url+'/advanced');owner.locator('#token').fill(settings.token);owner.locator('#login-form button').click()
+                expect(owner.locator('#identity-menu')).to_be_visible();owner.locator('#identity-menu').click()
+                check('The same compact profile works from advanced tools',owner.locator('#identity-account input:visible').count()==0)
+                check('Profile primary action has readable contrast outside the chat theme',owner.evaluate("""() => {
+                    const style=getComputedStyle(document.querySelector('.identity-primary'));
+                    function l(c){const v=c.match(/[\\d.]+/g).slice(0,3).map(Number).map(x=>{x/=255;return x<=.04045?x/12.92:((x+.055)/1.055)**2.4});return v[0]*.2126+v[1]*.7152+v[2]*.0722;}
+                    const a=l(style.color),b=l(style.backgroundColor);return (Math.max(a,b)+.05)/(Math.min(a,b)+.05)>=4.5;
+                }"""))
+                owner.screenshot(path=str(reports/'identity-profile-advanced.png'))
+                owner.keyboard.press('Escape');connect(owner)
                 owner.locator('#identity-menu').click();owner.get_by_role('button',name='Gerenciar equipe',exact=True).click()
                 own_row=owner.locator(f'.identity-user-row[data-user-id="{owner_id}"]');own_row.locator('summary').click()
                 own_row.locator('input[type=text]').fill('Browser laboratory race fixture')

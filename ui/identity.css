@@ -15,7 +15,7 @@
 .identity-caption{display:block;font-size:12px;color:var(--muted,#666);font-weight:400}
 .identity-account .identity-hint,#identity-team>.identity-hint{color:var(--muted,#666);font-size:13px;line-height:1.6}
 .identity-account-actions{display:grid;gap:8px;margin:22px 0}
-.identity-account-actions .identity-primary{background:var(--accent,#6950a3);border-color:var(--accent,#6950a3);color:var(--canvas,#fff);font-weight:600}
+.identity-account-actions .identity-primary{background:var(--accent,#6950a3);border-color:var(--accent,#6950a3);color:var(--canvas,var(--bg,#fff));font-weight:600}
 .identity-profile-details{border-top:1px solid var(--line,#ddd);padding-top:16px;color:var(--muted,#666);font-size:12px}
 .identity-profile-details summary,.identity-add-person>summary{cursor:pointer;padding:5px 0}
 .identity-profile-details h3{font-size:12px;margin:16px 0 4px}
