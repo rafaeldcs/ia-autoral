@@ -210,8 +210,9 @@ function modeNotice() { $('mode-notice').textContent = 'Ctrl + Enter para enviar
 $('response-mode').onchange = () => { modeNotice(); updateInputCount(); };
 function looksLikeCode(value) {
     // Presentation only. The server independently classifies the original string.
+    const declaration = /^\s*(?:const|let|var|string|int|bool|double|decimal)\s+[\p{L}\p{N}_]+\s*=/imu;
     const codeLine = /^\s*(?:(?:def|async\s+def|class)\s+\w+[^\n]*[:{]\s*$|(?:export\s+)?(?:async\s+)?function\s+\w+\s*\(|(?:const|let|var|string|int|bool|double|decimal)\s+\w+\s*=|(?:public|private|protected|internal)\s+(?:static\s+)?(?:class|void|async|Task|[A-Z]\w*)\b|(?:from\s+[\w.]+\s+import\s+|import\s+(?:[\w.]+|[{'\"])|using\s+[\w.]+\s*;)|(?:SELECT\s+.+\s+FROM\b|INSERT\s+INTO\b|CREATE\s+TABLE\b|UPDATE\s+\w+\s+SET\b)|(?:console\.(?:log|error)|print|Assert\.\w+|assert\.\w+)\s*\(|(?:if|for|while)\s*\([^\n]*\)\s*[{:]|(?:handle|reverse_proxy|server|location)\s+[^\n]*[{}]|(?:return|throw)\s+[^\n]+;\s*$)/im;
-    if (/^\s{0,3}(?:`{3,}|~{3,})/m.test(value) || codeLine.test(value) || /^\s*<([A-Za-z][\w:-]*)\b[^>]*>[\s\S]*<\/\1>\s*$/i.test(value)) return true;
+    if (/^\s{0,3}(?:`{3,}|~{3,})/m.test(value) || declaration.test(value) || codeLine.test(value) || /^\s*<([A-Za-z][\w:-]*)\b[^>]*>[\s\S]*<\/\1>\s*$/i.test(value)) return true;
     if (/^\s*[\[{]/.test(value)) { try { const parsed = JSON.parse(value); return parsed !== null && typeof parsed === 'object'; } catch {} }
     return false;
 }

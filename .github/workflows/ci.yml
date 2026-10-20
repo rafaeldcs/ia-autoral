@@ -54,11 +54,14 @@ jobs:
         run: dotnet build dotnet/LocalAuthor.Client/LocalAuthor.Client.csproj -c Release
       - run: dotnet build examples/laboratory/Laboratory.csproj -c Release
       - run: python scripts/dotnet-smoke.py
+      - run: python scripts/lan-static-smoke.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: dotnet-${{ matrix.os }}
-          path: reports/dotnet-smoke.json
+          path: |
+            reports/dotnet-smoke.json
+            reports/lan-static-smoke.json
   browser-ui:
     runs-on: ubuntu-latest
     steps:

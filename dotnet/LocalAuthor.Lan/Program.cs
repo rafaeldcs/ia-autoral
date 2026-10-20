@@ -76,6 +76,9 @@ try {
  _=discoveryTask.ContinueWith(t=>{if(t.IsFaulted){Console.Error.WriteLine("Descoberta indisponível; verifique a porta UDP.");app.Lifetime.StopApplication();}},TaskScheduler.Default);
  using var client=new HttpClient(new HttpClientHandler {AllowAutoRedirect=false,UseProxy=false,UseCookies=false}) {BaseAddress=new Uri($"http://127.0.0.1:{config.BackendPort}"),Timeout=TimeSpan.FromSeconds(120)};
  using var concurrency=new SemaphoreSlim(4,4);
+ // A page loads more than four assets in parallel. Keep the shared execution
+ // limit, but give a bounded number of allowlisted static reads time to enter.
+ using var staticQueue=new SemaphoreSlim(16,16);
  var advertisedOrigin=$"https://{config.Bind}:{config.Port}";
  var staticPaths=new HashSet<string>{"/","/chat.js","/chat.css","/advanced","/app.js","/styles.css",
   "/marketing","/marketing.js","/marketing.css",
@@ -107,7 +110,14 @@ try {
    if(authenticated==null) {await Error(401,"Acesso inválido ou revogado.");return;}
    if(!path.StartsWith("/api/",StringComparison.Ordinal)) {await Error(404,"Rota não encontrada.");return;}
   }
-  if(!await concurrency.WaitAsync(0)){await Error(429,"Servidor ocupado. Tente novamente em instantes.");return;}
+  bool admitted;
+  if(publicAsset) {
+   if(!staticQueue.Wait(0)){await Error(429,"Servidor ocupado. Tente novamente em instantes.");return;}
+   try {admitted=await concurrency.WaitAsync(TimeSpan.FromSeconds(5),context.RequestAborted);}
+   catch(OperationCanceledException){return;}
+   finally {staticQueue.Release();}
+  } else admitted=await concurrency.WaitAsync(0);
+  if(!admitted){await Error(429,"Servidor ocupado. Tente novamente em instantes.");return;}
   try {
    if(path=="/api/device" && context.Request.Method=="GET") {
     await context.Response.WriteAsJsonAsync(new {canPublishUpdates=true,publicationPasswordConfigured=publicationPassword.Configured,publicationPasswordRequired=true});return;
