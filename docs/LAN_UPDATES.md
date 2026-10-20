@@ -1,5 +1,11 @@
 # Atualização automática do cliente Windows
 
+## Estado ativo do chat — cliente 0.3.13
+
+A verificação de reinício consulta a instância ativa da recuperação do chat para conferir pedidos pendentes, carregamento e sincronização. A versão anterior consultava o módulo que cria essa instância; aqueles atributos não estavam presentes no módulo. Os testes agora verificam a instância real, incluindo texto vazio com sincronização pendente. O bloqueio por mensagem digitada e a retomada ao apagar permanecem.
+
+A versão intermediária 0.3.12 manteve o comportamento da 0.3.11 para exercitar uma atualização verdadeira no aplicativo instalado. A versão distribuída passa a ser a 0.3.13, também no instalador conectado. Não é necessário trocar a conexão salva.
+
 ## Retomada ao apagar um rascunho — cliente 0.3.11
 
 Quando encontra uma atualização e o chat está ocupado, o cliente verifica localmente a cada segundo se já pode continuar. Apagar todo o texto ou desfazer alterações de formulário libera a retomada, sem esperar a próxima consulta de cinco minutos. O aviso de reinício de 15 segundos permanece.

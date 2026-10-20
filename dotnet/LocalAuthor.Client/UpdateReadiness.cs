@@ -64,8 +64,8 @@ internal static class UpdateReadiness
           !document.body.classList.contains('identity-locked') && !document.querySelector('dialog[open]') &&
           typeof state !== 'undefined' && !state.busy && !state.requestBusy && !state.jobId &&
           document.getElementById('message-input')?.value === '' &&
-          !window.LocalAuthorRecovery?.pending && window.LocalAuthorRecovery?.ready !== false &&
-          (!window.LocalAuthorRecovery?.current || document.getElementById('chat-recovery')?.dataset.saved === 'true') &&
+          typeof recovery !== 'undefined' && recovery.ready && !recovery.pending &&
+          (!recovery.current || document.getElementById('chat-recovery')?.dataset.saved === 'true') &&
           window.LocalAuthorUpdateReadiness && !window.LocalAuthorUpdateReadiness.hasChanges())
         """;
 }
