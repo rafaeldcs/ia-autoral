@@ -140,7 +140,8 @@ class FoundationService:
                         if not review['checked']:
                             review={'checked':previous_checks,'violations':['A revisão não entregou um bloco de código verificável para os critérios pedidos.']}
                         attempts.append({'content':content,'possibly_truncated':truncated,'review':review})
-            result = {"origin": "foundation_text", "content": content, "sources": [],
+            from ..message_format import detect_message_format
+            result = {"origin": "foundation_text", "content": content, "format": detect_message_format(content), "sources": [],
                 "model": spec.provenance(), "evidence": context.evidence,
                 "input_tokens": context.input_tokens, "history_used": bool(context.history_used),
                 "history_messages_used": context.history_used,

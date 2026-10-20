@@ -158,7 +158,10 @@ function messageContent(message) {
         fence.lastIndex = position;
         if (!end || position === value.length) break;
     }
-    if (!position) return el(message.metadata.format === 'code' ? 'pre' : 'div', value, message.metadata.format === 'code' ? 'message-content code-content' : 'message-content');
+    if (!position) {
+        if (message.metadata.format === 'code') { block(value, ''); return content; }
+        return el('div', value, 'message-content');
+    }
     if (position < value.length) content.append(el('div', value.slice(position), 'message-prose'));
     return content;
 }

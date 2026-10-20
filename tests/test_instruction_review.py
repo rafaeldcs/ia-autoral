@@ -80,3 +80,11 @@ class BoundedInstructionRetryTests(WorkspaceCase):
         result,calls=self.generate(['```cs\nlinha 1\nlinha 2\n```','Não incluí código.'])
         self.assertEqual(len(calls),2)
         self.assertTrue(result['instruction_review']['violations'])
+
+    def test_unfenced_model_code_has_an_automatic_presentation_hint(self):
+        original='using System;\npublic class Tarefa {}'
+        result,calls=self.generate([original])
+        self.assertEqual(result['format'],'code')
+        self.assertEqual(result['content'],original)
+        self.assertEqual(len(calls),1)
+        self.assertNotIn('instruction_review',result)

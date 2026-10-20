@@ -175,6 +175,9 @@ def main():
                 page.locator('.message.assistant').last.locator('.copy-message').click()
                 check('Whole-message copy retains the original fence delimiters and prose',page.evaluate('window.layoutCopiedText')==fenced_reply)
                 page.evaluate("() => {if(window.layoutClipboardOriginal)Object.defineProperty(navigator,'clipboard',window.layoutClipboardOriginal);else delete navigator.clipboard;state.conversation.messages.pop();renderMessages();}")
+                page.evaluate("() => {state.conversation.messages.push({role:'assistant',content:'using System;\\npublic class Tarefa {}',metadata:{format:'code'}});renderMessages();}")
+                check('Unfenced model code retains its original text inside a copyable code block',page.locator('.message.assistant').last.locator('.code-block code').text_content()=='using System;\npublic class Tarefa {}')
+                page.evaluate('state.conversation.messages.pop();renderMessages()')
                 edge_reply='````text\nLinha\n```\nainda no bloco\n````\n~~~sql\nSELECT 2;'
                 page.evaluate('content=>{state.conversation.messages.push({role:"assistant",content,metadata:{origin:"foundation_text"}});renderMessages()}',edge_reply)
                 blocks=page.locator('.message.assistant').last.locator('.code-block')

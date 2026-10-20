@@ -2,6 +2,8 @@
 
 O chat separa o texto dos blocos cercados por crases ou tils. Cada bloco tem linguagem, botão **Copiar código** e rolagem horizontal própria. O conteúdo é inserido como texto: HTML, comentários, Unicode, tabulações e quebras de linha não são executados nem reescritos. **Copiar mensagem** preserva a resposta original, incluindo as cercas. Um bloco sem fechamento recebe aviso visível.
 
+Quando o modelo omite todas as cercas, o detector conservador de formato já existente classifica a resposta inteira. Se detectar código, o chat usa um bloco genérico copiável, preservando integralmente o texto. Essa apresentação alternativa não inventa uma linguagem nem aprova o código sem cercas na revisão de instruções.
+
 Pedidos de programação recebem orientação para conferir requisitos, proibições, tipos, imports e correções do usuário. Essa orientação não ocupa o orçamento das conversas sociais e de marketing. Fontes recuperadas continuam sendo dados não confiáveis, separados das regras do sistema; o pedido atual não é cortado para caber no contexto.
 
 Após gerar código com o modelo local, a plataforma verifica alguns critérios explícitos do pedido atual: um limite não ambíguo de linhas, proibições de `useEffect`, imports relativos e algumas classes Tailwind, além de identity do PostgreSQL quando pedida. São verificações lexicais limitadas; não são um compilador nem uma avaliação semântica completa. Comentários também contam para essas verificações e as regras não reconhecem toda formulação possível.
