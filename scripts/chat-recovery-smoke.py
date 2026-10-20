@@ -39,7 +39,7 @@ def main():
         app.jobs.handlers['chat']=slow
         server=create_server(app,ROOT/'ui',port=0);thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start();app.start()
         url=f'http://127.0.0.1:{server.server_port}'
-        contexts=[]
+        contexts=[];workspace_loading=[]
         try:
             with sync_playwright() as p:
                 def reopen():
@@ -48,6 +48,10 @@ def main():
                     page.on('pageerror',lambda error:report['errors'].append(str(error)))
                     connect(page);return context,page
                 def connect(page,name=None):
+                    def observe_workspace(route):
+                        if route.request.method=='GET':workspace_loading.append(page.locator('#studio').is_hidden())
+                        route.continue_()
+                    page.route('**/api/chat-workspace',observe_workspace)
                     page.goto(url);page.locator('#local-token').fill(app.settings.token);page.locator('#connect-form button').click()
                     if name is None:enter_profile(page)
                     else:
@@ -160,6 +164,7 @@ def main():
                 connect(page,'Marketing fixture')
                 check('Changing profiles does not reveal the previous profile drafts',page.locator('#project-list button').count()==0 and page.locator('#message-input').input_value()=='')
                 check('No credentials are stored in web storage',page.evaluate('localStorage.length+sessionStorage.length')==0)
+                check('The workspace stays hidden until its initial saved selection is resolved',bool(workspace_loading) and all(workspace_loading))
                 check('No browser JavaScript errors',not report['errors']);report['success']=True
                 context.close()
         except Exception as exc:

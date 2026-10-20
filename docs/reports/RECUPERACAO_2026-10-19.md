@@ -15,7 +15,7 @@ O chat principal agora salva o texto sem envio, mantém cópias locais e no serv
 ## Evidências locais
 
 - Python 3.14/Windows: **664 testes, 661 aprovados, zero falhas/erros e três testes de links simbólicos indisponíveis por falta de privilégio do Windows**. Os 15 casos novos usam bancos reais, concorrência, reinício, permissões, conteúdo inválido, recibos e recuperação após gravação da resposta.
-- Navegador real: **19 verificações aprovadas**, incluindo fechamento/reabertura, término real dos renderizadores do navegador temporário, edição sem servidor, sincronização posterior, conflito entre abas, perda da resposta HTTP após aceitação, reenvio explícito de pedido não aceito, não ressurreição de rascunho concluído, outra instalação sem armazenamento local e layout de 390 pixels. Sem erros JavaScript.
+- Navegador real: **20 verificações aprovadas**, incluindo fechamento/reabertura, término real dos renderizadores do navegador temporário, edição sem servidor, sincronização posterior, conflito entre abas, perda da resposta HTTP após aceitação, reenvio explícito de pedido não aceito, não ressurreição de rascunho concluído, outra instalação sem armazenamento local e layout de 390 pixels. Sem erros JavaScript.
 - HTTPS/gateway real: **11 verificações aprovadas**, com duas credenciais de dispositivos descartáveis, cookies separados, acesso ao rascunho/seleção e bloqueio a outro perfil.
 - Fachada .NET: **16 verificações aprovadas**. Interfaces avançada, chat, foundation, voz, marketing, leads e perfis executadas novamente sem falhas.
 - Atualizador nativo: **33 verificações aprovadas**, com atualização/reabertura autenticada pelos formulários reais, rascunho preservado, integridade e versão, recusa de servidor incorreto/revogação e retorno à versão anterior após falha.
@@ -27,6 +27,8 @@ O teste inicial de queda usando `Page.crash` bloqueava a própria chamada CDP. O
 O primeiro empacotamento manual do gateway omitiu a biblioteca nativa do SQLite. O pacote foi reconstruído e conferido em HTTPS; a opção de inclusão agora faz parte do projeto para publicações em arquivo único. Durante a atualização nativa, o driver de teste deixava de preencher o perfil porque comparava literalmente `/` com o endereço equivalente `/?`. Agora confere esquema, host, porta, caminho e ausência de parâmetros/fragmentos; mantém a automação enquanto cada WebView existe e reconecta quando o atualizador substitui o processo. Nenhum formulário ou validação de entrada foi contornado.
 
 Relatórios completos, imagens, backups, bancos, conexões pareadas e executáveis privados permanecem fora do Git. O CI deve ser conferido no SHA publicado desta revisão, sem usar o resultado de uma revisão anterior como substituto.
+
+O primeiro CI (`c03da1e`) identificou um clique durante a seleção inicial do projeto na interface móvel: a recuperação ainda podia substituir os botões após a tela se tornar visível. O chat agora só é exibido depois de resolver essa seleção. O teste de recuperação verifica esse limite enquanto a requisição ocorre, e os testes de interface foram repetidos. A falha original permanece registrada no CI; a conclusão exige conferir a revisão corrigida.
 
 ## Limites
 

@@ -111,12 +111,14 @@ function renderMessages() { const list = $('messages'); list.replaceChildren(); 
         box.append(el('small', message.metadata.notice));
     list.append(box);
 } list.scrollTop = list.scrollHeight; }
-$('connect-form').onsubmit = handle(async () => { state.token = $('local-token').value.trim(); await api('/api/health'); state.projects = await api('/api/projects'); $('local-token').value = ''; $('connect').hidden = true; $('studio').hidden = false; renderProjects(); updateAvailability(); if (state.projects.length){
+$('connect-form').onsubmit = handle(async () => { state.token = $('local-token').value.trim(); await api('/api/health'); state.projects = await api('/api/projects'); renderProjects(); updateAvailability(); if (state.projects.length){
     const last=await recovery.selection();const project=state.projects.find(row=>row.id===last?.project_id)||state.projects[0];
     try{await selectProject(project,project.id===last?.project_id?last.conversation_id:'');}catch(error){toast(error.message);await selectProject(project);}
 }
-else
-    $('add-project').focus(); });
+// Expose the workspace only after recovery finishes choosing its initial scope.
+// Otherwise a click can race the automatic selection and be lost on mobile.
+$('local-token').value = ''; $('connect').hidden = true; $('studio').hidden = false;
+if (!state.projects.length) $('add-project').focus(); });
 $('logout').onclick = () => { voiceChat?.stop(); hideBrowserPanel(); state.token = ''; state.project = null; state.conversation = null; state.projects = []; $('messages').replaceChildren(); $('project-list').replaceChildren(); $('conversation-list').replaceChildren(); $('studio').hidden = true; $('connect').hidden = false; $('local-token').focus(); };
 const mobileNavigation = matchMedia('(max-width:760px)');
 function closeNavigation(collapse = false) {
