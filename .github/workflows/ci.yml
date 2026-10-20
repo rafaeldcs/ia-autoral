@@ -63,7 +63,8 @@ jobs:
             reports/dotnet-smoke.json
             reports/lan-static-smoke.json
   browser-ui:
-    runs-on: ubuntu-latest
+    # Playwright 1.55 supports this image; ubuntu-latest moved to 26.04.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
