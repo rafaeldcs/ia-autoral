@@ -97,7 +97,11 @@ def build_context(message: str, history: list[dict], evidence: list[dict], *,
                   context_tokens: int, output_tokens: int, work_profile: str = "general",
                   project_guidance: dict | None = None, project_memory: list[dict] | None = None) -> Context:
     from .work_profiles import orientation
+    from ..chat_routing import social_only
     rules = orientation(work_profile)
+    social = social_only(message) if isinstance(message, str) else False
+    if social:
+        rules = ''
     if project_guidance is not None and (not isinstance(project_guidance, dict)
             or set(project_guidance) != {"method", "wip_limit", "definition_of_done"}
             or not isinstance(project_guidance["method"], str)
@@ -131,7 +135,7 @@ def build_context(message: str, history: list[dict], evidence: list[dict], *,
 
     def assemble() -> list[dict]:
         payload = {"pedido_atual": message, "fontes_nao_confiaveis": selected}
-        if project_guidance is not None: payload["orientacao_do_projeto"] = project_guidance
+        if project_guidance is not None and not social: payload["orientacao_do_projeto"] = project_guidance
         if memories: payload["memorias_do_projeto"] = selected_memory
         return [{"role": "system", "content": SYSTEM + (" " + rules if rules else "")}, *chosen_history,
                 {"role": "user", "content": json.dumps(payload, ensure_ascii=False)}]
@@ -147,12 +151,12 @@ def build_context(message: str, history: list[dict], evidence: list[dict], *,
     # Reserve at most half the remaining budget for recent history, so it cannot
     # starve every source. Keep complete consecutive pairs, never system messages.
     history_budget = count(assemble()) + (budget - count(assemble())) // 2
-    for pair in reversed(pairs):
+    for pair in ([] if social else reversed(pairs)):
         chosen_history[:0] = pair
         if count(assemble()) > history_budget:
             del chosen_history[:2]
             break
-    for entry in evidence[:24]:
+    for entry in ([] if social else evidence[:24]):
         if entry.get("scope") != scope:
             continue
         if not isinstance(entry.get("text"), str) or len(entry["text"]) > 12000:

@@ -6,6 +6,8 @@ Durante a leitura, **Interromper e falar** interrompe a voz e abre uma nova capt
 
 O modelo recebe orientações de conversação: acolher cumprimentos e agradecimentos brevemente, respeitar despedidas, simplificar explicações quando houver confusão e responder à pergunta mesmo que ela venha junto de um agradecimento. Essas orientações e o histórico melhoram o comportamento sem alterar pesos. A simpatia continua sujeita à qualidade do modelo local.
 
+Saudações e agradecimentos simples reconhecidos usam um contexto menor, para não retomar uma tarefa antiga por engano. Preferências declaradas do projeto continuam disponíveis. Uma pergunta junto do agradecimento mantém histórico, fontes e orientações do projeto. Nenhuma mensagem é apagada; os metadados registram as omissões. Expressões não reconhecidas usam o fluxo normal de contexto.
+
 Rascunhos digitados não são substituídos: envie ou guarde a mensagem antes de começar. O microfone fica desligado durante transcrição, geração e leitura. Trocar a página ou deixá-la em segundo plano encerra a voz. A captura nunca começa automaticamente ao abrir o aplicativo.
 
 ## Processamento e privacidade

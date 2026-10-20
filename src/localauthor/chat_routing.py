@@ -7,6 +7,25 @@ def plain(text):
     return ''.join(c for c in unicodedata.normalize('NFD',text.lower()) if not unicodedata.combining(c))
 
 
+def social_only(message):
+    """A narrow acknowledgement is not a request to resume an earlier task.
+
+    Mixed questions, code, approvals and unrecognized wording keep full context.
+    This selects relevant context; the local model still generates the reply.
+    """
+    if any(char in message for char in '`~<>[]{}()"\'\\/=;'):
+        return False
+    text = ' '.join(re.sub(r'[^\w\s]', ' ', plain(message)).split())
+    return bool(re.fullmatch(
+        r'(?:(?:chat|localauthor) )?(?:'
+        r'(?:oi|ola)(?: (?:bom dia|boa tarde|boa noite))?(?: tudo bem)?|'
+        r'(?:bom dia|boa tarde|boa noite)(?: tudo bem)?|'
+        r'(?:muito )?(?:obrigado|obrigada|grato|grata)(?: (?:pela ajuda|ajudou muito))?|'
+        r'perfeito muito grat[oa] pela ajuda|'
+        r'valeu(?: ate (?:amanha|mais|logo))?|'
+        r'ate (?:amanha|mais|logo)|tchau)', text))
+
+
 def urls(text):
     return list(dict.fromkeys(url.rstrip('.,;!?') for url in re.findall(r'https://[^\s<>"\)]+',text)))
 
