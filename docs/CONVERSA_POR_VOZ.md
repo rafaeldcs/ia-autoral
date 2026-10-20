@@ -14,7 +14,8 @@ Rascunhos digitados não são substituídos: envie ou guarde a mensagem antes de
 
 - O cliente captura o microfone e lê com uma voz local em português do Windows. Voz remota é recusada. Se faltar uma voz local, instale o recurso de fala nas configurações de idioma do Windows.
 - O servidor reconhece a fala com Whisper small q5_1 multilíngue em CPU num contêiner sem rede e responde com o modelo textual local registrado na Foundation. Clientes não precisam de pesos ou Docker.
-- Áudio só atravessa a conexão autenticada com seu servidor. Não é salvo no banco, na fila ou no navegador. O WAV temporário existe no `/tmp` em memória dentro do contêiner e é descartado ao remover aquela instância.
+- O perfil persistente conserva os pesos do Whisper entre falas e processa WAV em memória. O servidor HTTP do decoder fica somente no loopback interno do contêiner, sem porta publicada, rede externa ou histórico de transcrição entre pedidos. Logs Docker são desabilitados nesse perfil. O perfil antigo continua compatível e usa WAV temporário no `/tmp`.
+- Áudio só atravessa a conexão autenticada com seu servidor. Não é salvo no banco, na fila ou no navegador. Cancelamento/falha remove o runtime persistente afetado; uma nova fala cria outro. Troca do manifesto e encerramento do servidor também liberam o decoder.
 - Transcrição e resposta ficam no histórico do projeto. Registrar uma experiência não autoriza treinamento. Voz não concede permissão para executar código, publicar, pagar ou alterar sistemas. Não fale senhas ou dados privados.
 
 Histórico e fontes entram no limite real de contexto; não há memória ilimitada. A conversa também funciona por texto no modo **Conversar com a IA local**.
@@ -25,7 +26,11 @@ Cada fala tem até 30 segundos. O cliente envia WAV PCM mono de 16 kHz. O servid
 
 É uma conversa contínua por turnos: ouvir → transcrever → gerar → ler → ouvir. Não é áudio simultâneo nem resposta em tempo real com latência garantida. No ensaio de 20/10/2026, a transcrição levou aproximadamente oito segundos e confundiu “Kanban” com “Cambam”; a resposta preservou esse erro. O microfone físico e o reconhecimento desse termo não foram homologados.
 
-Uma transcrição por vez usa quatro CPUs e até 2 GiB de RAM. A decodificação tem prazo de 90 segundos. Ausência de modelo/Docker, servidor ocupado, microfone negado ou voz local ausente geram aviso e encerram a sessão. Não há reenvio automático após falha nem serviço remoto de contingência. A primeira resposta pode demorar mais ao carregar o modelo. Respostas longas são lidas parcialmente com aviso; o leitor não corta o texto armazenado. Reinícios automáticos aguardam a conversa por voz terminar.
+Uma transcrição por vez usa quatro CPUs no perfil antigo. O persistente permite quatro ou seis threads/CPUs explicitamente registrados, mantendo o teto de 2 GiB de RAM. O servidor desta entrega tem seis núcleos físicos e recebeu o perfil de seis CPUs. A decodificação tem prazo de 90 segundos. Ausência de modelo/Docker, servidor ocupado, microfone negado ou voz local ausente geram aviso e encerram a sessão. Não há reenvio automático após falha nem serviço remoto de contingência. A primeira resposta pode demorar mais ao carregar o modelo. Respostas longas são lidas parcialmente com aviso; o leitor não corta o texto armazenado. Reinícios automáticos aguardam a conversa por voz terminar.
+
+Ao começar a voz e permitir o microfone, o cliente também solicita o aquecimento do modelo textual pela fila existente. A captura é conectada antes de aguardar a resposta dessa solicitação, preservando as primeiras palavras. Esse job não gera mensagens, executa código ou guarda áudio; exige acesso de escrita ao projeto e tem as permissões rechecadas na execução. O modelo pode carregar enquanto a fala é reconhecida. A pausa de envio permanece em 1,5 segundo.
+
+No perfil persistente, falas com até oito segundos usam uma janela de encoder de 15,36 segundos; falas maiores mantêm a janela completa de 30 segundos. Nenhuma amostra é cortada e a busca do decoder continua com beam/best-of 5. Os testes de qualidade incluíram termos técnicos e uma fala de 28 segundos; isso não garante acerto universal nem corrige automaticamente o erro conhecido Kanban/Cambam.
 
 ## Preparar um servidor novo
 
@@ -41,6 +46,8 @@ Esta máquina foi preparada pelo operador. O aplicativo não baixa modelos, imag
 python scripts/register-voice.py --home "D:\LocalAuthor" --model "D:\Modelos\ggml-small-q5_1.bin" --image-id "sha256:HASH_CONFERIDO_DA_IMAGEM" --accept-mit-license
 ```
 
+Para o perfil persistente, compile `qa/voice/Dockerfile.persistent` com o mesmo código fonte e bases locais conferidas, passando `--build-arg VOICE_BASE=IMAGEM_LOCAL_CONFERIDA`. Nenhum download é feito pelo aplicativo. O binário `whisper-server` da mesma revisão é uma dependência nova; a licença está incluída na imagem. Ao registrar em um servidor novo, acrescente `--persistent --threads 6` (ou `4` num servidor menor). Use o hash dessa imagem persistente, nunca o do worker antigo. Um manifesto existente não é sobrescrito pelo registrador; a migração precisa preservar cópia e hash do registro original, validar o novo perfil e ativá-lo durante manutenção.
+
 6. Registre um modelo textual compatível conforme `FOUNDATION.md`, preservando registros anteriores, e reinicie o servidor cooperativamente. Conversa experimental não promove o modelo como programadora ou QA qualificada.
 7. Abra/reconecte os clientes já vinculados. O cliente 0.3.7 carrega esta interface pelo servidor; esta mudança web não exige reinstalação. Em navegador, use HTTPS ou loopback; HTTP por IP da rede não habilita microfone.
 
@@ -55,3 +62,5 @@ O decoder real isolado reconheceu três frases sintéticas em português, produz
 Nova verificação e evidências: [conversação e voz em 20/10/2026](reports/CONVERSACAO_E_VOZ_2026-10-20.md). O script opt-in `scripts/conversation-real-check.py --run-real --home CAMINHO --output PASTA_NOVA` executa doze pedidos no modelo registrado, sem usar a base de conversas do servidor. `--audio-fixtures PASTA` acrescenta arquivos sintéticos `input-*.wav` no formato canônico acima, com transcrição real e histórico entre turnos. Resultados e áudio ficam privados. `success` significa execução sem saída truncada, não aprovação semântica: revise respostas, transcrições e limitações.
 
 Referências: [Whisper.cpp](https://github.com/ggml-org/whisper.cpp), [vozes locais no navegador](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesisVoice/localService).
+
+Comparação de latência, configurações descartadas e limites: [otimização de voz em 20/10/2026](reports/VOZ_LATENCIA_2026-10-20.md).

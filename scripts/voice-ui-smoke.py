@@ -158,7 +158,8 @@ def main():
                 check('Voice controls fit narrow screens', page.evaluate('document.documentElement.scrollWidth<=innerWidth'))
                 page.screenshot(path=str(reports / 'voice-mobile.png'))
                 check('No audio or voice setting is persisted in browser', page.evaluate("Object.keys(localStorage).every(k=>k==='localauthor.appearance') && sessionStorage.length===0"))
-                check('No persistent transcription job stores audio', all(j['kind'] == 'chat' for j in app.jobs.list()))
+                check('Only warming and chat use the queue; no queued job stores audio',
+                      all(j['kind'] in {'chat','voice-prepare'} and 'audio' not in j['payload'] for j in app.jobs.list()))
                 assert not report['errors'], report['errors']; report['success'] = True; browser.close()
         finally:
             server.shutdown(); server.server_close(); worker.join(); app.close()

@@ -1,0 +1,14 @@
+# Same reviewed CPU source and weights; persistent server stays on container loopback.
+ARG VOICE_BASE
+FROM localauthor-cuda118-builder:1 AS build
+USER root
+COPY --from=whisper_source / /source/
+RUN cmake -S /source -B /build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DGGML_NATIVE=OFF -DGGML_OPENMP=OFF -DWHISPER_BUILD_TESTS=OFF -DWHISPER_SDL2=OFF -DGGML_CUDA=OFF && cmake --build /build --target whisper-server -j 4
+FROM ${VOICE_BASE}
+USER root
+COPY --from=build /build/bin/whisper-server /opt/voice/whisper-server
+COPY --from=build /source/LICENSE /opt/voice/LICENSE.whisper.cpp
+COPY scripts/voice-persistent-worker.py /opt/voice/persistent.py
+USER 10001:10001
+WORKDIR /tmp
+ENTRYPOINT ["python3", "/opt/voice/persistent.py"]

@@ -27,8 +27,11 @@ def main():
     parser.add_argument('--home', type=Path, required=True)
     parser.add_argument('--model', type=Path, required=True)
     parser.add_argument('--image-id', required=True)
+    parser.add_argument('--persistent',action='store_true',help='Use only with the reviewed persistent worker image.')
+    parser.add_argument('--threads',type=int,choices=(4,6),default=4)
     parser.add_argument('--accept-mit-license', action='store_true', required=True)
     args = parser.parse_args()
+    if not args.persistent and args.threads != 4: parser.error('Six threads require the persistent profile.')
     target = local_path(args.home / 'voice/model.json')
     if target.exists(): raise RuntimeError('Registro existente; preserve e revise antes de substituir.')
     if not re.fullmatch('sha256:[a-f0-9]{64}', args.image_id): raise RuntimeError('Imagem deve ser identificada por hash.')
@@ -49,9 +52,10 @@ def main():
                         '--mount', f'type=volume,src={volume},dst=/weights', args.image_id, '-c', 'true'])
         if not re.fullmatch('[a-f0-9]{64}', ident): raise RuntimeError('Identidade de instalação inválida.')
         docker(['cp', str(model), ident + ':/weights/ggml-small-q5_1.bin'])
-        spec = validate_manifest({'schema': 1, 'model': 'whisper-small-q5_1', 'source': 'https://huggingface.co/ggerganov/whisper.cpp',
+        spec = validate_manifest({'schema': 2 if args.persistent else 1, 'model': 'whisper-small-q5_1', 'source': 'https://huggingface.co/ggerganov/whisper.cpp',
                                   'revision': REVISION, 'license': 'MIT', 'license_accepted': args.accept_mit_license,
-                                  'sha256': MODEL_SHA, 'image_id': args.image_id, 'volume': volume})
+                                  'sha256': MODEL_SHA, 'image_id': args.image_id, 'volume': volume,
+                                  **({'protocol':'persistent-v1','threads':args.threads} if args.persistent else {})})
         target.parent.mkdir(parents=True, exist_ok=True)
         write_new(target, spec)
         print('Voz registrada; áudio não é armazenado; nenhum download ou treinamento executado.')

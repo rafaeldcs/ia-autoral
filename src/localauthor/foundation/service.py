@@ -66,6 +66,13 @@ class FoundationService:
     def close(self):
         return self.unload()
 
+    def prepare_text(self, cancel=None):
+        """Warm registered weights without generating a reply or an experience."""
+        with self._lock:
+            spec, _ = self._engine('text', cancel)
+            check_cancel(cancel)
+            return {'ready': True, 'model_id': spec.model_id, 'weights_trained': False}
+
     def _engine(self, kind: str, cancel=None):
         check_cancel(cancel)
         if self._unload_failed:

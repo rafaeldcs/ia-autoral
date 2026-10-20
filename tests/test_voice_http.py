@@ -3,6 +3,8 @@ import json
 from pathlib import Path
 import threading
 from unittest.mock import Mock
+from tests.test_foundation import register_fixture, DummyText
+from localauthor.foundation.service import FoundationService
 
 from tests.helpers import WorkspaceCase
 from tests.test_voice import audio_fixture, spec_fixture
@@ -36,6 +38,8 @@ class VoiceHttpTests(WorkspaceCase):
         self.assertEqual(self.request('/api/voice/status', auth=False)[0], 401)
         self.assertEqual(self.request('/api/voice/transcribe', body, auth=False)[0], 401)
         self.assertEqual(self.request('/api/voice/transcribe', body, origin='https://other.invalid')[0], 400)
+        self.assertEqual(self.request('/api/voice/prepare', {'project_id': self.project['id']}, auth=False)[0],401)
+        self.assertEqual(self.request('/api/voice/prepare', {'project_id': self.project['id']}, origin='https://other.invalid')[0],400)
         self.runtime.transcribe.assert_not_called()
 
     def test_real_route_does_not_save_audio_transcript_or_a_job(self):
@@ -57,3 +61,17 @@ class VoiceHttpTests(WorkspaceCase):
         self.assertFalse(result['training_allowed'])
         status, result = self.request('/api/voice/cancel', {'project_id': self.project['id'], 'request_id': 'a' * 32})
         self.assertEqual(status, 200); self.assertTrue(result['cancel_requested'])
+
+    def test_warmup_requires_only_project_and_queues_no_audio_or_generation(self):
+        register_fixture(self.settings.home,self.root/'warm-weights')
+        self.app.chat.foundation=FoundationService(self.settings.home,text_factory=DummyText)
+        status,result=self.request('/api/voice/prepare',{'project_id':self.project['id']})
+        self.assertEqual(status,200);self.assertEqual(result['job']['kind'],'voice-prepare')
+        self.assertNotIn('audio',result['job']['payload'])
+        status,_=self.request('/api/voice/prepare',{'project_id':self.project['id'],'command':'forbidden'})
+        self.assertEqual(status,400)
+        self.assertFalse(self.app.chat.foundation.status()['capabilities']['text']['loaded'])
+
+    def test_unconfigured_voice_warmup_is_rejected_before_queue(self):
+        status,_=self.request('/api/voice/prepare',{'project_id':self.project['id']})
+        self.assertEqual(status,400);self.assertFalse(self.app.jobs.list())

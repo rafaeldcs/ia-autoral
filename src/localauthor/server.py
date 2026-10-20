@@ -246,6 +246,12 @@ def make_handler(app: Application, ui_path: Path):
                         return {"path": q["path"], "sha256": sha256(raw), "content": raw.decode("utf-8")}
                     return app.tasks.preview(ident)
             if method == "POST":
+                if path == '/api/voice/prepare':
+                    if set(body) != {'project_id'}: raise PolicyError('Envie somente o projeto da conversa.')
+                    app.store.project(body['project_id'])
+                    if not app.chat.foundation.status()['capabilities']['text']['registered']:
+                        raise PolicyError('Configure o modelo de conversa local no servidor.')
+                    return {'job': app.jobs.submit('voice-prepare', {'project_id': body['project_id']})}
                 if path in {"/api/voice/transcribe", "/api/voice/cancel"}:
                     fields = {'project_id', 'request_id'} | ({'audio'} if path.endswith('transcribe') else set())
                     if set(body) != fields:

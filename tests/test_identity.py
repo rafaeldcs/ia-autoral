@@ -202,6 +202,7 @@ class IdentityHttpTests(WorkspaceCase):
         self.app.identity.share(self.owner,self.project['id'],self.dev['id'],'reader')
         self.assertEqual(self.request('GET','/api/conversations?project_id='+self.project['id'],token=self.dev_token)[0],200)
         self.assertEqual(self.request('POST','/api/conversations',{'project_id':self.project['id'],'title':'Forbidden'},self.dev_token)[0],403)
+        self.assertEqual(self.request('POST','/api/voice/prepare',{'project_id':self.project['id']},self.dev_token)[0],403)
         self.assertEqual(self.request('POST','/api/project-members',{'project_id':self.project['id'],'user_id':self.dev['id'],'role':'editor'},self.dev_token)[0],403)
         self.app.identity.share(self.owner,self.project['id'],self.dev['id'],'none')
         self.assertEqual(self.request('GET','/api/conversations?project_id='+self.project['id'],token=self.dev_token)[0],404)

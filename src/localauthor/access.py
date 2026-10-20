@@ -13,7 +13,7 @@ PROJECT_GET = {
     '/api/chat-draft','/api/chat-request',
 }
 PROJECT_POST = {
-    '/api/voice/transcribe','/api/voice/cancel','/api/marketing/campaigns',
+    '/api/voice/transcribe','/api/voice/cancel','/api/voice/prepare','/api/marketing/campaigns',
     '/api/marketing/brand','/api/marketing/style','/api/marketing/choice','/api/marketing/approve',
     '/api/marketing/connect','/api/marketing/disconnect','/api/marketing/preview','/api/marketing/publish',
     '/api/marketing/research','/api/marketing/generate','/api/marketing/plan','/api/marketing/brand-analysis',

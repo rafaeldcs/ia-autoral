@@ -424,7 +424,7 @@ function voiceWav(chunks, sampleRate) {
 }
 voiceChat = (() => {
     let active = false, muted = false, epoch = 0, phase = '', stream = null, context = null, processor = null;
-    let source = null, sink = null, timer = null, request = null, abort = null, voice = null, resumeSpeech = null, speechTimer = null;
+    let source = null, sink = null, timer = null, request = null, abort = null, voice = null, resumeSpeech = null, speechTimer = null, prepareJob = null;
     const status = value => { phase = value; $('voice-status').textContent = value; };
     const syncControls = () => {
         $('voice-start').disabled = !state.project || state.project.access==='reader' || (state.busy && !active);
@@ -450,6 +450,8 @@ voiceChat = (() => {
         if (request && state.project && state.token) api('/api/voice/cancel', {project_id: state.project.id, request_id: request}).catch(() => {});
         request = null; resumeSpeech = null; clearTimeout(speechTimer); speechTimer = null; window.speechSynthesis?.cancel();
         if (state.jobId && state.token) api('/api/jobs/' + state.jobId + '/cancel', {}).catch(() => {});
+        if (prepareJob && state.token) api('/api/jobs/' + prepareJob + '/cancel', {}).catch(() => {});
+        prepareJob = null;
         busy(state.requestBusy); syncControls();
         if (message) toast(message);
     }
@@ -477,12 +479,13 @@ voiceChat = (() => {
             voice = selectedVoice; active = true; muted = false; $('voice-dialog').close();
             clearTimeout(toastTimer); $('notification').hidden = true;
             $('response-mode').value = 'auto'; modeNotice(); busy(false); syncControls();
-            await listen(version);
+            await listen(version, true);
         } finally { $('voice-confirm').disabled = false; }
     }
-    async function listen(version = epoch) {
+    async function listen(version = epoch, prepare = false) {
         if (!active || version !== epoch) return;
         status('Ouvindo… Faça uma pausa para enviar.');
+        let stage = 'microphone';
         try {
             const captured = await navigator.mediaDevices.getUserMedia({audio: {echoCancellation: true, noiseSuppression: true, autoGainControl: true}, video: false});
             if (!active || version !== epoch) { captured.getTracks().forEach(track => track.stop()); return; }
@@ -510,8 +513,18 @@ voiceChat = (() => {
                 if (rms > .015) { speech = true; lastSpeech = seconds; }
                 if (seconds >= 30 || (speech && seconds - lastSpeech >= 1.5) || (!speech && seconds >= 10)) finish();
             };
+            // Capture is connected BEFORE awaiting network/queue work, so the
+            // first words cannot disappear while the model starts loading.
+            if (prepare) {
+                stage = 'prepare';
+                const prepared = await api('/api/voice/prepare', {project_id: state.project.id});
+                if (!active || version !== epoch) {
+                    api('/api/jobs/' + prepared.job.id + '/cancel', {}).catch(() => {}); return;
+                }
+                prepareJob = prepared.job.id;
+            }
         } catch (error) {
-            if (active && version === epoch) stop(error.name === 'NotAllowedError' ? 'Permita o microfone nas configurações do aplicativo ou navegador.' : 'Não consegui abrir o microfone. Confira o dispositivo de áudio.');
+            if (active && version === epoch) stop(stage === 'prepare' ? 'Não consegui preparar a conversa: ' + error.message : error.name === 'NotAllowedError' ? 'Permita o microfone nas configurações do aplicativo ou navegador.' : 'Não consegui abrir o microfone. Confira o dispositivo de áudio.');
         }
     }
     async function transcribe(audio, version) {
@@ -532,6 +545,7 @@ voiceChat = (() => {
     }
     function reply(text) {
         if (!active) return;
+        prepareJob = null;
         const version = epoch;
         if (muted) { listen(version); return; }
         const spoken = text.replace(/```[\s\S]*?```|~~~[\s\S]*?~~~/g, ' Há um trecho de código na resposta; consulte o chat. ').trim();
