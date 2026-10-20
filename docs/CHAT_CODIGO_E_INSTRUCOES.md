@@ -13,3 +13,5 @@ Quando encontra uma violação e a resposta não está truncada, solicita **uma 
 Os testes de software verificam apresentação segura, cópia exata, largura em telas pequenas, entrega das instruções ao contexto e repetição limitada com dublês identificados. A qualidade do modelo deve ser conferida separadamente em conversas reais, preservando também as tentativas malsucedidas. Nenhum desses controles garante obediência universal, compila o código gerado ou altera os pesos do modelo. Memória, orientação de contexto, revisão automática e treinamento são processos diferentes.
 
 Não há nova dependência, serviço externo ou permissão de execução. Os modelos e as experiências continuam no servidor local.
+
+Para compilar e testar exemplos registrados com autorização explícita do operador, há um [laboratório separado com Docker offline](CHAT_CODIGO_TESTES_REAIS.md). O fluxo de apresentação/revisão acima continua sem executar código gerado.
