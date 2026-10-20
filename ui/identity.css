@@ -1,4 +1,33 @@
 .identity-dialog{box-sizing:border-box;width:min(620px,calc(100vw - 28px));max-height:90dvh;overflow-y:auto;padding:28px;border:1px solid var(--line,#ddd);border-radius:18px;background:var(--bg,#fff);color:var(--text,#202020);font:15px/1.55 'Segoe UI',system-ui,sans-serif;box-shadow:0 24px 80px #0003}
 .identity-dialog::backdrop{background:#10132288;backdrop-filter:blur(3px)}
-.identity-dialog h2{margin:0 0 14px}.identity-dialog h3{margin:22px 0 12px}.identity-dialog form{display:grid;gap:14px;margin:18px 0}.identity-dialog label{display:grid;gap:6px;font-size:14px}.identity-dialog input,.identity-dialog select{box-sizing:border-box;max-width:100%;width:100%;padding:10px 12px;border:1px solid var(--line,#bbb);border-radius:8px;background:var(--bg,#fff);color:inherit;font:inherit}.identity-dialog input[type=checkbox]{width:20px;height:20px}.identity-dialog button{padding:10px 14px;border:1px solid var(--line,#bbb);border-radius:9px;font:inherit;cursor:pointer;background:var(--panel,#f4f4f5);color:inherit}.identity-dialog form>button{background:#5142ba;color:white;border:0}.identity-status{min-height:24px;white-space:pre-wrap;margin:0;color:var(--danger,#b42318)}.identity-user-row,.identity-member{padding:16px 0;border-top:1px solid var(--line,#ddd)}.identity-member{display:flex;justify-content:space-between;align-items:center;gap:12px}.identity-dialog details p{overflow-wrap:anywhere}.identity-menu{font:inherit!important;text-align:left;padding:10px 12px!important;overflow-wrap:anywhere;border-radius:10px}.identity-locked> :not(#identity-gate){visibility:hidden!important}body.identity-locked #identity-gate{visibility:visible!important}.project-group{font-size:11px;font-weight:600;color:var(--muted,#666);padding:16px 12px 4px;text-transform:uppercase;letter-spacing:.06em}.nav-detail{display:block;font-size:11px;color:var(--muted,#666);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.conversation-filter{margin:4px 0 10px;width:100%;font:inherit;padding:7px;border:1px solid var(--line,#ddd);border-radius:8px;background:var(--bg,#fff);color:inherit}
+.identity-dialog h2{margin:0 0 14px}.identity-dialog h3{margin:22px 0 12px}.identity-dialog form{display:grid;gap:14px;margin:18px 0}.identity-dialog label{display:grid;gap:6px;font-size:14px}.identity-dialog input,.identity-dialog select{box-sizing:border-box;max-width:100%;width:100%;padding:10px 12px;border:1px solid var(--line,#bbb);border-radius:8px;background:var(--bg,#fff);color:inherit;font:inherit}.identity-dialog input[type=checkbox]{width:20px;height:20px}.identity-dialog button{padding:10px 14px;border:1px solid var(--line,#bbb);border-radius:9px;font:inherit;cursor:pointer;background:var(--surface,var(--panel,#f4f4f5));color:inherit}.identity-dialog form>button{background:#5142ba;color:white;border:0}.identity-status{min-height:24px;white-space:pre-wrap;margin:0;color:var(--danger,#b42318)}.identity-user-row,.identity-member{padding:16px 0;border-top:1px solid var(--line,#ddd)}.identity-member{display:flex;justify-content:space-between;align-items:center;gap:12px}.identity-dialog details p{overflow-wrap:anywhere}.identity-menu{font:inherit!important;text-align:left;padding:10px 12px!important;overflow-wrap:anywhere;border-radius:10px}.identity-locked> :not(#identity-gate){visibility:hidden!important}body.identity-locked #identity-gate{visibility:visible!important}.project-group{font-size:11px;font-weight:600;color:var(--muted,#666);padding:16px 12px 4px;text-transform:uppercase;letter-spacing:.06em}.nav-detail{display:block;font-size:11px;color:var(--muted,#666);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.conversation-filter{margin:4px 0 10px;width:100%;font:inherit;padding:7px;border:1px solid var(--line,#ddd);border-radius:8px;background:var(--bg,#fff);color:inherit}
 @media(max-width:540px){.identity-dialog{padding:20px}.identity-member{align-items:flex-start;flex-direction:column}}
+
+/* The personal menu stays small; team administration opens only on request. */
+.identity-account{width:min(410px,calc(100vw - 28px))}
+.identity-dialog-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px}
+.identity-dialog-header h2{margin:0;font-size:20px}
+.identity-dialog-header button{flex-shrink:0;border:0;background:transparent;padding:6px 8px;font-size:12px;color:var(--muted,#666)}
+.identity-profile-card{display:flex;align-items:center;gap:14px;min-width:0}
+.identity-avatar{display:grid;place-items:center;flex-shrink:0;width:46px;height:46px;border-radius:50%;background:var(--accent-soft,#eee8f7);color:var(--accent,#6950a3);font-size:15px;font-weight:600}
+.identity-profile-card>div{min-width:0}
+.identity-profile-card strong{display:block;font-size:17px;overflow-wrap:anywhere}
+.identity-caption{display:block;font-size:12px;color:var(--muted,#666);font-weight:400}
+.identity-account .identity-hint,#identity-team>.identity-hint{color:var(--muted,#666);font-size:13px;line-height:1.6}
+.identity-account-actions{display:grid;gap:8px;margin:22px 0}
+.identity-account-actions .identity-primary{background:var(--accent,#6950a3);border-color:var(--accent,#6950a3);color:var(--canvas,#fff);font-weight:600}
+.identity-profile-details{border-top:1px solid var(--line,#ddd);padding-top:16px;color:var(--muted,#666);font-size:12px}
+.identity-profile-details summary,.identity-add-person>summary{cursor:pointer;padding:5px 0}
+.identity-profile-details h3{font-size:12px;margin:16px 0 4px}
+.identity-folder{font:11px/1.6 Consolas,monospace;overflow-wrap:anywhere}
+.identity-add-person{margin:20px 0;border:1px solid var(--line,#ddd);border-radius:10px;padding:10px 14px}
+#identity-team .identity-status{font-size:13px;min-height:0}
+#identity-team>.identity-status{color:var(--muted,#666);margin:12px 0}
+#identity-team .identity-user-row{padding:0;border-top:1px solid var(--line,#ddd)}
+.identity-user-row>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;cursor:pointer;list-style:none}
+.identity-user-row>summary::-webkit-details-marker{display:none}
+.identity-user-row>summary::after{content:'＋';color:var(--muted,#666);font-size:17px;flex-shrink:0}
+.identity-user-row[open]>summary::after{content:'−'}
+.identity-person-label{min-width:0;overflow-wrap:anywhere}
+.identity-user-row form{padding:0 4px 14px;margin:4px 0}
+.identity-dialog :is(button,summary,input,select):focus-visible{outline:2px solid var(--accent,#6950a3);outline-offset:3px}

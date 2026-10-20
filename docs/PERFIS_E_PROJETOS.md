@@ -17,7 +17,9 @@ Os perfis existentes são listados na entrada. Diferenças de maiúsculas e espa
 
 Use **Meu perfil → Trocar perfil**, no rodapé da barra lateral. A sessão atual é encerrada e você escolhe outro nome. Outras abas da mesma instalação são recarregadas para não continuar mostrando a seleção anterior. Uma seleção pode durar até 12 horas; ao expirar, basta escolher o nome novamente.
 
-Em **Meu perfil → Minha pasta no servidor**, confira o espaço associado ao nome. No primeiro perfil administrador, **Pessoas da equipe** permite preparar nomes antecipadamente, corrigir nomes, desativar perfis e organizar as funções de administrador/pessoa da equipe. Também é possível criar um novo perfil apenas informando seu nome na entrada.
+**Meu perfil** mostra somente o nome em uso, **Trocar perfil** e, para administradores, **Gerenciar equipe**. Não carrega a lista de pessoas nem exibe formulários ao abrir. Em **Detalhes do perfil**, ficam a pasta no servidor e a explicação da identificação sem senha.
+
+**Gerenciar equipe** abre uma tela separada. **Adicionar pessoa** expande o cadastro; selecionar o nome de uma pessoa abre somente seus campos de edição. É possível corrigir nomes, desativar perfis e organizar as funções de administrador/pessoa da equipe. **Voltar** retorna ao menu pessoal. Falhas ao carregar a lista aparecem nessa tela com **Tentar novamente**, sem bloquear o acesso ao próprio perfil. Também é possível criar um novo perfil apenas informando seu nome na entrada.
 
 As funções administrativas organizam as opções disponíveis no perfil selecionado. Como qualquer pessoa pareada pode selecionar um perfil administrador, elas não substituem autenticação pessoal. Para corrigir nomes iguais de perfis antigos, um administrador deve diferenciá-los antes da seleção por nome.
 

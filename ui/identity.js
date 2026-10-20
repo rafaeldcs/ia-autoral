@@ -5,6 +5,7 @@
   const channel = typeof BroadcastChannel === "function" ? new BroadcastChannel("localauthor-profile") : null;
   let user = null, initialized = false, gatePromise = null, auth = {}, gate = null;
   const node = (tag, text, cls) => { const n=document.createElement(tag); if(text)n.textContent=text; if(cls)n.className=cls; return n; };
+  const initials = name => name.trim().split(/\s+/u).slice(0,2).map(part=>Array.from(part)[0]).join('').toLocaleUpperCase('pt-BR');
   function field(form,label,id,type="text",required=true) {
     const wrap=node("label",label), input=node("input");input.id=id;input.type=type;input.required=required;
     input.maxLength=type==="password"?256:80;wrap.append(input);form.append(wrap);return input;
@@ -38,7 +39,7 @@
     control.textContent=user.name+" · Meu perfil";control.title=user.name+" · Trocar ou organizar seu perfil";
     if(control.closest('.sidebar-bottom')){
       control.setAttribute('aria-label',user.name+' · Meu perfil');
-      const avatar=node('span',user.name.trim().split(/\s+/u).slice(0,2).map(part=>Array.from(part)[0]).join('').toLocaleUpperCase('pt-BR'),'profile-avatar');avatar.setAttribute('aria-hidden','true');
+      const avatar=node('span',initials(user.name),'profile-avatar');avatar.setAttribute('aria-hidden','true');
       const copy=node('span',null,'profile-copy');copy.append(node('span',user.name,'profile-name'),node('span','Meu perfil','profile-caption'));
       control.replaceChildren(avatar,copy);
     }
@@ -94,33 +95,79 @@
     form.onsubmit=async event=>{event.preventDefault();const b=form.querySelector('button[type="submit"]')||form.querySelector("button");b.disabled=true;
       try{notice.textContent="Salvando…";await fn();}catch(error){notice.textContent=error.message;}finally{b.disabled=false;}};
   }
+  function profileHeader(d) {
+    const header=node('div',null,'identity-dialog-header');
+    header.append(d.querySelector('h2'));button(header,'Fechar',()=>d.close());d.prepend(header);
+  }
   async function account() {
-    const d=dialog("Meu perfil","identity-account");button(d,"Fechar",()=>d.close());
-    d.append(node("p",user.name));
-    const folder=node("details");folder.append(node("summary","Minha pasta no servidor"),node("p",user.workspace));d.append(folder);
-    button(d,"Trocar perfil",()=>logout().catch(error=>window.alert(error.message)));
-    d.append(node("p","Os perfis organizam projetos e conversas por nome. Eles não têm senha nem impedem que outra pessoa escolha seu perfil.","identity-hint"));
-    if(user.role==="admin"){
-      const section=node("section");section.id="identity-admin";section.append(node("h3","Pessoas da equipe"),node("p","Você pode preparar os perfis da equipe aqui. Cada pessoa também pode informar seu nome na entrada e criar o próprio espaço."));d.append(section);
-      const create=node("form");create.id="identity-create-user";section.append(create);
-      const name=field(create,"Nome da pessoa","identity-user-name");
-      const role=select(create,"Permissão no servidor",[["user","Pessoa da equipe"],["admin","Administrador"]],"user");
-      create.append(node("button","Adicionar pessoa"));const state=message(create),list=node("div");list.id="identity-users";section.append(list);
-      async function renderUsers(){
-        const users=await request("/api/identity/users");list.replaceChildren();
-        for(const person of users){
-          const row=node("form",null,"identity-user-row");row.dataset.userId=person.id;
-          row.append(node("strong",person.name));const name=field(row,"Nome","profile-name-"+person.id);name.value=person.name;
-          const role=select(row,"Permissão",[["user","Pessoa da equipe"],["admin","Administrador"]],person.role);
-          const enabled=field(row,"Perfil ativo","profile-active-"+person.id,"checkbox",false);enabled.checked=Boolean(person.active);
-          row.append(node("button","Salvar perfil"));const status=message(row);list.append(row);
-          formAction(row,status,async()=>{await request("/api/identity/users/update",{id:person.id,name:name.value,role:role.value,active:enabled.checked});status.textContent="Perfil atualizado.";});
-        }
-      }
-      formAction(create,state,async()=>{await request("/api/identity/users",{name:name.value,role:role.value});create.reset();state.textContent="Pessoa cadastrada. Ela já pode escolher seu nome ao abrir a LocalAuthor.";await renderUsers();});
-      await renderUsers();
-    }
+    const d=dialog("Meu perfil","identity-account");d.classList.add('identity-account');profileHeader(d);
+    const card=node('div',null,'identity-profile-card');
+    const avatar=node('span',initials(user.name),'identity-avatar');
+    avatar.setAttribute('aria-hidden','true');
+    const copy=node('div');copy.append(node('span','Você está usando','identity-caption'),node('strong',user.name));
+    card.append(avatar,copy);d.append(card,node('p','Seus projetos e conversas ficam organizados neste perfil.','identity-hint'));
+    const actions=node('div',null,'identity-account-actions');d.append(actions);
+    const notice=message(d);notice.hidden=true;
+    const switchProfile=button(actions,"Trocar perfil",async()=>{
+      switchProfile.disabled=true;notice.hidden=true;
+      try {await logout();} catch(error) {notice.textContent=error.message;notice.hidden=false;switchProfile.disabled=false;}
+    });
+    switchProfile.classList.add('identity-primary');
+    if(user.role==='admin')button(actions,'Gerenciar equipe',()=>team().catch(error=>window.alert(error.message)));
+    const details=node('details',null,'identity-profile-details');
+    details.append(node('summary','Detalhes do perfil'),node('p','Os perfis são escolhidos por nome, sem senha. Quem usa este aplicativo pode escolher outro perfil.','identity-hint'),node('h3','Minha pasta no servidor'),node('p',user.workspace,'identity-folder'));
+    d.append(details);
     d.showModal();
+  }
+  async function team() {
+    const d=dialog('Pessoas da equipe','identity-team');profileHeader(d);
+    const back=d.querySelector('.identity-dialog-header button');back.textContent='← Voltar';back.setAttribute('aria-label','Voltar ao perfil');
+    d.append(node('p','Adicione pessoas aqui ou deixe cada uma informar seu nome ao abrir a LocalAuthor.','identity-hint'));
+    const add=node('details',null,'identity-add-person');add.append(node('summary','Adicionar pessoa'));d.append(add);
+    const create=node('form');create.id='identity-create-user';add.append(create);
+    const name=field(create,'Nome da pessoa','identity-user-name');
+    const role=select(create,'Tipo de perfil',[['user','Pessoa da equipe'],['admin','Administrador']],'user');
+    create.append(node('button','Adicionar pessoa'));const state=message(create);
+    const status=message(d);const retry=button(d,'Tentar novamente',loadUsers);retry.hidden=true;
+    const list=node('div');list.id='identity-users';d.append(list);
+    async function renderUsers() {
+      const people=await request('/api/identity/users');list.replaceChildren();
+      for(const person of people) {
+        const row=node('details',null,'identity-user-row');row.dataset.userId=person.id;
+        const summary=node('summary');const label=node('span',null,'identity-person-label');
+        label.append(node('strong',person.name),node('span',(person.role==='admin'?'Administrador':'Pessoa da equipe')+(person.active?'':' · Inativo'),'identity-caption'));
+        summary.append(label);row.append(summary);
+        const form=node('form');row.append(form);list.append(row);
+        const name=field(form,'Nome','profile-name-'+person.id);name.value=person.name;
+        const role=select(form,'Tipo de perfil',[['user','Pessoa da equipe'],['admin','Administrador']],person.role);
+        const enabled=field(form,'Perfil ativo','profile-active-'+person.id,'checkbox',false);enabled.checked=Boolean(person.active);
+        form.append(node('button','Salvar perfil'));const notice=message(form);
+        formAction(form,notice,async()=>{
+          await request('/api/identity/users/update',{id:person.id,name:name.value,role:role.value,active:enabled.checked});
+          label.querySelector('strong').textContent=name.value;
+          label.querySelector('.identity-caption').textContent=(role.value==='admin'?'Administrador':'Pessoa da equipe')+(enabled.checked?'':' · Inativo');
+          if(person.id===user.id) {
+            const session=await request('/api/identity/status');
+            if(!session.user) {lock();changed();location.reload();return;}
+            user=session.user;mount();
+            const card=document.querySelector('#identity-account .identity-profile-card');
+            if(card) {card.querySelector('strong').textContent=user.name;card.querySelector('.identity-avatar').textContent=initials(user.name);}
+          }
+          notice.textContent='Perfil atualizado.';
+        });
+      }
+      status.textContent=people.length===1?'1 pessoa cadastrada.':people.length+' pessoas cadastradas.';
+    }
+    async function loadUsers() {
+      retry.hidden=true;status.textContent='Carregando pessoas…';
+      try {await renderUsers();} catch(error) {status.textContent=error.message;retry.hidden=false;}
+    }
+    formAction(create,state,async()=>{
+      await request('/api/identity/users',{name:name.value,role:role.value});create.reset();
+      state.textContent='Pessoa cadastrada. Ela já pode escolher seu nome ao abrir a LocalAuthor.';
+      await loadUsers();
+    });
+    d.showModal();await loadUsers();
   }
   async function openSharing(project) {
     const d=dialog("Compartilhar projeto","identity-sharing");button(d,"Fechar",()=>d.close());
