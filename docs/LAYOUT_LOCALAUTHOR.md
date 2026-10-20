@@ -13,7 +13,15 @@ A interface usa a organização solicitada pelo proprietário, inspirada no Code
 
 Chat, marketing, modelos e ferramentas avançadas compartilham cores neutras, campos legíveis e hierarquia consistente. Nenhum modelo, corpus, projeto ou credencial é removido por esta alteração. Os modos e as rotas existentes permanecem distintos e explícitos.
 
-Em **Ferramentas → Aparência**, escolha clara, escura ou conforme o sistema. A preferência visual é preservada neste navegador/aplicativo e acompanha as demais áreas do mesmo servidor. Não são armazenados token, mensagens ou senhas com essa preferência. A lista de projetos tem rolagem própria, para manter as conversas acessíveis mesmo com muitas pastas.
+Em **Ferramentas → Aparência**, escolha clara, escura ou conforme o sistema. A preferência visual é preservada neste navegador/aplicativo e acompanha as demais áreas do mesmo servidor. Não são armazenados token, mensagens ou senhas com essa preferência.
+
+### Barra lateral compacta — 20/10/2026
+
+A lateral usa uma única área de rolagem para projetos e conversas. Até quatro projetos aparecem inicialmente, incluindo sempre o selecionado; **Ver todos os projetos** expande a lista completa. Selecionar um projeto recolhe essa expansão e abre suas conversas. Os grupos de propriedade aparecem quando existem projetos compartilhados, preservando as indicações de leitura/edição e de responsável.
+
+O filtro **Minhas / Todas** fica junto ao título das conversas e se aplica somente ao projeto selecionado. Perfil, configurações e saída permanecem no rodapé fixo, inclusive com históricos longos. O nome completo do perfil e os títulos dos projetos/conversas continuam disponíveis nos controles; a apresentação compacta não altera permissões nem dados. A pasta do projeto permanece acessível na área rolável.
+
+Os ensaios de navegador usam 21 projetos e 34 conversas descartáveis, temas claro/escuro, seleção fora da prévia, teclado, recolhimento e larguras de 320 a 1440 pixels. Não exigem modelos reais nem qualificam sua inteligência. Esta mudança é web: reabrir a interface carrega os arquivos do servidor, sem reinstalar o cliente Windows.
 
 ## Validação e atualização
 

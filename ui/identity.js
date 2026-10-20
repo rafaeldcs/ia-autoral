@@ -35,7 +35,13 @@
     if(!control){control=node("button",null,"identity-menu");control.id="identity-menu";control.type="button";
       (document.querySelector(".sidebar-bottom")||document.querySelector("header")||document.body).prepend(control);
       control.onclick=()=>account().catch(error=>window.alert(error.message));}
-    control.textContent=user.name+" · Meu perfil";control.title="Trocar ou organizar seu perfil";
+    control.textContent=user.name+" · Meu perfil";control.title=user.name+" · Trocar ou organizar seu perfil";
+    if(control.closest('.sidebar-bottom')){
+      control.setAttribute('aria-label',user.name+' · Meu perfil');
+      const avatar=node('span',user.name.trim().split(/\s+/u).slice(0,2).map(part=>Array.from(part)[0]).join('').toLocaleUpperCase('pt-BR'),'profile-avatar');avatar.setAttribute('aria-hidden','true');
+      const copy=node('span',null,'profile-copy');copy.append(node('span',user.name,'profile-name'),node('span','Meu perfil','profile-caption'));
+      control.replaceChildren(avatar,copy);
+    }
     document.dispatchEvent(new CustomEvent("localauthor-profile",{detail:user}));
   }
   async function promptIdentity(status) {

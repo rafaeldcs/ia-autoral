@@ -4,6 +4,7 @@ const state = { token: '', projects: [], project: null, conversation: null, busy
 let voiceChat = null;
 let toastTimer;
 let conversationListVersion=0;
+let allProjectsVisible=false;
 const recovery=window.LocalAuthorRecovery.create({
     api,input:$('message-input'),mode:$('response-mode'),notice:toast,
     readOnly:()=>state.project?.access==='reader',changed:()=>updateAvailability(),
@@ -49,26 +50,56 @@ function updateAvailability() {
 function busy(value) { state.requestBusy = value; state.busy = value || Boolean(voiceChat?.active); $('busy').hidden = !value; for (const node of document.querySelectorAll('#studio button,#studio select'))
     node.disabled = state.busy; $('message-input').disabled = state.busy; updateAvailability(); }
 async function resetChat() { await selectProject(state.project); }
-function renderProjects() { const list = $('project-list'); list.replaceChildren(); for (const [shared,label] of [[false,'Meus projetos'],[true,'Compartilhados comigo']]) {
-const projects=state.projects.filter(project=>Boolean(project.access&&project.access!=='owner')===shared);
-if(!projects.length)continue;list.append(el('p',label,'project-group'));
-for (const project of projects) {
-    const node = el('button', project.name, project.id === state.project?.id ? 'active' : '');
-    node.disabled=state.busy;
-    node.replaceChildren(el('span', project.name, 'nav-label'));
-    if(shared)node.append(el('span',(project.access==='reader'?'Leitura':'Edição')+' · '+project.owner_name,'nav-detail'));
-    node.setAttribute('aria-current', project.id === state.project?.id ? 'true' : 'false');
-    node.title = project.name;
-    node.onclick = handle(() => selectProject(project));
-    list.append(node);
-} } }
+function renderProjects() {
+    const limit = 4;
+    const list = $('project-list');
+    list.replaceChildren();
+    const preview = state.projects.slice(0, limit).map(project => project.id);
+    if (state.project && !preview.includes(state.project.id)) {
+        preview.pop();
+        preview.push(state.project.id);
+    }
+    const hasShared = state.projects.some(project => project.access && project.access !== 'owner');
+    for (const [shared, label] of [[false, 'Meus projetos'], [true, 'Compartilhados comigo']]) {
+        const projects = state.projects.filter(project => Boolean(project.access && project.access !== 'owner') === shared);
+        if (!projects.length) continue;
+        if (hasShared) {
+            const heading = el('p', label, 'project-group');
+            heading.hidden = !allProjectsVisible && !projects.some(project => preview.includes(project.id));
+            list.append(heading);
+        }
+        for (const project of projects) {
+            const selected = project.id === state.project?.id;
+            const node = el('button', '', selected ? 'active' : '');
+            node.disabled = state.busy;
+            node.hidden = !allProjectsVisible && !preview.includes(project.id);
+            const copy = el('span', '', 'nav-copy');
+            copy.append(el('span', project.name, 'nav-label'));
+            if (shared) copy.append(el('span', (project.access === 'reader' ? 'Leitura' : 'Edição') + ' · ' + project.owner_name, 'nav-detail'));
+            node.append(copy);
+            node.setAttribute('aria-current', String(selected));
+            node.title = project.name;
+            node.onclick = handle(() => {
+                allProjectsVisible = false;
+                document.querySelector('.sidebar-scroll').scrollTop = 0;
+                return selectProject(project);
+            });
+            list.append(node);
+        }
+    }
+    const toggle = $('toggle-projects');
+    toggle.hidden = state.projects.length <= limit;
+    toggle.textContent = allProjectsVisible ? 'Mostrar menos projetos' : `Ver todos os projetos (${state.projects.length})`;
+    toggle.setAttribute('aria-expanded', String(allProjectsVisible));
+}
+$('toggle-projects').onclick=()=>{allProjectsVisible=!allProjectsVisible;renderProjects();};
 async function renderConversations() { if (!state.project)
     return; const project = state.project,version=++conversationListVersion; const rows = await api('/api/conversations?project_id=' + project.id+'&mine='+($('conversation-filter').value==='mine'?'1':'0')); if (state.project?.id !== project.id||version!==conversationListVersion)
     return; const list = $('conversation-list'); list.replaceChildren(); $('conversation-empty').hidden = rows.length > 0; for (const row of rows) {
     const node = el('button', row.title, row.id === state.conversation?.id ? 'active' : '');
     node.disabled=state.busy;
-    node.replaceChildren(el('span', row.title, 'nav-label'));
-    if(row.created_by&&row.created_by.user_id!==window.LocalAuthorIdentity?.user?.id)node.append(el('span',row.created_by.name,'nav-detail'));
+    const copy=el('span','','nav-copy');copy.append(el('span', row.title, 'nav-label'));node.replaceChildren(copy);
+    if(row.created_by&&row.created_by.user_id!==window.LocalAuthorIdentity?.user?.id)copy.append(el('span',row.created_by.name,'nav-detail'));
     node.setAttribute('aria-current', row.id === state.conversation?.id ? 'true' : 'false');
     node.title = row.title;
     node.onclick = handle(()=>selectProject(project,row.id));
@@ -259,7 +290,7 @@ document.addEventListener('keydown', event => {
         else if (!$('browser-panel').hidden) { hideBrowserPanel(); $('open-browser').focus(); }
     }
     if (event.key === 'Tab' && mobileNavigation.matches && $('sidebar').classList.contains('open')) {
-        const nodes = [...$('sidebar').querySelectorAll('button:not(:disabled),a[href],summary')].filter(node => node.getClientRects().length);
+        const nodes = [...$('sidebar').querySelectorAll('button:not(:disabled),select:not(:disabled),a[href],summary')].filter(node => node.getClientRects().length);
         const first = nodes[0], last = nodes.at(-1);
         if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
         else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }

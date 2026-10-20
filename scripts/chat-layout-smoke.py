@@ -14,6 +14,7 @@ from localauthor.config import Settings
 from localauthor.server import create_server
 from localauthor.foundation.service import FoundationService
 from tests.test_foundation import DummyText,register_fixture
+from localauthor.identity_context import current_actor
 from playwright.sync_api import sync_playwright, expect
 
 
@@ -77,6 +78,20 @@ def main():
                 page.evaluate("async () => { state.projects = await api('/api/projects'); renderProjects(); }")
                 expect(page.locator('#project-list button')).to_have_count(21)
                 check('Many projects keep conversation navigation visible', page.locator('.conversation-rail').bounding_box()['y'] < 500 and page.locator('.conversation-rail').bounding_box()['y'] + page.locator('.conversation-rail').bounding_box()['height'] <= 900)
+                expect(page.locator('#project-list button:visible')).to_have_count(4)
+                check('Project preview keeps the selected project visible', page.locator('#project-list button[aria-current="true"]').is_visible())
+                page.locator('#toggle-projects').focus()
+                page.keyboard.press('Enter')
+                expect(page.locator('#toggle-projects')).to_have_attribute('aria-expanded', 'true')
+                expect(page.locator('#project-list button:visible')).to_have_count(21)
+                page.locator('#project-list button').filter(has_text='Outro projeto 00').click()
+                expect(page.locator('#project-heading')).to_have_text('Outro projeto 00')
+                expect(page.locator('#toggle-projects')).to_have_attribute('aria-expanded', 'false')
+                expect(page.locator('#project-list button:visible')).to_have_count(4)
+                expect(page.locator('#message-input')).to_be_focused()
+                check('Selecting a project from the full list returns to a compact preview', page.locator('#project-list button[aria-current="true"]').is_visible())
+                page.locator('#toggle-projects').click()
+                page.locator('#project-list button').filter(has_text='Projeto de demonstração').click()
                 expect(page.locator('#repair-examples')).not_to_be_visible()
                 draft = 'Revisar interface: acentos, <script>window.PWNED=1</script> e comentários.'
                 page.locator('#message-input').fill(draft)
@@ -206,6 +221,52 @@ def main():
                 page.locator('#send').click()
                 expect(page.locator('.message.assistant')).to_contain_text('Ainda não há memórias')
                 check('Revocation remains effective in a subsequent conversation')
+                # Long, synthetic histories exercise the actual overflow and focus
+                # behavior without writing conversations to the running server.
+                project_id=page.evaluate('state.project.id')
+                actor=current_actor.set(page.evaluate('window.LocalAuthorIdentity.user.id'))
+                try:
+                    for index in range(30):
+                        app.chat.create(project_id,f'Conversa {index:02d} — planejamento, revisão e próximos passos da equipe')
+                finally:
+                    current_actor.reset(actor)
+                page.evaluate('renderConversations()')
+                expect(page.locator('#conversation-list button')).to_have_count(34)
+                for theme in ('light','dark'):
+                    page.evaluate('(theme) => document.documentElement.dataset.theme=theme',theme)
+                    page.locator('.sidebar-scroll').evaluate('(node) => node.scrollTop=0')
+                    check(theme+' sidebar has one scroll region',page.evaluate("""() => {
+                        const scrollable=[...document.querySelectorAll('#sidebar *')].filter(node=>
+                          ['auto','scroll'].includes(getComputedStyle(node).overflowY)&&node.scrollHeight>node.clientHeight+1);
+                        return scrollable.length===1&&scrollable[0].classList.contains('sidebar-scroll');
+                    }"""))
+                    expect(page.locator('#identity-menu')).to_be_in_viewport()
+                    expect(page.locator('#sidebar-tools')).to_be_in_viewport()
+                    page.screenshot(path=str(art / f'chat-sidebar-{theme}.png'))
+                last_title=page.locator('#conversation-list button').last.get_attribute('title')
+                page.locator('#conversation-list button').last.click()
+                page.wait_for_function('(title) => !state.busy && state.conversation?.title === title',arg=last_title)
+                expect(page.locator('#project-list button[aria-current="true"]')).to_have_attribute('title','Projeto de demonstração')
+                check('Last conversation in a long history opens without losing the project',page.evaluate('state.conversation.title')==last_title)
+                expect(page.locator('#sidebar-tools')).to_be_in_viewport()
+                page.locator('#sidebar-tools').click()
+                expect(page.locator('#tools-dialog')).to_be_visible()
+                page.keyboard.press('Escape')
+                expect(page.locator('#sidebar-tools')).to_be_focused()
+                check('Compact settings control preserves its accessible name and restores focus')
+                for width,height in [(390,844),(320,568),(1024,600)]:
+                    page.set_viewport_size({'width':width,'height':height})
+                    if width<760:page.locator('#open-menu').click()
+                    page.locator('.sidebar-scroll').evaluate('(node) => node.scrollTop=0')
+                    expect(page.locator('#identity-menu')).to_be_in_viewport()
+                    expect(page.locator('#sidebar-tools')).to_be_in_viewport()
+                    check(f'Long histories keep the footer and page within {width}x{height}',page.evaluate('document.documentElement.scrollWidth<=innerWidth'))
+                    page.locator('#conversation-filter').focus()
+                    page.keyboard.press('Tab')
+                    expect(page.locator('#conversation-list button').first).to_be_focused()
+                    check(f'Filter remains in normal keyboard order at {width}px')
+                    page.screenshot(path=str(art / f'chat-sidebar-{width}.png'))
+                    if width<760:page.keyboard.press('Escape')
                 check('No JavaScript exceptions', not report['errors'])
                 browser.close()
                 report['success'] = True

@@ -113,7 +113,7 @@ textarea {
   width:268px;
   background:var(--surface);
   border-right:1px solid var(--line);
-  padding:18px 12px;
+  padding:18px 12px 10px;
   display:flex;
   flex-direction:column;
   z-index:10;
@@ -138,9 +138,11 @@ textarea {
   flex:1;
   min-height:0;
   overflow:auto;
-  padding-top:25px;
-  display:flex;
-  flex-direction:column;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+  scrollbar-gutter:stable;
+  padding:20px 6px 12px;
+  margin:0 -6px;
 }
 .section-heading {
   display:flex;
@@ -156,9 +158,10 @@ textarea {
   margin:0;
 }
 .section-heading button {
-  font-size:11px;
-  min-width:0;
-  padding:4px 6px;
+  font-size:21px;
+  min-width:32px;
+  min-height:32px;
+  padding:0;
   border-radius:6px;
   margin-left:auto;
 }
@@ -168,13 +171,24 @@ textarea {
   align-items:center;
   gap:9px;
   text-align:left;
-  padding:9px 12px;
+  padding:8px 10px;
   border-radius:8px;
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
   font-size:13px;
   line-height:1.6;
+}
+.nav-copy {
+  display:grid;
+  min-width:0;
+  flex:1;
+}
+.sidebar .project-group {
+  margin:10px 0 4px;
+  padding:0 10px;
+  text-transform:none;
+  letter-spacing:0;
 }
 .sidebar nav button.active {
   background:#e7e7e7;
@@ -189,29 +203,47 @@ textarea {
   flex:1;
 }
 #project-list {
-  max-height:30dvh;
-  overflow:auto;
-  flex-shrink:0;
+  overflow:visible;
 }
 #project-list button::before {
   content:'▱';
   color:#737373;
   font-size:19px;
+  flex-shrink:0;
+}
+.project-toggle {
+  font-size:12px;
+  color:var(--muted);
+  padding:6px 10px;
+  margin-top:4px;
+  text-align:left;
+  border-radius:8px;
+  width:100%;
 }
 .conversation-rail {
-  margin-top:22px;
-  flex:1;
-  min-height:80px;
-  display:flex;
-  flex-direction:column;
+  margin-top:20px;
+  padding-top:16px;
+  border-top:1px solid var(--line);
 }
 #conversation-list {
-  overflow:auto;
-  min-height:0;
-  flex:1;
+  overflow:visible;
 }
 .rail-heading {
-  padding:0 12px 8px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+  padding:0 8px 8px;
+}
+.sidebar .conversation-filter {
+  width:auto;
+  flex-shrink:0;
+  max-width:90px;
+  margin:0;
+  padding:5px 6px;
+  font-size:12px;
+  border:0;
+  background:transparent;
 }
 .empty-help {
   font-size:12px;
@@ -219,7 +251,7 @@ textarea {
   padding:0 12px;
 }
 .project-location {
-  margin:24px 10px 10px;
+  margin:20px 10px 8px;
   color:var(--muted);
   font-size:12px;
 }
@@ -231,10 +263,13 @@ textarea {
   font:11px/1.6 Consolas,monospace;
 }
 .sidebar-bottom {
-  padding:14px 4px 0;
+  padding:10px 0 0;
   border-top:1px solid var(--line);
   display:grid;
-  gap:6px;
+  grid-template-columns:minmax(0,1fr) 36px;
+  align-items:center;
+  gap:2px 4px;
+  flex-shrink:0;
 }
 .sidebar-bottom button {
   text-align:left;
@@ -242,10 +277,55 @@ textarea {
   padding:6px 8px;
   font-size:12px;
 }
-.sidebar-bottom span {
+.sidebar-bottom .local-status {
   font-size:11px;
   color:var(--muted);
   padding:0 8px;
+}
+.sidebar-bottom .identity-menu {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-width:0;
+  padding:6px!important;
+  font-size:12px!important;
+}
+.profile-avatar {
+  display:grid;
+  place-items:center;
+  flex-shrink:0;
+  width:30px;
+  height:30px;
+  border:1px solid var(--line);
+  border-radius:50%;
+  font-size:11px;
+}
+.profile-copy {
+  display:grid;
+  min-width:0;
+  line-height:1.5;
+}
+.profile-name {
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.profile-caption {
+  color:var(--muted);
+  font-size:11px;
+}
+#sidebar-tools {
+  display:grid;
+  place-items:center;
+  padding:0;
+}
+#logout {
+  grid-column:2;
+  min-height:28px;
+  padding:0;
+  font-size:11px;
+  color:var(--muted);
+  text-align:center;
 }
 .sidebar-bottom i {
   display:inline-block;
