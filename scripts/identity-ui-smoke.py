@@ -167,6 +167,19 @@ def main():
                 person.locator('#identity-profile').select_option(owner_id);expect(person.locator('#identity-name')).to_have_value('Browser laboratory');person.locator('#identity-submit').click()
                 expect(person.locator('#studio')).to_be_visible();expect(person.locator('#project-list')).not_to_contain_text('Projeto privado pessoal')
                 check('Switching profiles does not retain the previous private project list')
+                owner.set_viewport_size({'width':1440,'height':960})
+                owner.locator('#identity-menu').click();owner.get_by_role('button',name='Gerenciar equipe',exact=True).click()
+                own_row=owner.locator(f'.identity-user-row[data-user-id="{owner_id}"]');own_row.locator('summary').click()
+                own_row.locator('input[type=text]').fill('Browser laboratory race fixture')
+                # Simulate another tab changing the selected identity between
+                # the save and its status refresh. Never keep the old workspace
+                # visible after receiving a different identity.
+                owner.route('**/api/identity/status',lambda route:route.fulfill(status=200,content_type='application/json',body=json.dumps({'configured':True,'user':{'id':person_id,'name':'Developer fixture','role':'user'}})))
+                with owner.expect_navigation(wait_until='load'):
+                    own_row.get_by_role('button',name='Salvar perfil').click()
+                owner.unroute('**/api/identity/status')
+                expect(owner.locator('#studio')).to_be_hidden()
+                check('Concurrent profile change during editing reloads before exposing a different identity in the old workspace')
                 browser.close()
             check('No browser JavaScript errors',not report['errors']);report['success']=True
         finally:

@@ -148,7 +148,7 @@
           label.querySelector('.identity-caption').textContent=(role.value==='admin'?'Administrador':'Pessoa da equipe')+(enabled.checked?'':' · Inativo');
           if(person.id===user.id) {
             const session=await request('/api/identity/status');
-            if(!session.user) {lock();changed();location.reload();return;}
+            if(!session.user||session.user.id!==user.id) {lock();changed();location.reload();return;}
             user=session.user;mount();
             const card=document.querySelector('#identity-account .identity-profile-card');
             if(card) {card.querySelector('strong').textContent=user.name;card.querySelector('.identity-avatar').textContent=initials(user.name);}
