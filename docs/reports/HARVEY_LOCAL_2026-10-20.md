@@ -14,7 +14,7 @@ Imagem executada: `sha256:66e10ff6ffc2a98cc8f0f14d99f0136289c0c4016932e8741a0c4e
 
 | Verificação | Resultado observado | Limite da evidência |
 | --- | --- | --- |
-| Suíte Python completa | 694 testes, zero falhas/erros, três skips de links simbólicos indisponíveis no Windows local | Não mede inteligência; CI da revisão publicada é conferido separadamente |
+| Suíte Python completa após o reforço final de retomada | 695 testes, zero falhas/erros, três skips de links simbólicos indisponíveis no Windows local | Não mede inteligência; CI da revisão publicada é conferido separadamente |
 | Motor original, sete ferramentas e parsers DOCX/XLSX/PPTX/PDF | Execução real em Docker aprovada, incluindo bloqueio de rede e escrita nas entradas/controlador | Modelo e juiz roteirizados neste smoke |
 | Todas as rubricas originais sem entregáveis | 2.010 tarefas / 114.437 critérios corretamente reprovados, sem erro de avaliação | Avaliador negativo determinístico; não são acertos da IA |
 | Código `billing.py` gerado no piloto real | Sete asserções numéricas independentes aprovadas em nova sandbox | Exercício sintético pequeno; não certifica projetos arbitrários |
@@ -39,7 +39,7 @@ O modelo também é o juiz. Seus pareceres não são independentes e exigem revi
 
 As **2.010 tarefas** entraram no estado persistente do lote original, com as rubricas completas. No corte deste relatório, cinco tarefas haviam terminado reprovadas, uma estava em execução e 2.004 aguardavam. **Isso não é conclusão nem aprovação do benchmark completo.** O `state.json` e o `report.html` privados trazem o progresso posterior; números deste documento são apenas um corte datado.
 
-O lote ativo usa cópia congelada do controlador e clone Git privado da revisão original, para que atualizações do projeto não mudem a implementação durante a medição. Essa cópia antecede somente ajustes de apresentação do relatório de erro e limpeza de imports. Não há descarte silencioso do histórico quando o contexto se esgota: o limite aparece como falha. O comando não reinicia automaticamente com o Windows; a retomada explícita exige a mesma configuração congelada.
+O lote ativo usa cópia congelada integral do controlador e clone Git privado da revisão original, para que atualizações do projeto não mudem a implementação durante a medição. Essa cópia antecede o reforço de conferência do hash de todos os fontes de inferência na retomada, ajustes de apresentação do relatório de erro e limpeza de imports. O motor, as ferramentas e os critérios de avaliação do lote permanecem os congelados. Não há descarte silencioso do histórico quando o contexto se esgota: o limite aparece como falha. O comando não reinicia automaticamente com o Windows; a retomada explícita exige a mesma configuração congelada.
 
 ## Pendências de qualificação
 

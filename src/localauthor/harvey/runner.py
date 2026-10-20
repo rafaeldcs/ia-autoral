@@ -25,8 +25,13 @@ VERIFIED_CORPORA=set()
 
 
 def adapter_hash():
-    return content_hash({name:hashlib.sha256((Path(__file__).parent/name).read_bytes()).hexdigest()
-                         for name in ['__main__.py','contracts.py','runner.py','worker.py']})
+    # Resume must also detect changes to the inference bridge, model loader and
+    # isolation checks, not just changes to these four benchmark modules.
+    sources=sorted((ROOT/'src/localauthor').rglob('*.py'))
+    if not sources:raise PolicyError('Fontes do controlador ausentes; não congelar execução.')
+    sources.append(ROOT/'scripts/foundation-gguf-rpc.py')
+    return content_hash({path.relative_to(ROOT).as_posix():hashlib.sha256(path.read_bytes()).hexdigest()
+                         for path in sources})
 
 
 def git(root,*args):

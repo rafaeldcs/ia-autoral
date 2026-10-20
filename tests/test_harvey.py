@@ -8,10 +8,20 @@ from unittest.mock import patch
 
 from localauthor.errors import PolicyError
 from localauthor.harvey.contracts import content_hash,parse_action,receive_record,relative_file,sign_frame,validate_task,verify_frame,verify_sandbox
-from localauthor.harvey.runner import write_report
+from localauthor.harvey.runner import adapter_hash,write_report
 
 
 class HarveyContractsTests(unittest.TestCase):
+    def test_resume_freeze_includes_inference_sources_and_rpc_script(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);bridge=root/'src/localauthor/foundation/gguf_bridge.py'
+            bridge.parent.mkdir(parents=True);bridge.write_text('original bridge')
+            rpc=root/'scripts/foundation-gguf-rpc.py';rpc.parent.mkdir();rpc.write_text('original RPC')
+            with patch('localauthor.harvey.runner.ROOT',root):
+                first=adapter_hash();self.assertEqual(first,adapter_hash())
+                bridge.write_text('changed bridge');second=adapter_hash();self.assertNotEqual(first,second)
+                rpc.write_text('changed RPC');self.assertNotEqual(second,adapter_hash())
+
     def test_generated_commands_cannot_forge_controller_frames(self):
         key=b'a'*32;original={'op':'done','scores':{'score':1}}
         signed=sign_frame(original,key);self.assertEqual(verify_frame(signed,key),original)

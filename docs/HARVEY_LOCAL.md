@@ -56,6 +56,8 @@ Abra `report.html` na pasta da execução. `state.json` mantém todas as tarefas
 
 Para parar entre tarefas, crie um arquivo vazio `STOP_AFTER_CASE` nessa pasta. Para continuar, remova **somente esse marcador** e repita o comando com `--resume`. Uma tentativa interrompida é preservada e ganha uma pasta nova ao retomar. Modelo, revisão, conjunto, adaptador, imagem e orçamento precisam corresponder ao estado congelado; uma mudança exige uma execução nova para comparação. Falhas concluídas permanecem registradas, sem serem reclassificadas como acertos pela retomada. O reinício do Windows não inicia esse comando de avaliação automaticamente.
 
+O hash do controlador inclui todos os fontes Python de `src/localauthor` e o script de transporte GGUF. Assim, atualizar somente o bridge ou o isolamento também impede retomar inadvertidamente com outra implementação. Para lotes longos, mantenha uma cópia congelada desses fontes e do script fora do checkout de desenvolvimento e execute/retome a partir dela. O lote original iniciado em 20/10 usa uma cópia anterior a esse endurecimento do hash; sua cópia integral está preservada, e a retomada deve usar aquele mesmo controlador.
+
 ## Verificar a integração
 
 ```powershell
