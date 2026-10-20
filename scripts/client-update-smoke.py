@@ -22,6 +22,7 @@ sys.path.insert(0, str(ROOT / 'src'))
 from localauthor.application import Application
 from localauthor.config import Settings
 from localauthor.server import create_server
+from localauthor.util import write_json
 
 checks = []
 FLAGS = subprocess.CREATE_NO_WINDOW
@@ -87,6 +88,9 @@ with tempfile.TemporaryDirectory(prefix='localauthor-update-check-') as temp:
                                     print('PASS: Native fixture selected its profile through the real form',flush=True)
                                 except Exception as exc:
                                     if not page.is_closed():profile_errors.append(type(exc).__name__)
+                            download=page.locator('#native-installer-fixture-download')
+                            if download.count():
+                                download.click();download.evaluate('(node)=>node.remove()')
                 except Exception as error:
                     diagnostic=type(error).__name__+': '+str(error).splitlines()[0]
                     if diagnostic!=last_diagnostic:
@@ -95,6 +99,10 @@ with tempfile.TemporaryDirectory(prefix='localauthor-update-check-') as temp:
                 profile_stop.wait(.25)
     settings = Settings.load(base / 'backend')
     app = Application(settings)
+    installer_fixture=b'MZ'+b'explicit installer download fixture'*1024
+    installer_folder=settings.home/'lan/private-installers'/('a'*32);installer_folder.mkdir(parents=True)
+    (installer_folder/'Instalar-LocalAuthor-Conectado.exe').write_bytes(installer_fixture)
+    write_json(settings.home/'lan/installer-release.json',{'folder':'a'*32,'version':'0.3.10','size':len(installer_fixture),'sha256':hashlib.sha256(installer_fixture).hexdigest().upper()})
     app.start()
     backend = create_server(app, ROOT / 'ui', port=0)
     thread = threading.Thread(target=backend.serve_forever, daemon=True)
@@ -180,6 +188,13 @@ with tempfile.TemporaryDirectory(prefix='localauthor-update-check-') as temp:
                 if request('/api/health')[0] == 200: break
             except OSError: pass
             time.sleep(.1)
+        installer_report=base/'native-installer.json';installer_target=base/'downloaded-installer.exe'
+        run(new,'--installer-download-smoke',pair,installer_report,installer_target)
+        native_installer=wait_file(installer_report)
+        (ROOT/'reports/native-installer-download.json').write_text(json.dumps(native_installer),encoding='utf-8')
+        print('Native installer result: '+json.dumps(native_installer),flush=True)
+        check('Native WebView downloads the exact published installer through authenticated TLS',native_installer['passed'] and installer_target.read_bytes()==installer_fixture)
+        check('Native installer download accepts only its pinned server endpoint',native_installer['restricted'])
         check('No publication returns 404', request('/api/client-update')[0] == 404)
         check('Update manifest requires device authentication', request('/api/client-update', '')[0] == 401)
         publisher = ROOT / 'scripts/lan/Publish-ClientUpdate.ps1'

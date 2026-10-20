@@ -16,6 +16,10 @@ from .safety import PathPolicy
 from .util import read_json, write_json, sha256
 
 MAX_BODY = 2_500_000
+
+
+class InstallerDownload:
+    def __init__(self, metadata, stream):self.metadata,self.stream=metadata,stream
 STATIC = {"/": "chat.html", "/advanced": "index.html", "/app.js": "app.js", "/styles.css": "styles.css", "/chat.js": "chat.js", "/chat.css": "chat.css",
           "/foundation": "foundation.html", "/foundation.js": "foundation.js", "/foundation.css": "foundation.css",
           "/visual-studio.js": "visual-studio.js",
@@ -147,7 +151,20 @@ def make_handler(app: Application, ui_path: Path):
                         else:result=self._route(method,path,q,body)
                     finally:
                         current_author.reset(author);current_actor.reset(actor)
-                self._send(200, result)
+                if isinstance(result,InstallerDownload):
+                    try:
+                        self.send_response(200)
+                        self.send_header('Content-Type','application/octet-stream')
+                        self.send_header('Content-Length',str(result.metadata['size']))
+                        self.send_header('Content-Disposition','attachment; filename="Instalar-LocalAuthor-Conectado.exe"')
+                        self.send_header('X-Content-Type-Options','nosniff')
+                        self.send_header('X-Content-Sha256',result.metadata['sha256'])
+                        self.send_header('Cache-Control','no-store')
+                        self.end_headers()
+                        while block:=result.stream.read(256*1024):self.wfile.write(block)
+                    except (BrokenPipeError,ConnectionResetError,ConnectionAbortedError):self.close_connection=True
+                    finally:result.stream.close()
+                else:self._send(200, result)
             except AuthenticationError as exc:
                 from .identity_http import session_cookie
                 self._profile_cookie=session_cookie(None,self.headers)
@@ -170,6 +187,10 @@ def make_handler(app: Application, ui_path: Path):
                 self._send(500, {"error": "Erro interno. Consulte o console local; nenhum fallback externo foi utilizado."})
 
         def _route(self, method, path, q, body):
+            if method=='GET' and path=='/api/app/installer':return app.installers.status()
+            if method=='GET' and path=='/api/app/installer/file':
+                if q:raise PolicyError('O instalador não aceita parâmetros de caminho.')
+                return InstallerDownload(*app.installers.open())
             if path in {'/api/chat-workspace','/api/chat-draft','/api/chat-request'}:
                 return app.recovery.route(method,path,q,body)
             if path.startswith('/api/leads'):
@@ -295,7 +316,7 @@ def make_handler(app: Application, ui_path: Path):
                         ImageOptions.parse(body["image_options"])
                     app.chat.get(body["project_id"], body["conversation_id"])
                     app.chat.validate_message(body["message"], body.get("mode", "guide"), body.get("input_format", "auto"))
-                    if 'request_id' in body or body.get("mode") in {"model", "foundation", "image"}:
+                    if 'request_id' in body or body.get("mode") in {"auto", "model", "foundation", "image"}:
                         return {"job": app.jobs.submit("chat", {k: body[k] for k in ("project_id", "conversation_id", "message", "mode", "input_format", "image_options") if k in body},request_id=body.get('request_id'))}
                     return app.chat.respond(body["project_id"], body["conversation_id"], body["message"], body.get("mode", "guide"), input_format=body.get("input_format", "auto"))
                 if path == "/api/consult": return app.knowledge.consult(body["query"], body.get("scope", "global"), body.get("include_global") is True)

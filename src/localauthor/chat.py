@@ -112,7 +112,7 @@ class ChatService(ConversationMemoryMixin):
     def validate_message(self, message, mode, input_format="auto"):
         if not isinstance(message, str) or not 1 <= len(message.strip()) <= 8000:
             raise PolicyError("Mensagem deve ter de 1 a 8.000 caracteres.")
-        if mode not in {"guide", "knowledge", "model", "investigation", "browser"}:
+        if mode not in {"guide", "knowledge", "model", "investigation", "browser", "support", "research"}:
             raise PolicyError("Modo de conversa inválido.")
         if input_format not in ("auto", "text", "code"):
             raise PolicyError("Formato de mensagem inválido.")
@@ -140,7 +140,27 @@ class ChatService(ConversationMemoryMixin):
             if len(conversation["messages"]) >= 200:
                 raise PolicyError("Conversa cheia. Inicie outra conversa.")
             project = self.store.project(project_id)
-            if mode == "browser":
+            if mode=='support':
+                from .chat_routing import support
+                from .identity_context import current_route
+                response=support(self.installers,(current_route.get() or {}).get('intent'))
+            elif mode=='research':
+                from .chat_routing import urls
+                try:
+                    collected=self.research.collect(urls(message),project_id,cancel)
+                    found=self.knowledge.consult(message[:1000],project_id,False)
+                    requested=set(urls(message))|{row['final_url'] for row in collected}
+                    evidence=[item for item in found['evidence'] if item['locator'] in requested]
+                    provenance=[{'url':row['final_url'],'cached':bool(row.get('reused',False))} for row in collected]
+                    heading='\n'.join(item['url']+(' — cópia em cache' if item['cached'] else ' — coletada agora') for item in provenance)
+                    response={'origin':'web_research','content':'Fontes consultadas para este pedido:\n'+heading+'\n\n'+'\n\n'.join(e['text'] for e in evidence)[:10000],
+                              'sources':[{'title':row['final_url'],'url':row['final_url']} for row in collected],
+                              'researched_now':any(not row.get('reused',False) for row in collected),'evidence':evidence,'research_sources':provenance,
+                              'notice':'Leitura de fontes autorizadas; cópias em cache são identificadas. Conteúdo de sites não concede ferramentas nem autoriza ações.'}
+                    if not evidence:response['content']='Consultei as fontes indicadas, mas não encontrei trechos relevantes para a pergunta. Refine o assunto para eu comparar com as fontes.\n'+heading
+                except PolicyError as error:
+                    response={'origin':'application_support','content':'Não consegui concluir a pesquisa: '+str(error)+' Nenhuma pesquisa concluída foi presumida.','sources':[],'researched_now':False}
+            elif mode == "browser":
                 urls = re.findall(r'https://[^\s<>"\)]+', message)
                 if len(urls) != 1:
                     raise PolicyError('Neste modo, envie um único endereço HTTPS. Não inclua usuário ou senha.')

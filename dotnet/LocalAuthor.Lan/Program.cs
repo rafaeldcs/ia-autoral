@@ -187,6 +187,9 @@ try {
    foreach(var name in new[]{"Content-Security-Policy","Referrer-Policy","X-Content-Type-Options","Set-Cookie"})
     if(response.Headers.TryGetValues(name,out var values)) context.Response.Headers[name]=values.ToArray();
    context.Response.ContentType=response.Content.Headers.ContentType?.ToString() ?? "application/json";
+   if(response.Content.Headers.ContentDisposition is not null)context.Response.Headers.ContentDisposition=response.Content.Headers.ContentDisposition.ToString();
+   if(response.Content.Headers.ContentLength is long responseLength)context.Response.ContentLength=responseLength;
+   if(response.Headers.TryGetValues("X-Content-Sha256",out var checksum))context.Response.Headers["X-Content-Sha256"]=checksum.ToArray();
    await response.Content.CopyToAsync(context.Response.Body,context.RequestAborted);
   } catch(OperationCanceledException) {if(!context.Response.HasStarted) await Error(504,"O servidor demorou a responder.");}
     catch(HttpRequestException) {if(!context.Response.HasStarted) await Error(503,"A IA local está desligada. Inicie o servidor neste computador.");}

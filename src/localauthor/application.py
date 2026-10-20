@@ -27,6 +27,9 @@ class Application:
         self.browser = BrowserWorkspace(settings, self.store)
         self.chat.browser = self.browser
         self.research = ResearchService(self.store, settings)
+        self.chat.research = self.research
+        from .installer_catalog import InstallerCatalog
+        self.installers = self.chat.installers = InstallerCatalog(settings.home)
         from .foundation.marketing_workflow import MarketingWorkflow
         self.marketing = MarketingWorkflow(self.store, self.research, self.chat.foundation, self.browser)
         from .foundation.marketing_channels import MarketingChannels

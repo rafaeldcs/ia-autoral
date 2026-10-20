@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS chat_drafts(
  text TEXT NOT NULL,mode TEXT NOT NULL,pending TEXT,revision INTEGER NOT NULL,updated_at TEXT NOT NULL,
  PRIMARY KEY(actor,project_id,conversation_id));
 """
-MODES={'guide','knowledge','model','foundation','image','investigation','browser'}
+MODES={'auto','guide','knowledge','model','foundation','image','investigation','browser'}
 
 
 def identifier(value, *, empty=False):
@@ -67,7 +67,7 @@ class ChatRecovery:
         actor=self.scope(project_id,conversation_id)
         with self.app.store.connect() as db:
             row=db.execute('SELECT text,mode,pending,revision,updated_at FROM chat_drafts WHERE actor=? AND project_id=? AND conversation_id=?',(actor,project_id,conversation_id)).fetchone()
-        return {**dict(row),'pending':json.loads(row['pending']) if row['pending'] else None} if row else {'text':'','mode':'guide','pending':None,'revision':0,'updated_at':None}
+        return {**dict(row),'pending':json.loads(row['pending']) if row['pending'] else None} if row else {'text':'','mode':'auto','pending':None,'revision':0,'updated_at':None}
 
     def save(self, project_id, conversation_id, text, mode, revision, pending=None):
         actor=self.scope(project_id,conversation_id,action='write')

@@ -3,7 +3,7 @@
 // a chat command on startup: recovery reads the accepted-request journal only.
 window.LocalAuthorRecovery = (() => {
   const uuid = () => crypto.randomUUID().replaceAll('-', '');
-  const modes = new Set(['guide','knowledge','model','foundation','image','investigation','browser']);
+  const modes = new Set(['auto','guide','knowledge','model','foundation','image','investigation','browser']);
   let database;
   function db() {
     if (!database) database = new Promise((resolve, reject) => {
@@ -143,7 +143,7 @@ window.LocalAuthorRecovery = (() => {
     }
     async function open(project,conversation='') {
       await flushLocal();clearTimeout(timer);opening=true;phase='';lastError='';alternatives=[];
-      const id=profile();let rows=[],remote={text:'',mode:'guide',pending:null,revision:0};
+      const id=profile();let rows=[],remote={text:'',mode:'auto',pending:null,revision:0};
       try{rows=(await read('drafts',id,'profile')).filter(row=>row.project===project&&row.conversation===conversation&&valid(row)).sort((a,b)=>b.updated-a.updated);}catch(error){localError=error.message;}
       try{remote=await api('/api/chat-draft?project_id='+project+'&conversation_id='+conversation);}catch(error){lastError=error.message;}
       const local=rows[0];
@@ -171,7 +171,7 @@ window.LocalAuthorRecovery = (() => {
       const pending=context.pending;
       if(!pending)return;
       context.pending=null;context.requestState=null;
-      if(deps.input.value===pending.message && deps.mode.value===pending.mode)deps.write('',context.mode);
+      if(deps.input.value===pending.message)deps.write('',context.mode);
       capture(true);await flushLocal();
       try{await sync();}catch{/* A newer server draft is kept; completed messages remain authoritative. */}
       phase='Resposta salva no histórico.';render();

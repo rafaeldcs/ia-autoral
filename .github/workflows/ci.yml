@@ -88,6 +88,7 @@ jobs:
       - run: python scripts/leads-ui-smoke.py
       - run: python scripts/identity-ui-smoke.py
       - run: python scripts/chat-recovery-smoke.py
+      - run: python scripts/chat-auto-smoke.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -120,6 +121,9 @@ jobs:
             reports/chat-recovery-smoke.json
             reports/chat-recovery-desktop.png
             reports/chat-recovery-mobile.png
+            reports/chat-auto-smoke.json
+            reports/chat-auto-installer-desktop.png
+            reports/chat-auto-mobile.png
             reports/work-profile-mobile.png
             reports/business-metrics-desktop.png
             reports/business-metrics-mobile.png

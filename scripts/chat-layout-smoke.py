@@ -8,15 +8,17 @@ import threading
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / 'src'))
+sys.path[:0] = [str(ROOT / 'src'),str(ROOT)]
 from localauthor.application import Application
 from localauthor.config import Settings
 from localauthor.server import create_server
+from localauthor.foundation.service import FoundationService
+from tests.test_foundation import DummyText,register_fixture
 from playwright.sync_api import sync_playwright, expect
 
 
 def main():
-    report = {'checks': [], 'errors': [], 'success': False, 'scope': 'temporary projects; structured guide; no model qualification'}
+    report = {'checks': [], 'errors': [], 'success': False, 'scope': 'temporary projects; automatic chat with explicit generation double; no model qualification'}
     art = ROOT / 'reports'
     art.mkdir(exist_ok=True)
 
@@ -30,6 +32,12 @@ def main():
         project.mkdir()
         settings = Settings.load(base / 'data')
         app = Application(settings)
+        class LayoutText(DummyText):
+            def generate(self,messages,cancel=None):
+                assert json.loads(messages[-1]['content'])['orientacao_do_projeto']['definition_of_done']=='Revisão e testes aprovados.','Saved project criteria must reach the model context'
+                return 'Dublê explícito de conversa. Critério recebido: Revisão e testes aprovados.',False
+        register_fixture(settings.home,base/'fixture-weights')
+        app.chat.foundation=FoundationService(settings.home,text_factory=LayoutText)
         app.start()
         server = create_server(app, ROOT / 'ui', port=0)
         worker = threading.Thread(target=server.serve_forever, daemon=True)
@@ -56,7 +64,7 @@ def main():
                 expect(page.locator('#project-heading')).to_have_text('Projeto de demonstração')
                 check('Projects and conversations share one sidebar', page.locator('#sidebar #project-list').count() == page.locator('#sidebar #conversation-list').count() == 1)
                 check('Chat width is not consumed by a second navigation rail', page.locator('.chat').bounding_box()['width'] > 1000)
-                check('Format selection is absent from the composer', page.locator('#input-format').get_attribute('type') == 'hidden' and page.locator('#compose select').count() == 1)
+                check('Neither format nor response mode requires a composer choice', page.locator('#input-format').get_attribute('type') == 'hidden' and page.locator('#compose select:visible').count() == 0)
                 check('Empty composer is compact and send is disabled', page.locator('#compose').bounding_box()['height'] < 150 and page.locator('#send').is_disabled() and page.locator('#input-count').is_hidden())
                 formats = json.loads((ROOT / 'tests/fixtures/message_formats.json').read_text(encoding='utf-8'))
                 for sample in formats:
@@ -89,7 +97,7 @@ def main():
                     check(name + ' has a real destination', page.locator('.tool-links').get_by_role('link', name=name).get_attribute('href') == href)
                 page.keyboard.press('Escape')
                 expect(page.locator('#open-tools')).to_be_focused()
-                check('Closing tools preserves draft and mode', page.locator('#message-input').input_value() == draft and page.locator('#response-mode').input_value() == 'guide')
+                check('Closing tools preserves draft and automatic routing', page.locator('#message-input').input_value() == draft and page.locator('#response-mode').input_value() == 'auto')
                 page.locator('#close-menu').click()
                 expect(page.locator('#sidebar')).not_to_be_visible()
                 expect(page.locator('#open-menu')).to_be_focused()
@@ -104,7 +112,7 @@ def main():
                 page.locator('#send').click()
                 expect(page.locator('.message.assistant')).to_have_count(1)
                 expect(page.locator('.message.assistant')).to_contain_text('Revisão e testes aprovados.')
-                check('Guide still uses saved project preferences')
+                check('Automatic conversation receives saved project preferences',page.evaluate("state.conversation.messages.at(-1).metadata.routing.selected==='foundation'&&state.conversation.messages.at(-1).metadata.origin==='foundation_text'"))
                 check('Messages remain inert text', page.evaluate('window.PWNED') is None and page.locator('.message.user .message-content').text_content() == draft)
                 expect(page.locator('#conversation-list button')).to_have_count(1)
                 expect(page.locator('#conversation-list button')).to_be_in_viewport()

@@ -5,7 +5,7 @@ namespace LocalAuthor.Client;
 internal static class DesktopShell
 {
     internal static bool Accepts(string source, Uri origin, string command) =>
-        command == "desktop-settings" && Uri.TryCreate(source, UriKind.Absolute, out var uri) &&
+        (command == "desktop-settings" || command == "download-installer") && Uri.TryCreate(source, UriKind.Absolute, out var uri) &&
         uri.Scheme == origin.Scheme && uri.Host == origin.Host && uri.Port == origin.Port &&
         uri.UserInfo.Length == 0;
 

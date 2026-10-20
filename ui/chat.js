@@ -7,9 +7,15 @@ let conversationListVersion=0;
 const recovery=window.LocalAuthorRecovery.create({
     api,input:$('message-input'),mode:$('response-mode'),notice:toast,
     readOnly:()=>state.project?.access==='reader',changed:()=>updateAvailability(),
-    write:(text,mode)=>{$('message-input').value=text;$('response-mode').value=[...$('response-mode').options].some(option=>option.value===mode)?mode:'guide';modeNotice();updateInputCount(false);},
+    write:(text,mode)=>{$('message-input').value=text;$('response-mode').value=mode==='model'?'model':'auto';modeNotice();updateInputCount(false);},
     inspect:()=>recoverRequest(),retry:()=>retryRequest(),cancel:async()=>{const pending=recovery.pending;if(!pending)return;const request=await lookupRequest(pending);await api('/api/jobs/'+request.job_id+'/cancel',{});await recoverRequest();}
 });
+window.localAuthorInstallerState=phase=>{
+    for(const link of document.querySelectorAll('.message-action[href="/api/app/installer/file"]')){
+        link.textContent=phase==='loading'?'Baixando instalador…':'Baixar instalador';
+        if(phase==='loading')link.setAttribute('aria-disabled','true');else link.removeAttribute('aria-disabled');
+    }
+};
 window.LocalAuthorRecovery.flushLocal=()=>recovery.flushLocal();
 function el(tag, text, cls) { const node = document.createElement(tag); node.textContent = text; if (cls)
     node.className = cls; return node; }
@@ -70,8 +76,9 @@ async function renderConversations() { if (!state.project)
 } }
 async function selectProject(project,conversation='') {
     if(state.busy||!project)return;
-    await recovery.flushLocal();busy(true);
+    busy(true);
     try{
+        await recovery.flushLocal();
         const selected=conversation?await api('/api/conversation?project_id='+project.id+'&id='+conversation):null;
         hideBrowserPanel();state.project=project;state.conversation=selected;
         $('project-heading').textContent=project.name;$('project-heading').title=project.name;$('folder-path').textContent=project.root;
@@ -83,7 +90,7 @@ async function selectProject(project,conversation='') {
 }
 function renderMessages() { const list = $('messages'); list.replaceChildren(); const messages = state.conversation?.messages || []; $('welcome').hidden = messages.length > 0; for (const message of messages) {
     const box = el('article', '', `message ${message.role}`);
-    const names = { project_memory: 'Memória do projeto · preferência registrada', foundation_text: 'LocalAuthor · modelo local com contexto', project_guide: 'Guia do projeto · orientação estruturada', retrieval_only: 'Memória local · trechos recuperados', local_model: 'IA local · geração experimental', investigation_memory: 'Sistema investigado · evidências observadas', browser_session: 'Navegador da IA · sessão de investigação' };
+    const names = { application_support:'LocalAuthor · aplicativo',web_research:'LocalAuthor · fontes consultadas', project_memory: 'Memória do projeto · preferência registrada', foundation_text: 'LocalAuthor · modelo local com contexto', project_guide: 'Guia do projeto · orientação estruturada', retrieval_only: 'Memória local · trechos recuperados', local_model: 'IA local · geração experimental', investigation_memory: 'Sistema investigado · evidências observadas', browser_session: 'Navegador da IA · sessão de investigação' };
     const code = message.metadata.format === 'code';
     const person=message.metadata.author_id?(message.metadata.author_id===window.LocalAuthorIdentity?.user?.id?'Você':message.metadata.author_name||'Pessoa do projeto'):(window.LocalAuthorIdentity?.user?'Histórico anterior aos perfis':'Você');
     const label = message.role === 'user' ? person : message.metadata.qualification === 'scoped' ? 'IA local · correção avaliada em escopo limitado' : names[message.metadata.origin] || 'Assistente';
@@ -95,6 +102,21 @@ function renderMessages() { const list = $('messages'); list.replaceChildren(); 
         toast('Mensagem copiada sem alterar o texto.');
     });
     box.append(copy);
+    for(const action of message.metadata.actions||[]) {
+        if(action.kind!=='download_installer'||action.url!=='/api/app/installer/file')continue;
+        const download=el('a','Baixar instalador','message-action');download.href=action.url;download.download='Instalar-LocalAuthor-Conectado.exe';
+        download.onclick=async event=>{
+            event.preventDefault();
+            if(window.chrome?.webview&&window.__localAuthorNativeInstallerDownloads){window.localAuthorInstallerState('loading');window.chrome.webview.postMessage('download-installer');return;}
+            if(window.chrome?.webview){toast('Atualize o aplicativo para baixar por aqui. A nova versão será aplicada quando o chat estiver livre.');return;}
+            download.setAttribute('aria-disabled','true');
+            try{
+                const response=await fetch(action.url,{headers:{Authorization:'Bearer '+state.token}});
+                if(!response.ok){const error=await response.json();throw Error(error.error||'Instalador indisponível.');}
+                const url=URL.createObjectURL(await response.blob());const link=document.createElement('a');link.href=url;link.download=download.download;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);toast('Instalador baixado. Abra o arquivo salvo para instalar.');
+            }catch(error){toast(error.message);}finally{download.removeAttribute('aria-disabled');}
+        };box.append(download);
+    }
     if(message.metadata.browser_session_id) { const view=el('button','Acompanhar investigação','copy-message'); view.onclick=handle(()=>openBrowserSession(message.metadata.browser_session_id)); box.append(view); }
     for (const source of message.metadata.sources || []) {
         if (!source.url.startsWith('https://'))
@@ -143,8 +165,8 @@ $('project-create').onsubmit = handle(async () => { const managed=$('project-man
 $('new-chat').onclick = handle(async () => { if (!state.project)
     throw Error('Adicione uma pasta de projeto primeiro.'); closeNavigation(); await resetChat(); });
 for (const button of document.querySelectorAll('[data-prompt]'))
-    button.onclick = () => { $('tools-dialog').close(); $('message-input').value = button.dataset.prompt; $('response-mode').value = button.dataset.mode || 'guide'; modeNotice(); updateInputCount(); $('message-input').focus(); toast('Exemplo preenchido. Edite a mensagem ou clique em Enviar.'); };
-function modeNotice() { const modes = { foundation: 'Conversa com o modelo local, histórico e fontes deste projeto. Respostas podem estar erradas; código não é executado.', browser: 'Envie um endereço HTTPS para abrir o navegador da IA e acompanhar as capturas. Isso autoriza conexão ao site nesta sessão. Nunca envie senhas no chat.', investigation: 'Consulta as telas já observadas neste projeto, com data e origem. Não navega agora. Não envie senhas no chat.', guide: 'Guias estruturados e referências. Não é geração neural. Ctrl + Enter para enviar.', knowledge: 'Consulta apenas fontes deste projeto. Não inclui conversas ou fontes de outros projetos.', model: 'Laboratório: pedido curto, sem histórico nem arquivos no contexto. A saída pode estar errada e não é executada.' }; $('mode-notice').textContent = modes[$('response-mode').value]; }
+    button.onclick = () => { $('tools-dialog').close(); $('message-input').value = button.dataset.prompt; $('response-mode').value = button.dataset.mode === 'model' ? 'model' : 'auto'; modeNotice(); updateInputCount(); $('message-input').focus(); toast('Exemplo preenchido. Edite a mensagem ou clique em Enviar.'); };
+function modeNotice() { $('mode-notice').textContent = 'Ctrl + Enter para enviar.'; }
 $('response-mode').onchange = () => { modeNotice(); updateInputCount(); };
 function looksLikeCode(value) {
     // Presentation only. The server independently classifies the original string.
@@ -188,6 +210,7 @@ $('compose').onsubmit = handle(async () => { if (state.busy)
     if ($('response-mode').value === 'model' && new TextEncoder().encode(message).length > 180)
         throw Error('Este modelo aceita até 180 bytes por pedido. O texto foi mantido; reduza o pedido ou escolha outro modo.');
     if(recovery.pending)throw Error('Consulte o envio anterior antes de iniciar outro.');
+    if($('response-mode').value!=='model')$('response-mode').value='auto';
     const pending={request_id:window.LocalAuthorRecovery.uuid(),conversation_id:state.conversation?.id||window.LocalAuthorRecovery.uuid(),message,mode:$('response-mode').value};
     busy(true);try{await recovery.prepare(pending);await sendPending(pending);}catch(error){recovery.requestState('unknown','Envio não confirmado. Seu pedido foi preservado. Use Consultar pedido.');throw error;}finally{busy(false);}
 });
@@ -449,7 +472,7 @@ voiceChat = (() => {
             if (version !== epoch || state.project?.id !== project) return;
             voice = selectedVoice; active = true; muted = false; $('voice-dialog').close();
             clearTimeout(toastTimer); $('notification').hidden = true;
-            $('response-mode').value = 'foundation'; modeNotice(); busy(false); syncControls();
+            $('response-mode').value = 'auto'; modeNotice(); busy(false); syncControls();
             await listen(version);
         } finally { $('voice-confirm').disabled = false; }
     }

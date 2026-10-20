@@ -27,7 +27,7 @@ PROJECT_POST = {
 SCOPE_GET = {'/api/sources','/api/relations'}
 SCOPE_POST = {'/api/consult','/api/import','/api/sources/delete','/api/relations','/api/jobs/research'}
 ADMIN_GET = {'/api/diagnostics','/api/models'}
-SHARED_GET = {'/api/health','/api/foundation/status','/api/voice/status','/api/engineering-report','/api/communication-report'}
+SHARED_GET = {'/api/health','/api/foundation/status','/api/voice/status','/api/engineering-report','/api/communication-report','/api/app/installer','/api/app/installer/file'}
 
 
 class ProjectAccess:

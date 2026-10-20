@@ -4,10 +4,11 @@ from contextvars import ContextVar
 current_actor = ContextVar("localauthor_actor", default=None)
 current_author = ContextVar("localauthor_author", default=None)
 current_request = ContextVar("localauthor_request", default=None)
+current_route = ContextVar("localauthor_route", default=None)
 
 
 def response_metadata(metadata):
-    return {**metadata, **({'request_id':current_request.get()} if current_request.get() else {})}
+    return {**metadata, **({'request_id':current_request.get()} if current_request.get() else {}), **({'routing':current_route.get()} if current_route.get() else {})}
 
 
 def message_metadata(input_format):

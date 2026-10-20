@@ -21,7 +21,7 @@ class FoundationChatService(ChatService):
         self.foundation = FoundationService(settings.home)
 
     def validate_message(self, message, mode, input_format="auto"):
-        if mode in {"foundation", "image"}:
+        if mode in {"auto", "foundation", "image"}:
             # Keep Unicode, secret and format checks; do not use the tiny model cap.
             super().validate_message(message, "guide", input_format)
             if len(message) > 8000:
@@ -46,6 +46,20 @@ class FoundationChatService(ChatService):
             child(self.settings.home / "foundation" / "artifacts", f"{project_id}/{run_id}.png").unlink(missing_ok=True)
 
     def respond(self, project_id, conversation_id, message, mode="guide", cancel=None, input_format="auto", image_options=None):
+        if mode=='auto':
+            self.validate_message(message,mode,input_format)
+            conversation=self.get(project_id,conversation_id)
+            remembered=self._memory_turn(project_id,conversation_id,message,cancel,resolve_message_format(message,input_format))
+            if remembered is not None:return remembered
+            from ..chat_routing import choose
+            from ..identity_context import current_route
+            selected,intent=choose(message,conversation['messages'])
+            if selected=='foundation' and not self.foundation.status()['capabilities']['text']['registered']:
+                selected='knowledge' if self.knowledge.consult(message[:1000],project_id,False)['evidence'] else 'support'
+                intent='local_sources' if selected=='knowledge' else 'model_unavailable'
+            token=current_route.set({'requested':'auto','selected':selected,'intent':intent})
+            try:return self.respond(project_id,conversation_id,message,selected,cancel,input_format,image_options=image_options)
+            finally:current_route.reset(token)
         if image_options is not None and mode != "image":
             raise PolicyError("Parâmetros visuais exigem modo imagem.")
         if mode not in {"foundation", "image"}:

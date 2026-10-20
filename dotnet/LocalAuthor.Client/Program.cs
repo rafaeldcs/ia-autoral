@@ -64,11 +64,13 @@ sealed class ClientForm : Form {
  readonly System.Windows.Forms.Timer updateTimer=new(){Interval=300000};
  bool checkingUpdate,applyingUpdate;DateTime nextUpdate=DateTime.MinValue;
  bool automaticAttempt;
+ bool installerDownloading;
  readonly LocalServerConnection localServer;
  bool loadingSaved;
  readonly CancellationTokenSource shutdown=new();
  readonly string? smokeFile;readonly string? reportFile;
  readonly string? automaticTestReport;
+ readonly string? installerTestDestination;
  public ClientForm(string[] args) {
   Text="LocalAuthor — IA da sua rede";Width=1280;Height=880;MinimumSize=new Size(700,550);StartPosition=FormStartPosition.CenterScreen;
   Font=new Font("Segoe UI",10);BackColor=Color.White;
@@ -93,6 +95,7 @@ sealed class ClientForm : Form {
   int i=Array.IndexOf(args,"--smoke");if(i>=0){smokeFile=args[i+1];reportFile=args[i+2];Opacity=0;ShowInTaskbar=false;}
   int savedIndex=Array.IndexOf(args,"--smoke-saved");if(savedIndex>=0){home=Path.GetFullPath(args[savedIndex+1]);reportFile=args[savedIndex+2];Opacity=0;ShowInTaskbar=false;}
   int autoIndex=Array.IndexOf(args,"--auto-update-smoke");if(autoIndex>=0){smokeFile=Path.GetFullPath(args[autoIndex+1]);automaticTestReport=Path.GetFullPath(args[autoIndex+2]);home=Path.Combine(Path.GetDirectoryName(automaticTestReport)!,"isolated-client-data");Opacity=0;ShowInTaskbar=false;}
+  int installerIndex=Array.IndexOf(args,"--installer-download-smoke");if(installerIndex>=0){smokeFile=Path.GetFullPath(args[installerIndex+1]);automaticTestReport=Path.GetFullPath(args[installerIndex+2]);installerTestDestination=Path.GetFullPath(args[installerIndex+3]);home=Path.Combine(Path.GetDirectoryName(automaticTestReport)!,"isolated-installer-client");Opacity=0;ShowInTaskbar=false;}
   int localIndex=Array.IndexOf(args,"--smoke-local-server");
   if(localIndex>=0){home=Path.GetFullPath(args[localIndex+2]);reportFile=args[localIndex+3];Opacity=0;ShowInTaskbar=false;}
   // Existing isolated smoke modes must never enroll into the real user's server.
@@ -116,6 +119,12 @@ sealed class ClientForm : Form {
    if(reportFile==null){
     if(automaticTestReport==null)await EnsurePublicationPassword();
     for(int attempt=0;attempt<40&&!IsDisposed;attempt++){if(await SafeToRestart())break;await Task.Delay(250);}
+    if(installerTestDestination!=null){
+     await browser!.CoreWebView2.ExecuteScriptAsync("(()=>{const link=document.createElement('a');link.id='native-installer-fixture-download';link.textContent='Download fixture';link.style.cssText='position:fixed;top:0;left:0;z-index:99999;background:white;padding:10px';link.href='/api/app/installer/file';link.onclick=event=>{event.preventDefault();window.chrome.webview.postMessage('download-installer');};document.body.append(link);})()");
+     for(int attempt=0;attempt<120&&!File.Exists(automaticTestReport!);attempt++)await Task.Delay(250);
+     if(!File.Exists(automaticTestReport!))File.WriteAllText(automaticTestReport!,JsonSerializer.Serialize(new{passed=false,error="download-timeout"}));
+     Close();return;
+    }
     if(automaticTestReport!=null&&args.Contains("--draft"))await browser!.CoreWebView2.ExecuteScriptAsync("document.getElementById('message-input').value='rascunho de teste';");
     if(automaticTestReport!=null&&args.Contains("--appearance"))await browser!.CoreWebView2.ExecuteScriptAsync("(()=>{const appearance=document.querySelector('[data-appearance]');appearance.value='dark';appearance.dispatchEvent(new Event('input',{bubbles:true}));appearance.dispatchEvent(new Event('change',{bubbles:true}));})()");
     if(!IsDisposed)await CheckForUpdates();
@@ -152,8 +161,32 @@ sealed class ClientForm : Form {
    try{using var form=new PublicationPasswordForm(connection);return form.ShowDialog(this)==DialogResult.OK;}finally{publishing=wasPublishing;}
   }catch{status.Text="Não foi possível consultar a senha de publicação no servidor.";return false;}
  }
+ async Task SaveInstaller(){
+  if(installerDownloading||connection==null||browser?.CoreWebView2==null)return;
+  installerDownloading=true;
+  try{
+   string destination;
+   if(installerTestDestination!=null)destination=installerTestDestination;
+   else{
+    using var save=new SaveFileDialog{Title="Salvar instalador da LocalAuthor",FileName="Instalar-LocalAuthor-Conectado.exe",Filter="Aplicativo Windows (*.exe)|*.exe",OverwritePrompt=true};
+    if(save.ShowDialog(this)!=DialogResult.OK)return;destination=save.FileName;
+   }
+   var selected=connection;
+   var cookies=await browser.CoreWebView2.CookieManager.GetCookiesAsync(selected.Server);
+   var profile=cookies.FirstOrDefault(cookie=>cookie.Name=="la_profile"&&cookie.Path=="/")?.Value;
+   if(string.IsNullOrWhiteSpace(profile))throw new InvalidOperationException("Escolha um perfil antes de baixar.");
+   await InstallerDownload.SaveAsync(selected,profile,destination,shutdown.Token);
+   if(installerTestDestination!=null){
+    using var input=File.OpenRead(destination);var hash=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(input));
+    File.WriteAllText(automaticTestReport!,JsonSerializer.Serialize(new{passed=true,sha256=hash,bytes=new FileInfo(destination).Length,restricted=InstallerDownload.Allows(new Uri(new Uri(selected.Server),"/api/app/installer/file").ToString(),new Uri(selected.Server))&&!DesktopShell.Accepts("https://example.com",new Uri(selected.Server),"download-installer")&&!InstallerDownload.Allows(new Uri(new Uri(selected.Server),"/api/app/installer/file?path=x").ToString(),new Uri(selected.Server))}));
+   }else await browser.CoreWebView2.ExecuteScriptAsync("if(typeof toast==='function')toast('Instalador salvo. Abra o arquivo para instalar no outro computador da rede.');");
+  }catch(Exception error){
+   if(installerTestDestination!=null)File.WriteAllText(automaticTestReport!,JsonSerializer.Serialize(new{passed=false,error=error.GetType().Name,detail=error.Message}));
+   else if(!IsDisposed)MessageBox.Show(this,"Não consegui baixar o instalador. Confira se o servidor está ligado e escolha seu perfil novamente.","Instalador da LocalAuthor",MessageBoxButtons.OK,MessageBoxIcon.Information);
+  }finally{installerDownloading=false;if(!IsDisposed&&browser?.CoreWebView2!=null)try{await browser.CoreWebView2.ExecuteScriptAsync("window.localAuthorInstallerState?.('idle');");}catch(InvalidOperationException){}}
+ }
  async Task<bool> SafeToRestart(){
-  if(browser?.CoreWebView2==null||connecting)return false;
+  if(browser?.CoreWebView2==null||connecting||installerDownloading)return false;
   // Only restart from an idle chat. Other screens may contain unsaved forms.
   return await browser.CoreWebView2.ExecuteScriptAsync("Boolean(document.getElementById('studio')&&!document.getElementById('studio').hidden&&!document.body.classList.contains('identity-locked')&&!document.querySelector('dialog[open]')&&typeof state!=='undefined'&&!state.busy&&!document.getElementById('message-input').value&&!window.__localAuthorUpdateDirty)")=="true";
  }
@@ -219,7 +252,7 @@ sealed class ClientForm : Form {
    var environment=await CoreWebView2Environment.CreateAsync(null,profile);
    await browser.EnsureCoreWebView2Async(environment);
    var web=browser.CoreWebView2;
-   web.WebMessageReceived+=(_,e)=>{try{if(DesktopShell.Accepts(e.Source,uri,e.TryGetWebMessageAsString()))ShowSettings();}catch(Exception error) when(error is ArgumentException or InvalidOperationException or System.Runtime.InteropServices.COMException){ /* Ignore non-string messages. */ }};
+   web.WebMessageReceived+=async(_,e)=>{try{var command=e.TryGetWebMessageAsString();if(!DesktopShell.Accepts(e.Source,uri,command))return;if(command=="desktop-settings")ShowSettings();else await SaveInstaller();}catch(Exception error) when(error is ArgumentException or InvalidOperationException or System.Runtime.InteropServices.COMException){ /* Ignore invalid bridge messages. */ }};
    await web.AddScriptToExecuteOnDocumentCreatedAsync("window.__localAuthorUpdateDirty=false;document.addEventListener('input',e=>{if(!e.target.matches('#message-input,#local-token,#response-mode,#input-format,#identity-name,#identity-username,#identity-password,#identity-confirm,[data-appearance]'))window.__localAuthorUpdateDirty=true;},true);");
    web.Settings.AreDevToolsEnabled=false;web.Settings.AreHostObjectsAllowed=false;web.Settings.IsPasswordAutosaveEnabled=false;web.Settings.IsGeneralAutofillEnabled=false;web.Settings.AreDefaultContextMenusEnabled=true;
    bool SameOrigin(string value) => Uri.TryCreate(value,UriKind.Absolute,out var target)&&target.Scheme==uri.Scheme&&target.Host==uri.Host&&target.Port==uri.Port;
@@ -230,8 +263,9 @@ sealed class ClientForm : Form {
    web.WebResourceRequested+=(_,e)=>{if(SameOrigin(e.Request.Uri))e.Request.Headers.SetHeader("Authorization","Bearer "+selected.AccessKey);};
    web.NavigationStarting+=(_,e)=>{if(!SameOrigin(e.Uri)){e.Cancel=true;status.Text="Navegação externa bloqueada nesta janela. Use os links de referência.";}};
    web.NewWindowRequested+=(_,e)=>{e.Handled=true;if(e.IsUserInitiated&&Uri.TryCreate(e.Uri,UriKind.Absolute,out var external)&&external.Scheme=="https")Process.Start(new ProcessStartInfo(external.AbsoluteUri){UseShellExecute=true});};
-   web.DownloadStarting+=(_,e)=>{e.Cancel=true;status.Text="Downloads devem ser feitos no servidor.";};
+   web.DownloadStarting+=(_,e)=>{e.Cancel=true;status.Text="Use Baixar instalador na resposta da LocalAuthor.";};
    web.DOMContentLoaded+=async (_,_)=>{
+    await web.ExecuteScriptAsync("window.__localAuthorNativeInstallerDownloads=true;");
     await web.ExecuteScriptAsync(DesktopShell.MountScript);
     await web.ExecuteScriptAsync("(()=>{const f=document.getElementById('connect-form')||document.getElementById('login-form');const t=document.getElementById('local-token')||document.getElementById('token');if(f&&t){t.value='dispositivo-pareado';f.requestSubmit();}const logout=document.getElementById('logout');if(logout)logout.hidden=true;})()");
     if(draft!=null){

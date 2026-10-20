@@ -90,6 +90,7 @@ Documentos de histórico e operação:
 - [`docs/LAN_INSTALL.md`](docs/LAN_INSTALL.md), [`docs/LAN_VALIDATION.md`](docs/LAN_VALIDATION.md): cliente Windows e host de rede. A nova interface deve ser validada separadamente em cada instalação/proxy.
 - [`docs/PERFIS_E_PROJETOS.md`](docs/PERFIS_E_PROJETOS.md): espaços separados por nome, sem senha de perfil, e compartilhamento na mesma IA da rede local.
 - [`docs/RECUPERACAO_E_RASCUNHOS.md`](docs/RECUPERACAO_E_RASCUNHOS.md): salvar texto automaticamente, recuperar a última conversa e conferir envios sem duplicá-los após uma falha.
+- [`docs/CONVERSA_AUTOMATICA.md`](docs/CONVERSA_AUTOMATICA.md): escolha automática de recursos e download do instalador pelo chat, sem selecionar modos.
 
 O repositório remoto é `rafaeldcs/ia-autoral`. Não execute o bootstrap de publicação sobre esse remoto existente. GitHub/Actions são ferramentas de desenvolvimento, não dependências da inferência local. O estado de publicação e os resultados são os do commit e do workflow consultados.
 
