@@ -424,7 +424,7 @@ function voiceWav(chunks, sampleRate) {
 }
 voiceChat = (() => {
     let active = false, muted = false, epoch = 0, phase = '', stream = null, context = null, processor = null;
-    let source = null, sink = null, timer = null, request = null, abort = null, voice = null, resumeSpeech = null;
+    let source = null, sink = null, timer = null, request = null, abort = null, voice = null, resumeSpeech = null, speechTimer = null;
     const status = value => { phase = value; $('voice-status').textContent = value; };
     const syncControls = () => {
         $('voice-start').disabled = !state.project || state.project.access==='reader' || (state.busy && !active);
@@ -434,6 +434,8 @@ voiceChat = (() => {
         $('voice-stop').disabled = false; $('voice-mute').disabled = false;
         $('voice-mute').setAttribute('aria-pressed', String(muted));
         $('voice-mute').textContent = muted ? 'Ouvir respostas' : 'Silenciar resposta';
+        $('voice-interrupt').hidden = !resumeSpeech;
+        $('voice-interrupt').disabled = !resumeSpeech;
     };
     function releaseMicrophone() {
         clearTimeout(timer); timer = null;
@@ -446,7 +448,7 @@ voiceChat = (() => {
         active = false; ++epoch; releaseMicrophone();
         abort?.abort(); abort = null;
         if (request && state.project && state.token) api('/api/voice/cancel', {project_id: state.project.id, request_id: request}).catch(() => {});
-        request = null; resumeSpeech = null; window.speechSynthesis?.cancel();
+        request = null; resumeSpeech = null; clearTimeout(speechTimer); speechTimer = null; window.speechSynthesis?.cancel();
         if (state.jobId && state.token) api('/api/jobs/' + state.jobId + '/cancel', {}).catch(() => {});
         busy(state.requestBusy); syncControls();
         if (message) toast(message);
@@ -538,11 +540,24 @@ voiceChat = (() => {
         const utterance = new SpeechSynthesisUtterance(spoken.slice(0, 1800) + (spoken.length > 1800 ? ' A resposta completa está no chat.' : ''));
         utterance.voice = voice; utterance.lang = voice.lang; utterance.rate = 1;
         let finished = false;
-        const finish = () => { if (finished) return; finished = true; resumeSpeech = null; if (active && version === epoch) listen(version); };
+        const finish = () => {
+            if (finished || version !== epoch) return; finished = true; clearTimeout(speechTimer); speechTimer = null;
+            resumeSpeech = null; syncControls(); if (active && version === epoch) listen(version);
+        };
         resumeSpeech = finish;
+        syncControls();
         utterance.onend = finish;
         utterance.onerror = event => { if (muted || event.error === 'interrupted' || event.error === 'canceled') finish(); else if (active && version === epoch) stop('Não consegui ler a resposta. O texto completo permanece no chat.'); };
-        speechSynthesis.cancel(); speechSynthesis.speak(utterance);
+        speechSynthesis.cancel();
+        // Some platform readers never deliver onend/onerror. Do not leave the
+        // conversation permanently busy or silently reopen a microphone.
+        speechTimer = setTimeout(() => {
+            if (!finished && active && version === epoch) {
+                finished = true; stop('A leitura demorou demais. A resposta está no chat; inicie a voz novamente para continuar.');
+            }
+        }, Math.min(180000, Math.max(15000, utterance.text.length * 100)));
+        try { speechSynthesis.speak(utterance); }
+        catch { stop('Não consegui iniciar a leitura. A resposta completa permanece no chat.'); }
     }
     $('voice-start').onclick = () => {
         if (active) { stop('Conversa por voz encerrada.'); return; }
@@ -550,6 +565,7 @@ voiceChat = (() => {
     };
     $('voice-confirm').onclick = async () => { try { await start(); } catch (error) { $('voice-setup').textContent = error.message; stop(); } };
     $('voice-stop').onclick = () => stop('Conversa por voz encerrada.');
+    $('voice-interrupt').onclick = () => { const next = resumeSpeech; speechSynthesis.cancel(); next?.(); };
     $('voice-mute').onclick = () => { muted = !muted; syncControls(); if (muted) { const next = resumeSpeech; speechSynthesis.cancel(); next?.(); } };
     $('voice-dialog').addEventListener('close', () => { if (!active) ++epoch; });
     document.addEventListener('visibilitychange', () => { if (document.hidden && active) stop('Voz encerrada porque o aplicativo ficou em segundo plano.'); });

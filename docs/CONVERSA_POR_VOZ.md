@@ -2,6 +2,10 @@
 
 Escolha um projeto no chat, clique no **microfone → Começar conversa** e permita o microfone quando solicitado. Uma pausa de aproximadamente 1,5 segundo envia a fala. A LocalAuthor responde, lê a resposta e volta a ouvir. **Encerrar voz** libera o microfone e solicita cancelamento da transcrição/geração. **Silenciar resposta** mantém a conversa com respostas escritas.
 
+Durante a leitura, **Interromper e falar** interrompe a voz e abre uma nova captura. O leitor tem um prazo limitado; se não avisar que terminou, a sessão encerra com mensagem e preserva a resposta escrita, sem abrir o microfone inesperadamente. O botão não interrompe uma geração ainda em andamento; use **Encerrar voz** para solicitar seu cancelamento.
+
+O modelo recebe orientações de conversação: acolher cumprimentos e agradecimentos brevemente, respeitar despedidas, simplificar explicações quando houver confusão e responder à pergunta mesmo que ela venha junto de um agradecimento. Essas orientações e o histórico melhoram o comportamento sem alterar pesos. A simpatia continua sujeita à qualidade do modelo local.
+
 Rascunhos digitados não são substituídos: envie ou guarde a mensagem antes de começar. O microfone fica desligado durante transcrição, geração e leitura. Trocar a página ou deixá-la em segundo plano encerra a voz. A captura nunca começa automaticamente ao abrir o aplicativo.
 
 ## Processamento e privacidade
@@ -16,6 +20,8 @@ Histórico e fontes entram no limite real de contexto; não há memória ilimita
 ## Limites
 
 Cada fala tem até 30 segundos. O cliente envia WAV PCM mono de 16 kHz. O servidor verifica formato, tamanho, duração e silêncio. Dez segundos sem fala encerram a captura. Ruído, sotaques e nomes técnicos podem causar erros: confira o chat, interrompa a voz e corrija por texto.
+
+É uma conversa contínua por turnos: ouvir → transcrever → gerar → ler → ouvir. Não é áudio simultâneo nem resposta em tempo real com latência garantida. No ensaio de 20/10/2026, a transcrição levou aproximadamente oito segundos e confundiu “Kanban” com “Cambam”; a resposta preservou esse erro. O microfone físico e o reconhecimento desse termo não foram homologados.
 
 Uma transcrição por vez usa quatro CPUs e até 2 GiB de RAM. A decodificação tem prazo de 90 segundos. Ausência de modelo/Docker, servidor ocupado, microfone negado ou voz local ausente geram aviso e encerram a sessão. Não há reenvio automático após falha nem serviço remoto de contingência. A primeira resposta pode demorar mais ao carregar o modelo. Respostas longas são lidas parcialmente com aviso; o leitor não corta o texto armazenado. Reinícios automáticos aguardam a conversa por voz terminar.
 
@@ -43,5 +49,7 @@ Push distribui código; instalar a revisão e reiniciar outro servidor continua 
 561 testes Python passaram, incluindo áudio inválido/silencioso/excedido, autenticação, origem, ausência de configuração, isolamento, concorrência, cancelamento e encerramento. `scripts/voice-ui-smoke.py` usa captura PCM real do Chromium com microfone sintético e dublês declarados de STT, TTS e modelo. A regressão das outras telas permanece no CI.
 
 O decoder real isolado reconheceu três frases sintéticas em português, produzidas pela voz Maria do Windows, em aproximadamente 7 segundos por fala. Qwen3.5 4B local respondeu a dois turnos com histórico: aproximadamente 37 segundos na primeira carga e 2 segundos no segundo turno. Estes casos não qualificam reconhecimento universal ou inteligência geral. Microfone físico do usuário e outro computador precisam de conferência no uso.
+
+Nova verificação e evidências: [conversação e voz em 20/10/2026](reports/CONVERSACAO_E_VOZ_2026-10-20.md). O script opt-in `scripts/conversation-real-check.py --run-real --home CAMINHO --output PASTA_NOVA` executa doze pedidos no modelo registrado, sem usar a base de conversas do servidor. `--audio-fixtures PASTA` acrescenta arquivos sintéticos `input-*.wav` no formato canônico acima, com transcrição real e histórico entre turnos. Resultados e áudio ficam privados. `success` significa execução sem saída truncada, não aprovação semântica: revise respostas, transcrições e limitações.
 
 Referências: [Whisper.cpp](https://github.com/ggml-org/whisper.cpp), [vozes locais no navegador](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesisVoice/localService).

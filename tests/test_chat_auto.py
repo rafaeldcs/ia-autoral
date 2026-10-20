@@ -81,6 +81,19 @@ class AutoChatTests(WorkspaceCase):
             self.assertTrue(answer.call_args.args[3])
             self.assertTrue(all(e['scope']==self.project['id'] for e in answer.call_args.args[3]))
 
+    def test_social_turns_and_mixed_questions_use_model_with_continuation(self):
+        with patch.object(self.chat.foundation,'status',return_value={'capabilities':{'text':{'registered':True}}}),patch.object(self.chat.foundation,'answer',return_value={'origin':'foundation_text','content':'Explicit conversational double','sources':[]}) as answer:
+            for text in ['Oi, bom dia!', 'Obrigado, ajudou muito!', 'Valeu, até amanhã!',
+                         'Obrigado! Agora me explique o que é uma API.', 'Thanks! Please reply in English.']:
+                with self.subTest(text=text):
+                    result=self.send(text)
+                    self.assertEqual(result['metadata']['origin'],'foundation_text')
+                    self.assertEqual(result['metadata']['routing']['selected'],'foundation')
+                    self.assertEqual(answer.call_args.args[1],text)
+            history=answer.call_args.args[2]
+            self.assertEqual(len(history),8)
+            self.assertIn('Obrigado! Agora',history[-2]['content'])
+
     def test_unavailable_model_is_explicit_and_does_not_fall_back_to_project_script(self):
         result=self.send('Olá, pode me ajudar?')
         self.assertIn('modelo de conversa local ainda não está configurado',result['content'])

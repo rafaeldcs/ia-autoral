@@ -62,6 +62,7 @@ def main():
                     args=['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream', '--use-file-for-fake-audio-capture=' + str(audio)])
                 context = browser.new_context(viewport={'width': 1440, 'height': 900})
                 page = context.new_page(); page.on('pageerror', lambda error: report['errors'].append(str(error)))
+                page.clock.install()
                 page.add_init_script("""(() => {
                   window.voiceTest={calls:0,streams:[],spoken:[],remoteOnly:false,denied:false,utterance:null};
                   const original=navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
@@ -104,6 +105,25 @@ def main():
                 check('Update restart is blocked during listening or synthesis', page.evaluate('state.busy && !state.requestBusy'))
                 check('Generated HTML stays inert', page.evaluate('window.PWNED') is None and page.locator('#messages script').count() == 0)
                 page.screenshot(path=str(reports / 'voice-desktop.png'))
+                page.evaluate('voiceTest.firstUtterance=voiceTest.utterance;voiceTest.firstUtterance.onend()')
+                expect(page.locator('#voice-status')).to_contain_text('Falando', timeout=30000)
+                wait_until(lambda: len(engines[0].received) == 2)
+                check('End of spoken reply automatically opens the next complete conversation turn',
+                      len([m for m in engines[0].received[-1] if m['role'] == 'user']) >= 2)
+                page.evaluate('voiceTest.oldUtterance=voiceTest.utterance')
+                page.locator('#voice-interrupt').click()
+                expect(page.locator('#voice-status')).to_contain_text('Ouvindo')
+                calls = page.evaluate('voiceTest.calls')
+                page.evaluate('voiceTest.oldUtterance.onend();voiceTest.oldUtterance.onerror({error:"interrupted"})')
+                check('Interrupting playback resumes one microphone and ignores duplicate reader callbacks',
+                      page.evaluate('voiceTest.calls') == calls)
+                page.locator('#voice-stop').click()
+                page.locator('#voice-start').click(); page.locator('#voice-confirm').click()
+                expect(page.locator('#voice-status')).to_contain_text('Falando', timeout=30000)
+                calls = page.evaluate('voiceTest.calls')
+                page.evaluate('voiceTest.firstUtterance.onend()')
+                check('A callback from the old session cannot reopen capture in a new speaking session',
+                      page.evaluate('voiceTest.calls') == calls)
                 page.locator('#voice-mute').click(); expect(page.locator('#voice-status')).to_contain_text('Ouvindo')
                 check('Muting resumes listening without speaking over the microphone')
                 page.locator('#voice-stop').click(); expect(page.locator('#voice-bar')).to_be_hidden()
@@ -113,7 +133,7 @@ def main():
                 check('Late callbacks cannot restart a stopped session', page.evaluate('voiceTest.spoken.length') == spoken and page.locator('#voice-bar').is_hidden())
                 page.locator('#voice-start').click(); page.locator('#voice-confirm').click()
                 expect(page.locator('#voice-status')).to_contain_text('Falando', timeout=30000)
-                check('Second turn retains conversation history', len(engines) == 1 and len(engines[0].received) == 2 and
+                check('Later turns retain conversation history', len(engines) == 1 and len(engines[0].received) >= 4 and
                       len([m for m in engines[0].received[-1] if m['role'] == 'user']) >= 2)
                 page.locator('#voice-stop').click()
                 baseline = len(app.chat.get(project['id'], app.chat.conversations(project['id'])[0]['id'])['messages'])
@@ -125,6 +145,15 @@ def main():
                 check('Stopping an active transcription cancels server and ignores its late result',
                       page.locator('#message-input').input_value() == '' and
                       len(app.chat.get(project['id'], app.chat.conversations(project['id'])[0]['id'])['messages']) == baseline)
+                speech_mode['hold'] = False
+                page.locator('#voice-start').click(); page.locator('#voice-confirm').click()
+                expect(page.locator('#voice-status')).to_contain_text('Falando', timeout=30000)
+                calls = page.evaluate('voiceTest.calls')
+                page.clock.fast_forward(180001)
+                expect(page.locator('#voice-bar')).to_be_hidden()
+                expect(page.locator('#notification')).to_contain_text('leitura demorou demais')
+                check('A reader without completion callbacks times out without reopening the microphone',
+                      page.evaluate('voiceTest.calls') == calls and not page.evaluate('state.busy'))
                 page.set_viewport_size({'width': 390, 'height': 844})
                 check('Voice controls fit narrow screens', page.evaluate('document.documentElement.scrollWidth<=innerWidth'))
                 page.screenshot(path=str(reports / 'voice-mobile.png'))
