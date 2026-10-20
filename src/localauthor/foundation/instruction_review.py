@@ -33,7 +33,12 @@ def review_code_request(prompt,content):
     if re.search(r'\bimports?\s+locais\b',bans,re.I):
         check('no_relative_imports',not re.search(r'(?:from\s*|import\s*)[\'"]\.',code),'O pedido proíbe imports locais; declare os tipos e funções necessários no arquivo solicitado.')
     if re.search(r'\btailwind\b',bans,re.I):
-        utility=re.search(r'\b(?:p[xytrbl]?-\d|m[xytrbl]?-\d|bg-[a-z]|text-(?:lg|sm|xl|gray|white)|font-bold|space-y-\d|rounded|line-through)\b',code)
+        # CSS values such as textDecoration: "line-through" are not classes.
+        classes=[]
+        for attribute in re.finditer(r'\bclass(?:Name)?\s*=\s*(?:([\'"])(.*?)\1|\{(.*?)\})',code,re.S):
+            if attribute[1]:classes.append(attribute[2])
+            else:classes.extend(match[2] for match in re.finditer(r'([\'"`])(.*?)\1',attribute[3],re.S))
+        utility=re.search(r'\b(?:p[xytrbl]?-\d|m[xytrbl]?-\d|bg-[a-z]|text-(?:lg|sm|xl|gray|white)|font-bold|space-y-\d|rounded|line-through)\b',' '.join(classes))
         check('no_tailwind_utilities',not utility,'O pedido proíbe Tailwind; retire as classes utilitárias. Use HTML sem essas classes ou CSS nativo quando permitido.')
     if re.search(r'PostgreSQL',prompt,re.I) and re.search(r'gerad[oa]\s+como\s+identidade|\bAS\s+IDENTITY\b',prompt,re.I):
         check('postgres_identity',bool(re.search(r'GENERATED\s+(?:ALWAYS|BY\s+DEFAULT)\s+AS\s+IDENTITY',code,re.I)) and not re.search(r'\bSERIAL\b',code,re.I),

@@ -34,6 +34,13 @@ class ExplicitCodeReviewTests(unittest.TestCase):
         self.assertEqual(len(review_code_request(prompt,'```sql\nCREATE TABLE t(id SERIAL PRIMARY KEY);\n```')['violations']),1)
         self.assertEqual(review_code_request(prompt,'```sql\nCREATE TABLE t(id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY);\n```')['violations'],[])
 
+    def test_native_css_values_are_not_misidentified_as_tailwind_classes(self):
+        prompt='Sem Tailwind.'
+        native='```tsx\n<span style={{textDecoration: concluida ? "line-through" : "none"}}>Tarefa</span>\n```'
+        self.assertEqual(review_code_request(prompt,native)['violations'],[])
+        for attribute in ('className="line-through"', 'className={concluida ? "line-through" : ""}', 'class="p-4"'):
+            self.assertTrue(review_code_request(prompt,'```tsx\n<span '+attribute+'>Tarefa</span>\n```')['violations'])
+
     def test_plain_prose_is_not_claimed_as_verified_code(self):
         self.assertEqual(review_code_request('Até 2 linhas.','Proposta sem código.'),{'checked':[],'violations':[]})
 
