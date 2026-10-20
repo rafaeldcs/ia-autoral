@@ -50,17 +50,20 @@ class Application:
             "lead-qualify": lambda p, c: self.leads.qualify(p['project_id'],p['id'],p['version'],p['context_digest'],c),
         })
         self.jobs.handlers = {kind:self._with_identity(handler) for kind,handler in self.jobs.handlers.items()}
+        from .chat_recovery import ChatRecovery
+        self.recovery = ChatRecovery(self)
 
     def _with_identity(self, handler):
         def run(payload, cancel):
             from .access import check_queued_job
-            from .identity_context import current_actor, current_author
+            from .identity_context import current_actor, current_author, current_request
             user=check_queued_job(self,payload)
             actor=current_actor.set(user['id'] if user else None)
             author=current_author.set(user['name'] if user else None)
+            request=current_request.set(payload.get('request_id'))
             try:return handler(payload,cancel)
             finally:
-                current_author.reset(author);current_actor.reset(actor)
+                current_request.reset(request);current_author.reset(author);current_actor.reset(actor)
         return run
 
     def _train(self, payload, cancel):

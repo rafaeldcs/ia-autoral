@@ -80,7 +80,8 @@ class FoundationChatService(ChatService):
                     project_memory=self.memories(project_id))
             try:
                 check_cancel(cancel)
-                metadata = json.dumps({k: v for k, v in response.items() if k != "content"}, ensure_ascii=False)
+                from ..identity_context import response_metadata
+                metadata = json.dumps(response_metadata({k: v for k, v in response.items() if k != "content"}), ensure_ascii=False)
                 with self.store.connect() as db:
                     db.execute("BEGIN IMMEDIATE")
                     used = conversation_bytes(db)

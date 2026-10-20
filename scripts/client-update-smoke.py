@@ -13,6 +13,7 @@ import sys
 import tempfile
 import threading
 import time
+from urllib.parse import urlsplit
 from playwright.sync_api import sync_playwright
 from ui_profile_fixture import enter_profile
 
@@ -28,6 +29,7 @@ native_environment = None
 def check(name, result):
     assert result, name
     checks.append(name)
+    print('PASS: '+name,flush=True)
 def run(*args):
     result = subprocess.run([str(a) for a in args], creationflags=FLAGS, capture_output=True, timeout=90,
                             env=native_environment if Path(str(args[0])).name=='LocalAuthor.Client.exe' else None)
@@ -62,23 +64,35 @@ with tempfile.TemporaryDirectory(prefix='localauthor-update-check-') as temp:
     native_environment=dict(os.environ,WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=f'--remote-debugging-address=127.0.0.1 --remote-debugging-port={debug_port}')
     profile_stop=threading.Event();profile_checks=[];profile_errors=[]
     def drive_profiles():
-        while not profile_stop.is_set():
-            try:
-                # Reconnect after each observation: an update replaces the
-                # WebView process and its CDP target, even on the same port.
-                with sync_playwright() as playwright:
-                    browser=playwright.chromium.connect_over_cdp(f'http://127.0.0.1:{debug_port}',timeout=1000)
+        # Keep one driver alive. Repeated driver teardown can leave the next
+        # native WebView undiscovered when the previous process closes.
+        with sync_playwright() as playwright:
+            browser=None;last_diagnostic=None
+            while not profile_stop.is_set():
+                try:
+                    if browser is None or not browser.is_connected():
+                        browser=playwright.chromium.connect_over_cdp(f'http://127.0.0.1:{debug_port}',timeout=1000)
+                        heartbeat=browser.new_browser_cdp_session()
+                    # Pump the protocol even if a closing WebView has no pages;
+                    # otherwise the disconnect event can remain undelivered.
+                    heartbeat.send('Browser.getVersion')
                     for context in browser.contexts:
                         for page in context.pages:
-                            if page.url!=f'https://127.0.0.1:{port}/':continue
+                            page.wait_for_timeout(20)
+                            location=urlsplit(page.url)
+                            if (location.scheme,location.hostname,location.port,location.path,location.query,location.fragment)!=('https','127.0.0.1',port,'/','',''):continue
                             if page.locator('#identity-gate[open]:visible').count():
                                 try:
                                     enter_profile(page);profile_checks.append('native form login')
+                                    print('PASS: Native fixture selected its profile through the real form',flush=True)
                                 except Exception as exc:
                                     if not page.is_closed():profile_errors.append(type(exc).__name__)
-            except Exception:
-                pass  # Native updater closes/reopens the WebView.
-            profile_stop.wait(.25)
+                except Exception as error:
+                    diagnostic=type(error).__name__+': '+str(error).splitlines()[0]
+                    if diagnostic!=last_diagnostic:
+                        print('Native driver reconnect: '+diagnostic,flush=True);last_diagnostic=diagnostic
+                    browser=None  # Native updater closes/reopens the WebView.
+                profile_stop.wait(.25)
     settings = Settings.load(base / 'backend')
     app = Application(settings)
     app.start()
@@ -129,7 +143,20 @@ with tempfile.TemporaryDirectory(prefix='localauthor-update-check-') as temp:
         sentinel = folder / 'connection-preserved.txt'
         sentinel.write_text('configuration untouched')
         report = folder / 'result.json'
-        parent = subprocess.run([str(executable), '--auto-update-smoke' if automatic else '--update-smoke', str(source), str(report), *extra_args], creationflags=FLAGS, timeout=90,env=native_environment)
+        try:
+            parent = subprocess.run([str(executable), '--auto-update-smoke' if automatic else '--update-smoke', str(source), str(report), *extra_args], creationflags=FLAGS, timeout=90,env=native_environment)
+        except subprocess.TimeoutExpired:
+            # Save only this disposable native fixture's UI for diagnosis.
+            try:
+                with sync_playwright() as playwright:
+                    browser=playwright.chromium.connect_over_cdp(f'http://127.0.0.1:{debug_port}',timeout=3000)
+                    for context in browser.contexts:
+                        for page in context.pages:
+                            page.screenshot(path=str(ROOT/'reports/client-update-timeout.png'))
+                            print(page.evaluate("({path:location.pathname,identityLoaded:!!window.LocalAuthorIdentity,profile:!!window.LocalAuthorIdentity?.user,recoveryLoaded:!!window.LocalAuthorRecovery,studioHidden:document.querySelector('#studio')?.hidden,notice:document.querySelector('#notification')?.textContent,busy:typeof state!=='undefined'?state.busy:null})"),flush=True)
+            except Exception as diagnostic:
+                print('Native fixture diagnostic unavailable: '+type(diagnostic).__name__,flush=True)
+            raise
         if expected_success:
             check(name + ': old process exits for update', parent.returncode == 0)
             job = Path(Path(str(report) + '.job').read_text())
@@ -184,7 +211,7 @@ with tempfile.TemporaryDirectory(prefix='localauthor-update-check-') as temp:
         check('Verified download removed after success', not (job / 'download.exe').exists())
         publish(new, version, corrupt=True)
         attempt('corrupt-package', expected_success=False)
-        publish(new, '0.3.9.0')
+        publish(new, '0.3.99.0')
         attempt('wrong-executable-version', expected_success=False)
         publish(new, '0.1.0.0')
         attempt('downgrade', expected_success=False)

@@ -74,9 +74,19 @@ def main():
             checks.append('Profile cookie cannot bypass device pairing or stale-tab identity checks')
             assert request('/api/conversations?project_id='+first['id'],1,b)[0]==404
             checks.append('Foreign private project IDs fail across real TLS')
-            for path in ('/identity.js','/identity.css'):
+            for path in ('/identity.js','/identity.css','/chat-recovery.js'):
                 status,_,raw=request(path);assert status==200 and raw
             checks.append('New profile assets are served through the native gateway')
+            draft={'project_id':first['id'],'conversation_id':'','text':'TLS draft fixture','mode':'guide','revision':0,'pending':None}
+            status,_,raw=request('/api/chat-draft',0,a,payload=draft)
+            assert status==200 and json.loads(raw)['revision']==1
+            status,_,raw=request('/api/chat-draft?project_id='+first['id']+'&conversation_id=',0,a)
+            assert status==200 and json.loads(raw)['text']==draft['text']
+            assert request('/api/chat-draft?project_id='+first['id']+'&conversation_id=',1,b)[0]==404
+            assert request('/api/chat-workspace',0,a,payload={'project_id':first['id'],'conversation_id':''})[0]==200
+            status,_,raw=request('/api/chat-workspace',0,a)
+            assert status==200 and json.loads(raw)['selection']['project_id']==first['id']
+            checks.append('Draft and workspace recovery work through real TLS and remain profile scoped')
             status,_,raw=request('/api/identity/status',extra={'X-LocalAuthor-Gateway':'lan','X-LocalAuthor-Device':'spoof'})
             assert status==200 and json.loads(raw)['can_setup'] is True
             checks.append('Gateway overwrites client-supplied device and origin headers')

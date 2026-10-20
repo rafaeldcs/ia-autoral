@@ -4,11 +4,18 @@ const state = { token: '', projects: [], project: null, conversation: null, busy
 let voiceChat = null;
 let toastTimer;
 let conversationListVersion=0;
+const recovery=window.LocalAuthorRecovery.create({
+    api,input:$('message-input'),mode:$('response-mode'),notice:toast,
+    readOnly:()=>state.project?.access==='reader',changed:()=>updateAvailability(),
+    write:(text,mode)=>{$('message-input').value=text;$('response-mode').value=[...$('response-mode').options].some(option=>option.value===mode)?mode:'guide';modeNotice();updateInputCount(false);},
+    inspect:()=>recoverRequest(),retry:()=>retryRequest(),cancel:async()=>{const pending=recovery.pending;if(!pending)return;const request=await lookupRequest(pending);await api('/api/jobs/'+request.job_id+'/cancel',{});await recoverRequest();}
+});
+window.LocalAuthorRecovery.flushLocal=()=>recovery.flushLocal();
 function el(tag, text, cls) { const node = document.createElement(tag); node.textContent = text; if (cls)
     node.className = cls; return node; }
 function toast(message) { $('notification').textContent = message; $('notification').hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => $('notification').hidden = true, 6000); }
-async function api(path, body) { const response = await fetch(path, { method: body ? 'POST' : 'GET', headers: { Authorization: 'Bearer ' + state.token, ...(body ? { 'Content-Type': 'application/json' } : {}) }, ...(body ? { body: JSON.stringify(body) } : {}) }); const result = await response.json(); if (!response.ok)
-    throw Error(result.error || 'Não foi possível concluir.'); return result; }
+async function api(path, body, options={}) { const response = await fetch(path, { ...options, method: body ? 'POST' : 'GET', headers: { Authorization: 'Bearer ' + state.token, ...(body ? { 'Content-Type': 'application/json' } : {}) }, ...(body ? { body: JSON.stringify(body) } : {}) }); const result = await response.json(); if (!response.ok){
+    const error=Error(result.error || 'Não foi possível concluir.');error.status=response.status;throw error;} return result; }
 function handle(fn) { return async (event) => { event?.preventDefault(); try {
     await fn(event);
 }
@@ -16,7 +23,7 @@ catch (error) {
     toast(error.message);
 } }; }
 function updateAvailability() {
-    const unavailable = !state.project || state.busy || state.project.access === 'reader';
+    const unavailable = !state.project || state.busy || state.project.access === 'reader' || Boolean(recovery.pending);
     for (const node of document.querySelectorAll('#new-chat,#compose button,#compose select,#message-input,[data-prompt]')) node.disabled = unavailable;
     $('show-rules').disabled=!state.project||state.busy;
     $('open-browser').disabled=!state.project||state.busy||state.project.access==='reader';
@@ -35,12 +42,13 @@ function updateAvailability() {
 }
 function busy(value) { state.requestBusy = value; state.busy = value || Boolean(voiceChat?.active); $('busy').hidden = !value; for (const node of document.querySelectorAll('#studio button,#studio select'))
     node.disabled = state.busy; $('message-input').disabled = state.busy; updateAvailability(); }
-function resetChat() { state.conversation = null; $('messages').replaceChildren(); $('welcome').hidden = false; $('message-input').value = ''; updateInputCount(); updateAvailability(); renderConversations().catch(error => toast(error.message)); $('message-input').focus(); }
+async function resetChat() { await selectProject(state.project); }
 function renderProjects() { const list = $('project-list'); list.replaceChildren(); for (const [shared,label] of [[false,'Meus projetos'],[true,'Compartilhados comigo']]) {
 const projects=state.projects.filter(project=>Boolean(project.access&&project.access!=='owner')===shared);
 if(!projects.length)continue;list.append(el('p',label,'project-group'));
 for (const project of projects) {
     const node = el('button', project.name, project.id === state.project?.id ? 'active' : '');
+    node.disabled=state.busy;
     node.replaceChildren(el('span', project.name, 'nav-label'));
     if(shared)node.append(el('span',(project.access==='reader'?'Leitura':'Edição')+' · '+project.owner_name,'nav-detail'));
     node.setAttribute('aria-current', project.id === state.project?.id ? 'true' : 'false');
@@ -52,20 +60,27 @@ async function renderConversations() { if (!state.project)
     return; const project = state.project,version=++conversationListVersion; const rows = await api('/api/conversations?project_id=' + project.id+'&mine='+($('conversation-filter').value==='mine'?'1':'0')); if (state.project?.id !== project.id||version!==conversationListVersion)
     return; const list = $('conversation-list'); list.replaceChildren(); $('conversation-empty').hidden = rows.length > 0; for (const row of rows) {
     const node = el('button', row.title, row.id === state.conversation?.id ? 'active' : '');
+    node.disabled=state.busy;
     node.replaceChildren(el('span', row.title, 'nav-label'));
     if(row.created_by&&row.created_by.user_id!==window.LocalAuthorIdentity?.user?.id)node.append(el('span',row.created_by.name,'nav-detail'));
     node.setAttribute('aria-current', row.id === state.conversation?.id ? 'true' : 'false');
     node.title = row.title;
-    node.onclick = handle(async () => { const data = await api('/api/conversation?project_id=' + project.id + '&id=' + row.id); if (state.project?.id === project.id) {
-        state.conversation = data;
-        renderMessages();
-        closeNavigation();
-        await renderConversations();
-    } });
+    node.onclick = handle(()=>selectProject(project,row.id));
     list.append(node);
 } }
-async function selectProject(project) { if (state.busy)
-    return; hideBrowserPanel(); state.project = project; state.conversation = null; $('project-heading').textContent = project.name; $('project-heading').title = project.name; $('folder-path').textContent = project.root; $('welcome-copy').textContent = 'Converse sobre ' + project.name + '. Comece com o problema, combine o critério de pronto e planeje como testar.'; closeNavigation(); renderProjects(); resetChat(); }
+async function selectProject(project,conversation='') {
+    if(state.busy||!project)return;
+    await recovery.flushLocal();busy(true);
+    try{
+        const selected=conversation?await api('/api/conversation?project_id='+project.id+'&id='+conversation):null;
+        hideBrowserPanel();state.project=project;state.conversation=selected;
+        $('project-heading').textContent=project.name;$('project-heading').title=project.name;$('folder-path').textContent=project.root;
+        $('welcome-copy').textContent='Converse sobre '+project.name+'. Comece com o problema, combine o critério de pronto e planeje como testar.';
+        closeNavigation();renderProjects();await recovery.open(project.id,conversation);renderMessages();await renderConversations();
+    }finally{busy(false);}
+    if(recovery.pending)await recoverRequest();
+    $('message-input').focus();
+}
 function renderMessages() { const list = $('messages'); list.replaceChildren(); const messages = state.conversation?.messages || []; $('welcome').hidden = messages.length > 0; for (const message of messages) {
     const box = el('article', '', `message ${message.role}`);
     const names = { project_memory: 'Memória do projeto · preferência registrada', foundation_text: 'LocalAuthor · modelo local com contexto', project_guide: 'Guia do projeto · orientação estruturada', retrieval_only: 'Memória local · trechos recuperados', local_model: 'IA local · geração experimental', investigation_memory: 'Sistema investigado · evidências observadas', browser_session: 'Navegador da IA · sessão de investigação' };
@@ -96,8 +111,10 @@ function renderMessages() { const list = $('messages'); list.replaceChildren(); 
         box.append(el('small', message.metadata.notice));
     list.append(box);
 } list.scrollTop = list.scrollHeight; }
-$('connect-form').onsubmit = handle(async () => { state.token = $('local-token').value.trim(); await api('/api/health'); state.projects = await api('/api/projects'); $('local-token').value = ''; $('connect').hidden = true; $('studio').hidden = false; renderProjects(); updateAvailability(); if (state.projects.length)
-    await selectProject(state.projects[0]);
+$('connect-form').onsubmit = handle(async () => { state.token = $('local-token').value.trim(); await api('/api/health'); state.projects = await api('/api/projects'); $('local-token').value = ''; $('connect').hidden = true; $('studio').hidden = false; renderProjects(); updateAvailability(); if (state.projects.length){
+    const last=await recovery.selection();const project=state.projects.find(row=>row.id===last?.project_id)||state.projects[0];
+    try{await selectProject(project,project.id===last?.project_id?last.conversation_id:'');}catch(error){toast(error.message);await selectProject(project);}
+}
 else
     $('add-project').focus(); });
 $('logout').onclick = () => { voiceChat?.stop(); hideBrowserPanel(); state.token = ''; state.project = null; state.conversation = null; state.projects = []; $('messages').replaceChildren(); $('project-list').replaceChildren(); $('conversation-list').replaceChildren(); $('studio').hidden = true; $('connect').hidden = false; $('local-token').focus(); };
@@ -122,7 +139,7 @@ $('conversation-filter').onchange=()=>renderConversations().catch(error=>toast(e
 $('project-sharing').onclick=handle(()=>window.LocalAuthorIdentity.openSharing(state.project));
 $('project-create').onsubmit = handle(async () => { const managed=$('project-managed').checked;const project = await api('/api/projects', { name: $('project-name').value,...(managed?{managed:true}:{root:$('project-root').value}) }); state.projects = await api('/api/projects'); $('project-dialog').close(); $('project-create').reset();$('project-managed').onchange(); await selectProject(state.projects.find(p=>p.id===project.id)||project); toast(managed?'Projeto criado na sua pasta do servidor.':'Pasta vinculada ao seu projeto.'); });
 $('new-chat').onclick = handle(async () => { if (!state.project)
-    throw Error('Adicione uma pasta de projeto primeiro.'); closeNavigation(); resetChat(); });
+    throw Error('Adicione uma pasta de projeto primeiro.'); closeNavigation(); await resetChat(); });
 for (const button of document.querySelectorAll('[data-prompt]'))
     button.onclick = () => { $('tools-dialog').close(); $('message-input').value = button.dataset.prompt; $('response-mode').value = button.dataset.mode || 'guide'; modeNotice(); updateInputCount(); $('message-input').focus(); toast('Exemplo preenchido. Edite a mensagem ou clique em Enviar.'); };
 function modeNotice() { const modes = { foundation: 'Conversa com o modelo local, histórico e fontes deste projeto. Respostas podem estar erradas; código não é executado.', browser: 'Envie um endereço HTTPS para abrir o navegador da IA e acompanhar as capturas. Isso autoriza conexão ao site nesta sessão. Nunca envie senhas no chat.', investigation: 'Consulta as telas já observadas neste projeto, com data e origem. Não navega agora. Não envie senhas no chat.', guide: 'Guias estruturados e referências. Não é geração neural. Ctrl + Enter para enviar.', knowledge: 'Consulta apenas fontes deste projeto. Não inclui conversas ou fontes de outros projetos.', model: 'Laboratório: pedido curto, sem histórico nem arquivos no contexto. A saída pode estar errada e não é executada.' }; $('mode-notice').textContent = modes[$('response-mode').value]; }
@@ -134,7 +151,7 @@ function looksLikeCode(value) {
     if (/^\s*[\[{]/.test(value)) { try { const parsed = JSON.parse(value); return parsed !== null && typeof parsed === 'object'; } catch {} }
     return false;
 }
-function updateInputCount() {
+function updateInputCount(save=true) {
     const value = $('message-input').value;
     const chars = Array.from(value).length;
     const bytes = new TextEncoder().encode(value).length;
@@ -149,7 +166,8 @@ function updateInputCount() {
     input.classList.toggle('code-input', code);
     input.style.height = 'auto';
     input.style.height = Math.min(Math.max(input.scrollHeight, 52), Math.min(220, innerHeight * .28)) + 'px';
-    $('send').disabled = !state.project || state.project.access === 'reader' || state.busy || !value.trim();
+    $('send').disabled = !state.project || state.project.access === 'reader' || state.busy || Boolean(recovery.pending) || !value.trim();
+    if(save!==false)recovery.capture();
 }
 $('message-input').oninput = updateInputCount;
 // Compatibility with installed clients that restore draft format through this ID.
@@ -167,43 +185,46 @@ $('compose').onsubmit = handle(async () => { if (state.busy)
         throw Error('O pedido excede 8.000 caracteres. O conteúdo foi mantido no campo; divida-o em mensagens.');
     if ($('response-mode').value === 'model' && new TextEncoder().encode(message).length > 180)
         throw Error('Este modelo aceita até 180 bytes por pedido. O texto foi mantido; reduza o pedido ou escolha outro modo.');
-    busy(true); try {
-    if (!state.conversation)
-        state.conversation = await api('/api/conversations', { project_id: state.project.id, title: Array.from(message.trim()).slice(0, 70).join('') });
-    let response = await api('/api/chat', { project_id: state.project.id, conversation_id: state.conversation.id, message, mode: $('response-mode').value, input_format: 'auto' });
-    if (response.job) {
-        state.jobId = response.job.id;
-        for (let i = 0; i < 180; i++) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            const job = await api('/api/jobs/' + response.job.id);
-            if (job.state === 'completed') {
-                response = job.result;
-                break;
-            }
-            if (['failed', 'cancelled', 'interrupted'].includes(job.state))
-                throw Error(job.error || 'Geração interrompida.');
-        }
-        if (response.job)
-            throw Error('Geração ainda em andamento. Consulte Atividade nas ferramentas avançadas.');
+    if(recovery.pending)throw Error('Consulte o envio anterior antes de iniciar outro.');
+    const pending={request_id:window.LocalAuthorRecovery.uuid(),conversation_id:state.conversation?.id||window.LocalAuthorRecovery.uuid(),message,mode:$('response-mode').value};
+    busy(true);try{await recovery.prepare(pending);await sendPending(pending);}catch(error){recovery.requestState('unknown','Envio não confirmado. Seu pedido foi preservado. Use Consultar pedido.');throw error;}finally{busy(false);}
+});
+
+const lookupRequest = pending => api('/api/chat-request?project_id='+state.project.id+'&request_id='+pending.request_id,undefined,{signal:AbortSignal.timeout(8000)});
+async function finishRequest(result) {
+    state.conversation=result;renderMessages();await recovery.complete(result);await renderConversations();
+    const browserMessage=result.messages?.at(-1)?.metadata?.browser_session_id;if(browserMessage)await openBrowserSession(browserMessage);
+    if(voiceChat?.active)voiceChat.reply(result.messages.at(-1)?.content||'');
+}
+async function sendPending(pending) {
+    try{state.conversation=await api('/api/conversation?project_id='+state.project.id+'&id='+pending.conversation_id,undefined,{signal:AbortSignal.timeout(8000)});}
+    catch(error){if(error.status!==404)throw error;state.conversation=await api('/api/conversations',{project_id:state.project.id,id:pending.conversation_id,title:Array.from(pending.message.trim()).slice(0,70).join('')},{signal:AbortSignal.timeout(8000)});}
+    const response=await api('/api/chat',{project_id:state.project.id,conversation_id:pending.conversation_id,request_id:pending.request_id,message:pending.message,mode:pending.mode,input_format:'auto'},{signal:AbortSignal.timeout(20000)});
+    if(!response.job){await finishRequest(response);return;}
+    state.jobId=response.job.id;await pollRequest(pending);
+}
+async function pollRequest(pending) {
+    for(let i=0;i<180;i++){
+        const request=await lookupRequest(pending);state.jobId=request.job_id;
+        if(request.state==='completed'){await finishRequest(request.result);return;}
+        recovery.requestState(request.state,['failed','cancelled','interrupted'].includes(request.state)?'Pedido encerrado sem conclusão. Pode haver trabalho parcial; confira antes de preparar nova tentativa.':'O servidor continua trabalhando. Você pode fechar e acompanhar ao reabrir.');
+        if(['failed','cancelled','interrupted'].includes(request.state))return;
+        await new Promise(resolve=>setTimeout(resolve,1000));
     }
-    state.conversation = response;
-    const browserMessage=response.messages?.at(-1)?.metadata?.browser_session_id;
-    if(browserMessage) await openBrowserSession(browserMessage);
-    $('message-input').value = '';
-    updateInputCount();
-    renderMessages();
-    await renderConversations();
+    recovery.requestState('running','O servidor ainda não concluiu. Use Consultar pedido ou Parar tarefa; o pedido não será reenviado.');
 }
-catch (error) {
-    voiceChat?.stop(error.message);
-    throw error;
+async function recoverRequest() {
+    const pending=recovery.pending;if(!pending||state.requestBusy)return;
+    busy(true);try{
+        const request=await lookupRequest(pending);state.jobId=request.job_id;
+        if(request.state==='completed')await finishRequest(request.result);
+        else recovery.requestState(request.state,['failed','cancelled','interrupted'].includes(request.state)?'Pedido encerrado sem conclusão. Pode haver trabalho parcial; confira antes de preparar nova tentativa.':'O servidor continua trabalhando. Use Consultar pedido para acompanhar ou Parar tarefa para solicitar o cancelamento.');
+    }catch(error){recovery.requestState('unknown',error.status===404?'O servidor ainda não confirmou este envio. Ele não foi reenviado.':'Não foi possível consultar o pedido. Seu texto continua salvo.');}finally{state.jobId=null;busy(false);}
 }
-finally {
-    state.jobId = null;
-    busy(false);
-    $('message-input').focus();
+async function retryRequest() {
+    const pending=recovery.pending;if(!pending||state.busy)return;
+    busy(true);try{await recovery.flushRemote();await sendPending(pending);}catch(error){recovery.requestState('unknown',error.message);throw error;}finally{state.jobId=null;busy(false);}
 }
-if (voiceChat?.active) voiceChat.reply(state.conversation.messages.at(-1)?.content || ''); });
 $('show-rules').onclick = handle(async () => { if (!state.project)
     throw Error('Escolha um projeto primeiro.'); const data = await api('/api/project-preferences?project_id=' + state.project.id); $('method').value = data.method; $('wip').value = data.wip_limit; $('done').value = data.definition_of_done; $('work-profile').value = data.work_profile || 'general'; $('quality-rules').replaceChildren(...data.quality.map(rule => el('li', rule))); $('official-sources').replaceChildren(...data.sources.map(source => { const a = el('a', source.title + ' ↗'); a.href = source.url; a.target = '_blank'; a.rel = 'noopener noreferrer'; return a; })); const report = await api('/api/engineering-report'); $('learning-result').textContent = report.evaluation ? `Curso experimental: ${report.evaluation.passed}/${report.evaluation.total} decisões guiadas aprovadas. ${report.limitations}` : 'Novo currículo em preparação. As orientações acima foram escritas e revisadas; não significam domínio adquirido pelo modelo.'; const writing = await api('/api/communication-report').catch(() => ({})); if (writing.evaluation?.total) { $('learning-result').textContent += ` Escrita: ${writing.evaluation.passed}/${writing.evaluation.total} pedidos reformulados. ${writing.chatEnabled ? 'Candidato experimental habilitado.' : 'Candidato não ativado no chat.'}`; } $('rules-dialog').showModal(); });
 $('rules-form').onsubmit = handle(async () => { await api('/api/project-preferences', { project_id: state.project.id, method: $('method').value, wip_limit: Number($('wip').value), definition_of_done: $('done').value, work_profile: $('work-profile').value }); $('rules-dialog').close(); toast('Orientações salvas para este projeto.'); });

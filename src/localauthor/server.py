@@ -24,6 +24,7 @@ STATIC = {"/": "chat.html", "/advanced": "index.html", "/app.js": "app.js", "/st
           "/leads": "leads.html", "/leads.js": "leads.js", "/leads.css": "leads.css",
           "/workspace.css": "workspace.css", "/appearance.js": "appearance.js"}
 STATIC.update({"/identity.js":"identity.js", "/identity.css":"identity.css"})
+STATIC['/chat-recovery.js']='chat-recovery.js'
 
 
 def make_handler(app: Application, ui_path: Path):
@@ -111,7 +112,7 @@ def make_handler(app: Application, ui_path: Path):
                 self._allowed_origin()
                 parsed = urlsplit(self.path)
                 path = parsed.path
-                q = {k: v[0] for k, v in parse_qs(parsed.query).items()}
+                q = {k: v[0] for k, v in parse_qs(parsed.query,keep_blank_values=True).items()}
                 if method == "GET" and path in STATIC:
                     file = ui_path / STATIC[path]
                     if not file.is_file(): raise NotFoundError("Interface não encontrada; execute a partir do repositório completo.")
@@ -169,6 +170,8 @@ def make_handler(app: Application, ui_path: Path):
                 self._send(500, {"error": "Erro interno. Consulte o console local; nenhum fallback externo foi utilizado."})
 
         def _route(self, method, path, q, body):
+            if path in {'/api/chat-workspace','/api/chat-draft','/api/chat-request'}:
+                return app.recovery.route(method,path,q,body)
             if path.startswith('/api/leads'):
                 from .lead_routes import route
                 return route(app, method, path, q, body)
@@ -276,17 +279,24 @@ def make_handler(app: Application, ui_path: Path):
                 if path == "/api/projects": return app.store.add_project(body["name"], body["root"])
                 if path == "/api/investigations": return app.chat.investigations.create(body["project_id"], body["name"], body["origin"])
                 if path == "/api/investigations/observe": return app.chat.investigations.observe(body["project_id"], body["investigation_id"], body["screen"])
-                if path == "/api/conversations": return app.chat.create(body["project_id"], body.get("title", "Nova conversa"))
+                if path == "/api/conversations":
+                    if 'id' in body:
+                        from .chat_recovery import identifier
+                        identifier(body['id'])
+                    return app.chat.create(body["project_id"], body.get("title", "Nova conversa"),ident=body.get('id'))
                 if path == "/api/project-preferences": return app.chat.save_preferences(body["project_id"], body["method"], body["wip_limit"], body["definition_of_done"], body.get("work_profile"))
                 if path == "/api/chat":
+                    if 'request_id' in body:
+                        from .chat_recovery import identifier
+                        identifier(body['request_id'])
                     if "image_options" in body:
                         if body.get("mode") != "image": raise PolicyError("Parâmetros visuais exigem modo imagem.")
                         from .foundation.visual import ImageOptions
                         ImageOptions.parse(body["image_options"])
                     app.chat.get(body["project_id"], body["conversation_id"])
                     app.chat.validate_message(body["message"], body.get("mode", "guide"), body.get("input_format", "auto"))
-                    if body.get("mode") in {"model", "foundation", "image"}:
-                        return {"job": app.jobs.submit("chat", {k: body[k] for k in ("project_id", "conversation_id", "message", "mode", "input_format", "image_options") if k in body})}
+                    if 'request_id' in body or body.get("mode") in {"model", "foundation", "image"}:
+                        return {"job": app.jobs.submit("chat", {k: body[k] for k in ("project_id", "conversation_id", "message", "mode", "input_format", "image_options") if k in body},request_id=body.get('request_id'))}
                     return app.chat.respond(body["project_id"], body["conversation_id"], body["message"], body.get("mode", "guide"), input_format=body.get("input_format", "auto"))
                 if path == "/api/consult": return app.knowledge.consult(body["query"], body.get("scope", "global"), body.get("include_global") is True)
                 if path == "/api/import":

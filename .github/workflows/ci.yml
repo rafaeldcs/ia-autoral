@@ -72,6 +72,7 @@ jobs:
       - run: node --check ui/foundation.js
       - run: node --check ui/chat.js
       - run: node --check ui/identity.js
+      - run: node --check ui/chat-recovery.js
       - run: node --check ui/appearance.js
       - run: node --check ui/business-tools.js
       - run: node --check ui/marketing.js
@@ -86,6 +87,7 @@ jobs:
       - run: python scripts/marketing-ui-smoke.py
       - run: python scripts/leads-ui-smoke.py
       - run: python scripts/identity-ui-smoke.py
+      - run: python scripts/chat-recovery-smoke.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -115,6 +117,9 @@ jobs:
             reports/identity-people-desktop.png
             reports/identity-sharing-desktop.png
             reports/identity-mobile.png
+            reports/chat-recovery-smoke.json
+            reports/chat-recovery-desktop.png
+            reports/chat-recovery-mobile.png
             reports/work-profile-mobile.png
             reports/business-metrics-desktop.png
             reports/business-metrics-mobile.png

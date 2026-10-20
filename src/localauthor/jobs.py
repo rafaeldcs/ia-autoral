@@ -3,7 +3,9 @@ import json
 import math
 import threading
 import uuid
-from .errors import NotFoundError, PolicyError
+import re
+import hashlib
+from .errors import NotFoundError, PolicyError, ConflictError
 from .store import Store
 from .util import utcnow
 
@@ -18,6 +20,7 @@ class JobQueue:
         self._lifecycle = threading.RLock()
         self._started = False
         with store.connect() as db:
+            db.execute('CREATE TABLE IF NOT EXISTS job_requests(actor TEXT NOT NULL,request_id TEXT NOT NULL,digest TEXT NOT NULL,job_id TEXT NOT NULL REFERENCES jobs(id),PRIMARY KEY(actor,request_id))')
             db.execute("UPDATE jobs SET state='interrupted',error='Processo anterior interrompido.',updated_at=? WHERE state='running'", (utcnow(),))
         self.thread = threading.Thread(target=self._run, daemon=True, name="localai-worker")
 
@@ -29,12 +32,18 @@ class JobQueue:
                 self.thread.start()
                 self._started = True
 
-    def submit(self, kind: str, payload: dict) -> dict:
+    def submit(self, kind: str, payload: dict, *, request_id=None) -> dict:
         if kind not in self.handlers:
             raise PolicyError("Tipo de job não permitido.")
         from .identity_context import current_actor
         if current_actor.get() is not None:
             payload = {**payload, '_actor_id': current_actor.get()}
+        if request_id is not None:
+            if kind!='chat' or not isinstance(request_id,str) or not re.fullmatch('[0-9a-f]{32}',request_id):
+                raise PolicyError('Identificador de envio inválido.')
+            payload={**payload,'request_id':request_id}
+        digest=hashlib.sha256(json.dumps({'kind':kind,'payload':payload},sort_keys=True,ensure_ascii=False).encode('utf-8')).hexdigest()
+        actor=current_actor.get() or 'local'
         raw = json.dumps(payload, ensure_ascii=False)
         if len(raw) > 20_000:
             raise PolicyError("Payload grande demais.")
@@ -44,9 +53,15 @@ class JobQueue:
                 raise PolicyError("Fila em encerramento; nenhum novo job foi aceito.")
             with self.store.connect() as db:
                 db.execute("BEGIN IMMEDIATE")
+                if request_id:
+                    previous=db.execute('SELECT digest,job_id FROM job_requests WHERE actor=? AND request_id=?',(actor,request_id)).fetchone()
+                    if previous:
+                        if previous['digest']!=digest:raise ConflictError('Este envio já foi registrado com outro conteúdo. Confira o pedido anterior.')
+                        return self.get(previous['job_id'])
                 if db.execute("SELECT COUNT(*) FROM jobs WHERE state IN ('queued','running')").fetchone()[0] >= 20:
                     raise PolicyError("Fila cheia.")
                 db.execute("INSERT INTO jobs VALUES(?,?,?,'queued',NULL,NULL,?,?)", (ident, kind, raw, now, now))
+                if request_id:db.execute('INSERT INTO job_requests VALUES(?,?,?,?)',(actor,request_id,digest,ident))
             self.wakeup.set()
         return self.get(ident)
 

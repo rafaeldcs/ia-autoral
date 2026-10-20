@@ -81,7 +81,7 @@ try {
   "/marketing","/marketing.js","/marketing.css",
   "/leads","/leads.js","/leads.css",
   "/foundation","/foundation.js","/foundation.css","/business-tools.js",
-  "/workspace.css","/appearance.js","/identity.js","/identity.css"};
+  "/workspace.css","/appearance.js","/identity.js","/identity.css","/chat-recovery.js"};
  app.Run(async context=>{
   context.Response.Headers.CacheControl="no-store";context.Response.Headers.XContentTypeOptions="nosniff";
   async Task Error(int code,string message){context.Response.StatusCode=code;await context.Response.WriteAsJsonAsync(new{error=message});}

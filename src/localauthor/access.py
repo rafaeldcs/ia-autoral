@@ -10,6 +10,7 @@ PROJECT_GET = {
     '/api/browser/session','/api/browser/image','/api/foundation/image','/api/investigations',
     '/api/conversations','/api/conversation','/api/project-preferences',
     '/api/leads/context','/api/leads','/api/leads/item','/api/leads/relay',
+    '/api/chat-draft','/api/chat-request',
 }
 PROJECT_POST = {
     '/api/voice/transcribe','/api/voice/cancel','/api/marketing/campaigns',
@@ -21,6 +22,7 @@ PROJECT_POST = {
     '/api/project-preferences','/api/chat','/api/tasks','/api/jobs/index','/api/symbols',
     '/api/leads/context','/api/leads/ingest','/api/leads/reject','/api/leads/qualify',
     '/api/leads/review','/api/leads/move','/api/leads/relay','/api/leads/relay/disable',
+    '/api/chat-draft','/api/chat-workspace',
 }
 SCOPE_GET = {'/api/sources','/api/relations'}
 SCOPE_POST = {'/api/consult','/api/import','/api/sources/delete','/api/relations','/api/jobs/research'}
@@ -51,7 +53,7 @@ class ProjectAccess:
         if '_actor_id' in body:raise PolicyError('A identidade da solicitação é definida pelo servidor.')
         data=q if method=='GET' else body
         if (method=='GET' and path in PROJECT_GET) or (method=='POST' and path in PROJECT_POST):
-            readonly=method=='GET' or path in {'/api/symbols','/api/foundation/business-metrics','/api/foundation/marketing-metrics'}
+            readonly=method=='GET' or path in {'/api/symbols','/api/foundation/business-metrics','/api/foundation/marketing-metrics','/api/chat-workspace'}
             self.identity.require_project(self.user,data.get('project_id'),'read' if readonly else 'write')
             return
         if (method=='GET' and path in SCOPE_GET) or (method=='POST' and path in SCOPE_POST):
@@ -69,7 +71,7 @@ class ProjectAccess:
             self.identity.require_admin(self.user);return
         if method=='POST' and path=='/api/jobs/train':
             self.identity.require_admin(self.user);return
-        if method=='GET' and path in SHARED_GET|{'/api/projects','/api/tasks','/api/jobs'}:return
+        if method=='GET' and path in SHARED_GET|{'/api/projects','/api/tasks','/api/jobs','/api/chat-workspace'}:return
         if method=='POST' and path=='/api/projects':return
         raise NotFoundError('Rota não encontrada neste perfil.')
 

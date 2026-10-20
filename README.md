@@ -89,6 +89,7 @@ Documentos de histórico e operação:
 - [`docs/PROGRESS_WINDOWS.md`](docs/PROGRESS_WINDOWS.md), [`docs/WRITING_AND_CODE.md`](docs/WRITING_AND_CODE.md), [`docs/PROJECT_CHAT.md`](docs/PROJECT_CHAT.md), [`docs/USABILITY_LEARNING.md`](docs/USABILITY_LEARNING.md): avaliações históricas, não resultados do checkpoint atual.
 - [`docs/LAN_INSTALL.md`](docs/LAN_INSTALL.md), [`docs/LAN_VALIDATION.md`](docs/LAN_VALIDATION.md): cliente Windows e host de rede. A nova interface deve ser validada separadamente em cada instalação/proxy.
 - [`docs/PERFIS_E_PROJETOS.md`](docs/PERFIS_E_PROJETOS.md): espaços separados por nome, sem senha de perfil, e compartilhamento na mesma IA da rede local.
+- [`docs/RECUPERACAO_E_RASCUNHOS.md`](docs/RECUPERACAO_E_RASCUNHOS.md): salvar texto automaticamente, recuperar a última conversa e conferir envios sem duplicá-los após uma falha.
 
 O repositório remoto é `rafaeldcs/ia-autoral`. Não execute o bootstrap de publicação sobre esse remoto existente. GitHub/Actions são ferramentas de desenvolvimento, não dependências da inferência local. O estado de publicação e os resultados são os do commit e do workflow consultados.
 

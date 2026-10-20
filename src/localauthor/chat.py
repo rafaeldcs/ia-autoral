@@ -72,21 +72,30 @@ class ChatService(ConversationMemoryMixin):
         with self.store.connect() as db:
             return [dict(row) for row in db.execute("SELECT * FROM conversations WHERE project_id=? ORDER BY updated_at DESC", (project_id,))]
 
-    def create(self, project_id, title):
+    def create(self, project_id, title, *, ident=None):
         self.store.project(project_id)
         if not isinstance(title, str) or not 1 <= len(title.strip()) <= 100:
             raise PolicyError("Título deve ter de 1 a 100 caracteres.")
         reject_secrets(title)
         if self.settings.token in title:
             raise PolicyError("Não use o token local como título.")
+        if ident is not None and (not isinstance(ident,str) or not re.fullmatch('[0-9a-f]{32}',ident)):
+            raise PolicyError('Identificador de conversa inválido.')
         now = utcnow()
-        result = {"id": uuid.uuid4().hex, "project_id": project_id, "title": title.strip(), "created_at": now, "updated_at": now}
+        result = {"id": ident or uuid.uuid4().hex, "project_id": project_id, "title": title.strip(), "created_at": now, "updated_at": now}
         with self.store.connect() as db:
             db.execute("BEGIN IMMEDIATE")
+            from .identity_context import current_actor
+            if ident:
+                previous=db.execute('SELECT * FROM conversations WHERE id=?',(ident,)).fetchone()
+                if previous:
+                    owner=db.execute('SELECT user_id FROM profile_conversations WHERE conversation_id=?',(ident,)).fetchone()
+                    if previous['project_id']!=project_id or (current_actor.get() and (not owner or owner[0]!=current_actor.get())):
+                        raise NotFoundError('Conversa não encontrada neste perfil.')
+                    return dict(previous)
             if db.execute("SELECT count(*) FROM conversations WHERE project_id=?", (project_id,)).fetchone()[0] >= 200:
                 raise PolicyError("Limite de 200 conversas neste projeto.")
             db.execute("INSERT INTO conversations VALUES(:id,:project_id,:title,:created_at,:updated_at)", result)
-            from .identity_context import current_actor
             if current_actor.get():
                 db.execute('INSERT INTO profile_conversations VALUES(?,?)',(result['id'],current_actor.get()))
         return result
@@ -153,7 +162,8 @@ class ChatService(ConversationMemoryMixin):
             if cancel and cancel.is_set():
                 raise PolicyError("Geração cancelada; nenhuma mensagem foi salva.")
             now = utcnow()
-            metadata = json.dumps({k: v for k, v in response.items() if k != "content"}, ensure_ascii=False)
+            from .identity_context import response_metadata
+            metadata = json.dumps(response_metadata({k: v for k, v in response.items() if k != "content"}), ensure_ascii=False)
             with self.store.connect() as db:
                 db.execute("BEGIN IMMEDIATE")
                 used = conversation_bytes(db)

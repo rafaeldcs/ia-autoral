@@ -9,6 +9,12 @@ def launch_browser(chromium, **options):
     return chromium.launch(**options)
 
 
+def launch_persistent_browser(chromium, directory, **options):
+    import sys
+    if sys.platform=='win32':options['channel']='msedge'
+    return chromium.launch_persistent_context(str(directory),**options)
+
+
 def enter_profile(page):
     try:
         # On mobile the account control is inside the collapsed sidebar. Its

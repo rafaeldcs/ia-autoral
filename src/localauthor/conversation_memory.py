@@ -71,8 +71,9 @@ class ConversationMemoryMixin:
                 active_count = len(active)
                 if operation == "remember" and (not existing or not existing["active"]): active_count += 1
                 if operation == "forget" and existing and existing["active"]: active_count -= 1
-                metadata = json.dumps({"origin": "project_memory", "operation": operation,
-                    "weights_trained": False, "active_memories": active_count}, ensure_ascii=False)
+                from .identity_context import response_metadata
+                metadata = json.dumps(response_metadata({"origin": "project_memory", "operation": operation,
+                    "weights_trained": False, "active_memories": active_count}), ensure_ascii=False)
                 size = len((message + reply + metadata + json.dumps({"format": input_format})).encode("utf-8"))
                 if conversation_bytes(db) + size + (len(content.encode("utf-8")) if operation == "remember" and not existing else 0) > min(self.settings.max_store_bytes, 32_000_000):
                     raise PolicyError("Limite de armazenamento das conversas atingido.")
