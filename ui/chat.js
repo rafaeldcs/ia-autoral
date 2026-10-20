@@ -252,7 +252,7 @@ async function retryRequest() {
 }
 $('show-rules').onclick = handle(async () => { if (!state.project)
     throw Error('Escolha um projeto primeiro.'); const data = await api('/api/project-preferences?project_id=' + state.project.id); $('method').value = data.method; $('wip').value = data.wip_limit; $('done').value = data.definition_of_done; $('work-profile').value = data.work_profile || 'general'; $('quality-rules').replaceChildren(...data.quality.map(rule => el('li', rule))); $('official-sources').replaceChildren(...data.sources.map(source => { const a = el('a', source.title + ' ↗'); a.href = source.url; a.target = '_blank'; a.rel = 'noopener noreferrer'; return a; })); const report = await api('/api/engineering-report'); $('learning-result').textContent = report.evaluation ? `Curso experimental: ${report.evaluation.passed}/${report.evaluation.total} decisões guiadas aprovadas. ${report.limitations}` : 'Novo currículo em preparação. As orientações acima foram escritas e revisadas; não significam domínio adquirido pelo modelo.'; const writing = await api('/api/communication-report').catch(() => ({})); if (writing.evaluation?.total) { $('learning-result').textContent += ` Escrita: ${writing.evaluation.passed}/${writing.evaluation.total} pedidos reformulados. ${writing.chatEnabled ? 'Candidato experimental habilitado.' : 'Candidato não ativado no chat.'}`; } $('rules-dialog').showModal(); });
-$('rules-form').onsubmit = handle(async () => { await api('/api/project-preferences', { project_id: state.project.id, method: $('method').value, wip_limit: Number($('wip').value), definition_of_done: $('done').value, work_profile: $('work-profile').value }); $('rules-dialog').close(); toast('Orientações salvas para este projeto.'); });
+$('rules-form').onsubmit = handle(async () => { const saved=window.LocalAuthorUpdateReadiness?.checkpoint($('rules-form')); await api('/api/project-preferences', { project_id: state.project.id, method: $('method').value, wip_limit: Number($('wip').value), definition_of_done: $('done').value, work_profile: $('work-profile').value }); saved?.(); $('rules-dialog').close(); toast('Orientações salvas para este projeto.'); });
 document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && !document.querySelector('dialog[open]')) {
         if ($('sidebar').classList.contains('open')) { closeNavigation(); $('open-menu').focus(); }
@@ -377,10 +377,12 @@ $('browser-close').onclick=()=>{ hideBrowserPanel(); $('open-browser').focus(); 
 $('browser-sessions').onchange=handle(()=>{if($('browser-sessions').value) return openBrowserSession($('browser-sessions').value);});
 $('browser-open-form').onsubmit=handle(async()=>{
     $('browser-start').disabled=true;
+    const saved=window.LocalAuthorUpdateReadiness?.checkpoint($('browser-open-form'));
     try {
         const row=await api('/api/browser/start',{project_id:state.project.id,url:$('browser-url').value.trim(),allow_network:true,
             asset_hosts:$('browser-hosts').value.split(',').map(s=>s.trim()).filter(Boolean),
             auth_hosts:$('browser-auth-hosts').value.split(',').map(s=>s.trim()).filter(Boolean)});
+        saved?.();
         await openBrowserSession(row.id);
     } finally { if(!['starting','busy','ready'].includes(browserState.row?.state)) $('browser-start').disabled=false; }
 });

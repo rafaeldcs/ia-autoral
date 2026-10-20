@@ -53,6 +53,8 @@ def wait_file(path, timeout=50):
 gateway = ROOT / 'build/lan-server/LocalAuthor.Lan.exe'
 old = ROOT / 'build/update-fixture/LocalAuthor.Client.exe'
 new = ROOT / 'build/lan-client/LocalAuthor.Client.exe'
+readiness_fixture = ROOT / 'build/update-readiness-fixture/LocalAuthor.Client.exe'
+run('dotnet','publish',ROOT/'dotnet/LocalAuthor.Client/LocalAuthor.Client.csproj','-c','Release','-r','win-x64','--self-contained','true','--no-restore','-p:PublishSingleFile=true','-p:IncludeNativeLibrariesForSelfExtract=true','-p:Version=0.2.98','-o',readiness_fixture.parent,'--nologo')
 version = ET.parse(ROOT/'dotnet/LocalAuthor.Client/LocalAuthor.Client.csproj').find('.//Version').text+'.0'
 broken = ROOT / 'build/update-failure/LocalAuthor.UpdateFailureFixture.exe'
 with tempfile.TemporaryDirectory(prefix='localauthor-update-check-') as temp:
@@ -143,11 +145,11 @@ with tempfile.TemporaryDirectory(prefix='localauthor-update-check-') as temp:
                 stream.write(bytes([original ^ 255]))
         (releases / 'current.json').write_text(json.dumps(manifest))
         return digest
-    def attempt(name, expected_success=True, source=pair, automatic=False, extra_args=()):
+    def attempt(name, expected_success=True, source=pair, automatic=False, extra_args=(), original=old):
         folder = base / name
         folder.mkdir()
         executable = folder / 'LocalAuthor.Client.exe'
-        shutil.copyfile(old, executable)
+        shutil.copyfile(original, executable)
         sentinel = folder / 'connection-preserved.txt'
         sentinel.write_text('configuration untouched')
         report = folder / 'result.json'
@@ -215,6 +217,11 @@ with tempfile.TemporaryDirectory(prefix='localauthor-update-check-') as temp:
         draft_report = draft_folder / 'draft.json'
         run(draft_client, '--auto-update-smoke', pair, draft_report, '--draft')
         check('Unsent draft defers automatic restart in real native chat', wait_file(draft_report)['passed'] and sha(draft_client) == sha(old))
+        executable,report,state,job=attempt('reverted-draft-update',automatic=True,extra_args=('--clear-draft',),original=readiness_fixture)
+        readiness=wait_file(Path(str(report)+'.idle.json'))
+        check('Real native updater defers while a draft or unsaved form exists',readiness['draftBlocked'] and readiness['formBlocked'])
+        check('Real native updater resumes within ten seconds of clearing edits',readiness['resumed'])
+        check('Reverted draft update replaces the binary and reopens the chat',state.get('state')=='completed' and sha(executable)==sha(new) and wait_file(report)['desktopLogin'])
         executable, report, state, job = attempt('successful-update', automatic=True, extra_args=('--appearance',))
         check('Updater confirms new process startup', state.get('state') == 'completed')
         check('New native application reopens authenticated chat', wait_file(report)['desktopLogin'])

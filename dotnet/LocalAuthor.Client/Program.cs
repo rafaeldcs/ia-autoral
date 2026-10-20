@@ -62,6 +62,7 @@ sealed class ClientForm : Form {
  bool recovering;
  readonly System.Windows.Forms.Timer retryTimer=new(){Interval=15000};
  readonly System.Windows.Forms.Timer updateTimer=new(){Interval=300000};
+ readonly System.Windows.Forms.Timer idleUpdateTimer=new(){Interval=1000};
  bool checkingUpdate,applyingUpdate;DateTime nextUpdate=DateTime.MinValue;
  bool automaticAttempt;
  bool installerDownloading;
@@ -105,11 +106,12 @@ sealed class ClientForm : Form {
   NetworkChange.NetworkAddressChanged+=NetworkChanged;
   retryTimer.Tick+=async(_,_)=>await RecoverConnection();
   updateTimer.Tick+=async(_,_)=>await CheckForUpdates();
+  idleUpdateTimer.Tick+=async(_,_)=>{if(!checkingUpdate&&await SafeToRestart())await CheckForUpdates();};
   publishUpdate.Click+=async(_,_)=>{if(connection==null||connecting||checkingUpdate)return;publishing=true;try{if(!await EnsurePublicationPassword())return;using var form=new PublishUpdateForm(connection);form.ShowDialog(this);}finally{publishing=false;}};
-  postponeUpdate.Click+=(_,_)=>{nextUpdate=DateTime.UtcNow.AddMinutes(30);updateStatus.Text="Atualização adiada por 30 minutos.";};
+  postponeUpdate.Click+=(_,_)=>{nextUpdate=DateTime.UtcNow.AddMinutes(30);idleUpdateTimer.Stop();updateStatus.Text="Atualização adiada por 30 minutos.";};
   if(reportFile==null)retryTimer.Start();
   if(reportFile==null)updateTimer.Start();
-  FormClosed+=(_,_)=>{NetworkChange.NetworkAddressChanged-=NetworkChanged;retryTimer.Stop();retryTimer.Dispose();updateTimer.Stop();updateTimer.Dispose();shutdown.Cancel();browser?.Dispose();settingsMenu.Dispose();};
+  FormClosed+=(_,_)=>{NetworkChange.NetworkAddressChanged-=NetworkChanged;retryTimer.Stop();retryTimer.Dispose();updateTimer.Stop();updateTimer.Dispose();idleUpdateTimer.Stop();idleUpdateTimer.Dispose();shutdown.Cancel();browser?.Dispose();settingsMenu.Dispose();};
   import.Click+=async (_,_)=>{if(localServer.UsingLocalServer||localServer.IsConfigured&&connection==null){await LoadSaved();return;}MessageBox.Show(this,"Instale a cópia privada do aplicativo vinculada ao seu servidor. Ela configura a conexão automaticamente, sem arquivo ou IP manual.\n\nSe já estava conectado, mantenha o servidor ligado e os dois computadores na mesma rede. O aplicativo tenta reencontrá-lo automaticamente.","Conexão automática",MessageBoxButtons.OK,MessageBoxIcon.Information);};
   reconnect.Click+=async (_,_)=>{if(connection!=null&&!localServer.UsingLocalServer)await Connect(connection);else await LoadSaved();};
   forget.Click+=(_,_)=>{if(MessageBox.Show(this,"Remover a conexão salva neste computador? Os projetos permanecem no servidor.","Esquecer conexão",MessageBoxButtons.YesNo,MessageBoxIcon.Question)!=DialogResult.Yes)return;File.Delete(Path.Combine(home,"connection.bin"));connection=null;browser?.Dispose();browser=null;status.Text="Conexão removida. Instale a cópia vinculada ao servidor desejado.";};
@@ -127,6 +129,16 @@ sealed class ClientForm : Form {
     }
     if(automaticTestReport!=null&&args.Contains("--draft"))await browser!.CoreWebView2.ExecuteScriptAsync("document.getElementById('message-input').value='rascunho de teste';");
     if(automaticTestReport!=null&&args.Contains("--appearance"))await browser!.CoreWebView2.ExecuteScriptAsync("(()=>{const appearance=document.querySelector('[data-appearance]');appearance.value='dark';appearance.dispatchEvent(new Event('input',{bubbles:true}));appearance.dispatchEvent(new Event('change',{bubbles:true}));})()");
+    if(automaticTestReport!=null&&args.Contains("--clear-draft")){
+     await browser!.CoreWebView2.ExecuteScriptAsync("(()=>{const input=document.getElementById('message-input');input.value='rascunho temporário';input.dispatchEvent(new Event('input',{bubbles:true}));const field=document.createElement('input');field.id='update-form-fixture';document.body.append(field);field.focus();field.value='alterado';field.dispatchEvent(new Event('input',{bubbles:true}));})()");
+     await CheckForUpdates();var draftBlocked=!File.Exists(automaticTestReport+".job")&&!await SafeToRestart();
+     await browser.CoreWebView2.ExecuteScriptAsync("document.getElementById('message-input').value='';document.getElementById('message-input').dispatchEvent(new Event('input',{bubbles:true}));");
+     var formBlocked=!await SafeToRestart();
+     await browser.CoreWebView2.ExecuteScriptAsync("document.getElementById('update-form-fixture').value='';document.getElementById('update-form-fixture').dispatchEvent(new Event('input',{bubbles:true}));");
+     // No second manual check: the idle timer must resume the update itself.
+     for(int attempt=0;attempt<40&&!File.Exists(automaticTestReport+".job");attempt++)await Task.Delay(250);
+     File.WriteAllText(automaticTestReport+".idle.json",JsonSerializer.Serialize(new{draftBlocked,formBlocked,resumed=File.Exists(automaticTestReport+".job")}));return;
+    }
     if(!IsDisposed)await CheckForUpdates();
     if(automaticTestReport!=null&&args.Contains("--draft")){
      var preserved=await browser!.CoreWebView2.ExecuteScriptAsync("document.getElementById('message-input').value==='rascunho de teste'")=="true";
@@ -186,26 +198,28 @@ sealed class ClientForm : Form {
   }finally{installerDownloading=false;if(!IsDisposed&&browser?.CoreWebView2!=null)try{await browser.CoreWebView2.ExecuteScriptAsync("window.localAuthorInstallerState?.('idle');");}catch(InvalidOperationException){}}
  }
  async Task<bool> SafeToRestart(){
-  if(browser?.CoreWebView2==null||connecting||installerDownloading)return false;
+  if(IsDisposed||browser?.CoreWebView2==null||connecting||installerDownloading)return false;
   // Only restart from an idle chat. Other screens may contain unsaved forms.
-  return await browser.CoreWebView2.ExecuteScriptAsync("Boolean(document.getElementById('studio')&&!document.getElementById('studio').hidden&&!document.body.classList.contains('identity-locked')&&!document.querySelector('dialog[open]')&&typeof state!=='undefined'&&!state.busy&&!document.getElementById('message-input').value&&!window.__localAuthorUpdateDirty)")=="true";
+  try{return await browser.CoreWebView2.ExecuteScriptAsync(UpdateReadiness.CanRestartScript)=="true";}
+  catch(Exception error) when(error is InvalidOperationException or System.Runtime.InteropServices.COMException){return false;}
  }
  async Task CheckForUpdates(){
   if(connection==null||checkingUpdate||connecting||publishing||reportFile!=null||DateTime.UtcNow<nextUpdate)return;
   checkingUpdate=true;
+  idleUpdateTimer.Stop();
   try{
    var selected=connection;var release=await ClientUpdates.CheckAsync(selected,shutdown.Token);if(release==null){updateStatus.Text="";return;}
    updateStatus.Text="Nova versão disponível. Aguardando o chat ficar livre…";
-   if(!await SafeToRestart())return;
+   if(!await SafeToRestart()){idleUpdateTimer.Start();return;}
    updateStatus.Text="Baixando atualização… Você pode continuar usando o chat.";
    var folder=await ClientUpdates.DownloadAsync(selected,release,shutdown.Token);
    if(automaticTestReport!=null){File.WriteAllText(Path.Combine(folder,"smoke.json"),JsonSerializer.Serialize(new[]{smokeFile!,automaticTestReport}));File.WriteAllText(automaticTestReport+".job",folder);}
    postponeUpdate.Visible=true;
    for(int remaining=15;remaining>0;remaining--){
-    if(connection!=selected||DateTime.UtcNow<nextUpdate||!await SafeToRestart()){File.Delete(Path.Combine(folder,"download.exe"));updateStatus.Text="Atualização adiada para preservar seu trabalho.";return;}
+    if(connection!=selected||DateTime.UtcNow<nextUpdate||!await SafeToRestart()){File.Delete(Path.Combine(folder,"download.exe"));updateStatus.Text="Atualização adiada para preservar seu trabalho.";idleUpdateTimer.Start();return;}
     updateStatus.Text=$"Atualização pronta. O aplicativo reabrirá em {remaining}s.";await Task.Delay(1000,shutdown.Token);
    }
-   if(connection!=selected||DateTime.UtcNow<nextUpdate||!await SafeToRestart()){File.Delete(Path.Combine(folder,"download.exe"));return;}
+   if(connection!=selected||DateTime.UtcNow<nextUpdate||!await SafeToRestart()){File.Delete(Path.Combine(folder,"download.exe"));idleUpdateTimer.Start();return;}
    applyingUpdate=true;import.Enabled=reconnect.Enabled=forget.Enabled=false;if(browser!=null)browser.Enabled=false;
    await ClientUpdates.LaunchAsync(folder,release,shutdown.Token);Close();
   }catch(OperationCanceledException){}catch(Exception){updateStatus.Text="Não foi possível atualizar agora. Nova tentativa automática em 5 minutos.";}
@@ -253,7 +267,7 @@ sealed class ClientForm : Form {
    await browser.EnsureCoreWebView2Async(environment);
    var web=browser.CoreWebView2;
    web.WebMessageReceived+=async(_,e)=>{try{var command=e.TryGetWebMessageAsString();if(!DesktopShell.Accepts(e.Source,uri,command))return;if(command=="desktop-settings")ShowSettings();else await SaveInstaller();}catch(Exception error) when(error is ArgumentException or InvalidOperationException or System.Runtime.InteropServices.COMException){ /* Ignore invalid bridge messages. */ }};
-   await web.AddScriptToExecuteOnDocumentCreatedAsync("window.__localAuthorUpdateDirty=false;document.addEventListener('input',e=>{if(!e.target.matches('#message-input,#local-token,#response-mode,#input-format,#identity-name,#identity-username,#identity-password,#identity-confirm,[data-appearance]'))window.__localAuthorUpdateDirty=true;},true);");
+   await web.AddScriptToExecuteOnDocumentCreatedAsync(UpdateReadiness.TrackScript);
    web.Settings.AreDevToolsEnabled=false;web.Settings.AreHostObjectsAllowed=false;web.Settings.IsPasswordAutosaveEnabled=false;web.Settings.IsGeneralAutofillEnabled=false;web.Settings.AreDefaultContextMenusEnabled=true;
    bool SameOrigin(string value) => Uri.TryCreate(value,UriKind.Absolute,out var target)&&target.Scheme==uri.Scheme&&target.Host==uri.Host&&target.Port==uri.Port;
    web.ServerCertificateErrorDetected+=(_,e)=>{

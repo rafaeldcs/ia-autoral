@@ -1,5 +1,13 @@
 # Atualização automática do cliente Windows
 
+## Retomada ao apagar um rascunho — cliente 0.3.11
+
+Quando encontra uma atualização e o chat está ocupado, o cliente verifica localmente a cada segundo se já pode continuar. Apagar todo o texto ou desfazer alterações de formulário libera a retomada, sem esperar a próxima consulta de cinco minutos. O aviso de reinício de 15 segundos permanece.
+
+O cliente compara alterações atuais com o estado original dos campos; um evento de digitação não deixa mais uma marca permanente. Aparência e filtro de conversas são preferências imediatas. Mensagens não enviadas, pedidos pendentes de reconciliação, geração ativa, sincronização de rascunho pendente, diálogos abertos e formulários não salvos continuam protegidos. Salvar orientações reconhece apenas os valores enviados; texto alterado durante a gravação continua protegido.
+
+Uma janela anterior já presa usa o atualizador antigo até ser fechada. Feche somente o aplicativo LocalAuthor e execute o instalador conectado atualizado uma vez; o servidor e seus dados permanecem no computador. As versões seguintes retomam automaticamente quando o chat fica livre.
+
 ## Aplicativo sem barra de conexão — cliente 0.3.7
 
 O chat ocupa toda a área do aplicativo, sem a barra nativa superior de conexão. Abra **Ferramentas e configurações → Este computador → Conexão e atualizações deste aplicativo** para consultar o IP, reconectar, trocar o vínculo ou publicar uma versão. Nas outras áreas existe **Configurações do aplicativo**; `Ctrl + ,` também abre esse menu. A barra de título e os controles de janela do Windows permanecem disponíveis.

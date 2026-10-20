@@ -11,6 +11,7 @@ from localauthor.server import create_server
 from tests.test_chat_auto import publish_fixture
 from tests.test_foundation import DummyText,register_fixture
 from ui_profile_fixture import enter_profile,launch_browser
+from update_readiness_fixture import native_scripts,check_readiness
 
 
 def main():
@@ -30,6 +31,7 @@ def main():
         try:
             with sync_playwright() as p:
                 browser=launch_browser(p.chromium,headless=True);page=browser.new_page(viewport={'width':1360,'height':960})
+                update_scripts=native_scripts();page.add_init_script(update_scripts['TrackScript'])
                 page.on('pageerror',lambda error:report['errors'].append(str(error)))
                 submissions=[]
                 page.on('request',lambda request:submissions.append(request.post_data_json) if request.url.endswith('/api/chat') and request.method=='POST' else None)
@@ -38,6 +40,7 @@ def main():
                 def send(text,count):
                     page.locator('#message-input').fill(text);page.locator('#send').click();expect(page.locator('.message.assistant')).to_have_count(count)
                 connect()
+                check_readiness(page,check,update_scripts)
                 check('Composer exposes no response mode or input format choice',page.locator('#compose select:visible').count()==0 and page.locator('#mode-notice').get_attribute('class').endswith('sr-only'))
                 send('chat preciso do instalar do localauthor',1)
                 expect(page.locator('.message.assistant')).to_contain_text('Aqui está meu instalador')
