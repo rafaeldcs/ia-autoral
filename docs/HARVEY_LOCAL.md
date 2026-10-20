@@ -13,6 +13,29 @@ Esta integração opcional executa o motor do [Harvey Legal Agent Benchmark](htt
 
 O avaliador pode ser o mesmo modelo que executa a tarefa. Seus pareceres são **provisórios**, não independentes. Isso não torna o modelo juridicamente qualificado nem comprova qualidade comercial. Uma tarefa interrompida, com contexto insuficiente, artefato ausente ou avaliação inválida não recebe aprovação. Não há importação automática para treinamento nem alteração de pesos.
 
+## Correções de contexto e ofertas — 20/10/2026
+
+O agente deixou de cortar silenciosamente resultados em 6.000 caracteres. Quando necessário, o host monta uma janela de trabalho contada pelo tokenizer real, preservando tarefa e regras completas. Saídas grandes viram trechos explicitamente identificados; pares antigos de ação/resultado podem sair da janela ativa. Todos os dados originais dessa chamada ficam em `controller/history/`, expostos ao agente por `/workspace/history/` somente leitura, com hash e eventos em `context-events.jsonl`. O agente pode recuperar ranges com Python/bash ou reler páginas do documento original. Isso não preserva atenção perfeita: informações omitidas da janela precisam ser consultadas novamente. Instruções obrigatórias que excedam o orçamento ainda falham de forma explícita. O avaliador não usa esse recorte: critério e evidência precisam caber completos.
+
+`--context-tokens 8192` permite testar o perfil GGUF já limitado a 8.192 tokens, sem editar o manifesto do servidor; o contexto efetivo entra no estado congelado da execução. Não há aumento automático ou fallback CPU. Uma GPU com memória insuficiente continua gerando erro.
+
+A regra compartilhada de ofertas agora entra tanto no chat normal da foundation quanto no agente Harvey. Ela distingue demonstração disponível de demonstração gratuita, preserva condições confirmadas e impede deduzir ofertas de referências. O avaliador recebe somente os quatro campos originais do scorer; a tarefa inteira não é mais acrescentada como requisito concorrente.
+
+Há também uma verificação lexical conservadora de famílias de recursos ausentes nas evidências consultadas. Em tarefas de marketing, a tentativa de concluir um texto com esses recursos é rejeitada e o modelo recebe feedback para reescrever o próprio rascunho. O controle é repetido depois de uma conclusão natural, impedindo contornar `finish`; ele também entra na validação de peças do workflow de marketing. O resultado original do scorer permanece intacto, mas uma pendência nesse controle impede a aprovação provisória do lote. `grounding-checks.jsonl` preserva os candidatos rejeitados, os motivos e a versão posterior. A presença de uma palavra na fonte **não prova** suporte semântico: pode haver negação, referência a concorrente, paráfrases não cobertas ou outros erros. Continua necessária a revisão humana.
+
+A adaptação também corrige `grep` com caminho de arquivo: a revisão upstream aceita esse parâmetro no schema, mas chama `Path.glob` sobre o arquivo e devolve ausência falsa. O adaptador encaminha a busca para o diretório com filtro exato de nome, mantendo o filtro adicional quando fornecido. Essa diferença é declarada e testada no smoke real.
+
+`benchmarks/harvey-local/grounding-regression.json` contém cinco casos sintéticos adicionais: preço desconhecido, gratuidade confirmada, demonstração paga, referência comercial de outra empresa e recuperação de um fato no meio de um documento longo. Os critérios do conjunto anterior continuam intactos. `scripts/harvey-grounding-oracle.py` acrescenta asserções independentes estreitas sobre essas ofertas e sobre os arquivos completos do contexto; não altera pontuações originais nem certifica qualidade universal. Princípios duráveis: [CONTEXTO_E_OFERTAS.md](../knowledge/CONTEXTO_E_OFERTAS.md).
+
+Reprodução das regressões com os pesos locais existentes:
+
+```powershell
+python -m localauthor.harvey run --upstream C:\LocalAuthor-Benchmarks\harvey-labs --home "$env:LOCALAPPDATA\LocalAuthor" --output C:\LocalAuthor-Benchmarks\regressao-001 --image sha256:ID_DA_IMAGEM --suite benchmarks/harvey-local/grounding-regression.json --max-turns 12 --context-tokens 8192
+python scripts/harvey-grounding-oracle.py --run C:\LocalAuthor-Benchmarks\regressao-001 --report reports/regressao-001-independent.json
+```
+
+As asserções de ofertas/recursos usam vocabulário explícito e limitado. Não são um verificador semântico universal. O relatório das correções e das falhas preservadas está em [HARVEY_CONTEXTO_MARKETING_2026-10-20.md](reports/HARVEY_CONTEXTO_MARKETING_2026-10-20.md).
+
 ## Infraestrutura
 
 O Python principal continua sem novas dependências obrigatórias. O worker usa Python 3.12 dentro da imagem Docker construída a partir do Dockerfile original, com Pandoc 3.11, LibreOffice, bibliotecas Python/JavaScript e ferramentas de documentos. O adaptador para Docker substitui a inicialização original em Podman. A imagem adicional incorpora o núcleo original e seu aviso MIT. A construção baixa dependências de infraestrutura, **não pesos de modelos generativos da LocalAuthor**. Bibliotecas de OCR/detecção de formatos podem incluir seus próprios dados de classificação. Um ambiente separado Python 3.13 pode ser usado para validar a biblioteca original; não substitui o ambiente do servidor.

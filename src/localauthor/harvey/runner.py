@@ -19,6 +19,8 @@ from ..errors import PolicyError
 from ..foundation.models import ModelSpec
 from ..foundation.gguf_bridge import DockerGgufRuntime
 from .contracts import MAX_FRAME,RECORDS,REVISION,UPSTREAM,content_hash,receive_record,relative_file,sign_frame,validate_task,verify_frame,verify_sandbox
+from .context import fit_agent_context
+from ..foundation.grounding import COMMERCIAL_GROUNDING
 
 ROOT=Path(__file__).resolve().parents[3]
 VERIFIED_CORPORA=set()
@@ -133,6 +135,9 @@ def run_case(task,run,image,engine,max_turns=6,*,documents=None):
     for name in ('workspace','documents','output'):(run/name).mkdir(exist_ok=True)
     (run/'task.json').write_text(json.dumps(task,ensure_ascii=False,indent=2),encoding='utf-8')
     controller=run/'controller';(controller/'localauthor/harvey').mkdir(parents=True)
+    (controller/'history').mkdir()
+    (controller/'localauthor/foundation').mkdir()
+    for name in ['__init__.py','grounding.py']:shutil.copy2(ROOT/'src/localauthor/foundation'/name,controller/'localauthor/foundation'/name)
     for name in ['__init__.py','errors.py']:shutil.copy2(ROOT/'src/localauthor'/name,controller/'localauthor'/name)
     for name in ['__init__.py','contracts.py','worker.py']:shutil.copy2(Path(__file__).parent/name,controller/'localauthor/harvey'/name)
     expected={'/opt/localauthor':(str(controller),False),'/workspace/documents':(str(documents or run/'documents'),False)}
@@ -172,7 +177,7 @@ def run_case(task,run,image,engine,max_turns=6,*,documents=None):
             raw=json.dumps(value if bootstrap else sign_frame(value,key),ensure_ascii=False).encode()+b'\n'
             if len(raw)>MAX_FRAME:raise PolicyError('Entrada RPC fora do orçamento.')
             process.stdin.write(raw);process.stdin.flush()
-        send({'task':task,'session_key':key.hex()},bootstrap=True);send({'max_turns':max_turns,'run_id':run.name})
+        send({'task':task,'session_key':key.hex()},bootstrap=True);send({'max_turns':max_turns,'run_id':run.name,'commercial_grounding':COMMERCIAL_GROUNDING})
         started=time.monotonic();model_calls=0;exported={};total_exported=0
         while time.monotonic()-started<3600:
             try:message=frames.get(timeout=300)
@@ -183,12 +188,27 @@ def run_case(task,run,image,engine,max_turns=6,*,documents=None):
                 engine.harvey_calls=getattr(engine,'harvey_calls',0)+1
                 if model_calls>max_turns+len(task['criteria'])+5:raise PolicyError('Chamadas de modelo excederam os critérios e turnos congelados.')
                 try:
-                    count=engine.count(message['messages'])
+                    messages=message['messages']
+                    def counted(rows):
+                        engine.harvey_rpc_calls=getattr(engine,'harvey_rpc_calls',0)+1
+                        return engine.count(rows)
+                    if message.get('purpose')=='agent':
+                        archive_name=str(model_calls).zfill(6)+'.json'
+                        raw=json.dumps(messages,ensure_ascii=False,indent=2).encode()
+                        (controller/'history'/archive_name).write_bytes(raw)
+                        reference='/workspace/history/'+archive_name
+                        messages,event=fit_agent_context(messages,counted,engine.spec.context_tokens-engine.spec.output_tokens,reference)
+                        with (run/'context-events.jsonl').open('a',encoding='utf-8') as journal:
+                            journal.write(json.dumps({**event,'call':model_calls,'archive':reference,'original_sha256':hashlib.sha256(raw).hexdigest(),'sent_sha256':content_hash(messages)})+'\n')
+                    if len(json.dumps(messages,ensure_ascii=False).encode())>110_000:
+                        raise PolicyError('context_length_exceeded: avaliação completa excede o transporte; não foi recortada.')
+                    count=event['after_tokens'] if message.get('purpose')=='agent' else counted(messages)
                     if count+engine.spec.output_tokens>engine.spec.context_tokens:
                         raise PolicyError('context_length_exceeded: contexto local insuficiente; histórico não foi apagado.')
-                    text,truncated=engine.generate(message['messages']);send({'text':text,'truncated':truncated})
+                    engine.harvey_rpc_calls=getattr(engine,'harvey_rpc_calls',0)+1
+                    text,truncated=engine.generate(messages);send({'text':text,'truncated':truncated})
                     with (run/'generations.jsonl').open('a',encoding='utf-8') as audit:
-                        audit.write(json.dumps({'call':model_calls,'input_tokens':count,'output':text,'truncated':truncated},ensure_ascii=False)+'\n')
+                        audit.write(json.dumps({'call':model_calls,'input_tokens':count,'output':text,'truncated':truncated,'purpose':message.get('purpose','judge')},ensure_ascii=False)+'\n')
                 except Exception as error:send({'error':type(error).__name__+': '+str(error)[:600]})
             elif operation=='done':
                 if set(message.get('records',{}))!=set(RECORDS):raise PolicyError('Registros obrigatórios ausentes.')

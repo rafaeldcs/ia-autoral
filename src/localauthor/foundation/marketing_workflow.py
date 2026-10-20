@@ -17,6 +17,7 @@ from ..errors import ConflictError, NotFoundError, PolicyError
 from ..safety import reject_secrets
 from ..util import utcnow
 from .marketing_brand import MarketingBrandMixin
+from .grounding import unmentioned_features
 
 ROLES = {'product', 'audience', 'reference', 'channel', 'measurement', 'competitor', 'brand'}
 CHANNELS = {'instagram', 'facebook', 'youtube', 'linkedin', 'website', 'email', 'whatsapp'}
@@ -378,6 +379,8 @@ class MarketingWorkflow(MarketingBrandMixin):
             snapshot=next(r for r in item['research'] if r.get('source_id')==claim['source_id'])
             lines=self._source(project,snapshot)['content'].splitlines()
             if quote not in '\n'.join(lines[start-1:end]):raise PolicyError('O fato citado não está nas linhas indicadas.')
+        unsupported=unmentioned_features(caption+' '+description,'\n'.join(claim['text'] for claim in claims))
+        if unsupported:raise PolicyError('Recursos ausentes nos fatos citados: '+', '.join(unsupported)+'. Reescreva sem extrapolar funcionalidades.')
         return {'caption':candidate['caption'],'alt_text':candidate['alt_text'],'claims':claims,'fact_indices':indices}
 
     def approve(self, project, ident, digest, reviewed):

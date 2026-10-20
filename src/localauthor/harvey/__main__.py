@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import uuid
+from dataclasses import replace
 
 from ..errors import PolicyError
 from ..foundation.models import ModelSpec
@@ -24,6 +25,7 @@ def main(argv=None):
     run.add_argument('--output',type=Path,required=True);run.add_argument('--image',required=True)
     source=run.add_mutually_exclusive_group(required=True);source.add_argument('--suite',type=Path);source.add_argument('--original',action='store_true')
     run.add_argument('--max-cases',type=int);run.add_argument('--max-turns',type=int,default=6);run.add_argument('--resume',action='store_true')
+    run.add_argument('--context-tokens',type=int,choices=[4096,8192],help='Perfil experimental local; não altera o manifesto do servidor')
     args=parser.parse_args(argv)
     args.upstream=args.upstream.resolve();args.output=args.output.resolve()
     catalog,files=inventory(args.upstream)
@@ -34,6 +36,7 @@ def main(argv=None):
     if not 1<=args.max_turns<=200:raise PolicyError('Número de turnos inválido.')
     spec=ModelSpec.load(args.home.resolve()/'foundation/text-model.json','text')
     if spec.backend!='gguf-docker':raise PolicyError('Esta integração exige o runtime GGUF Docker local verificado.')
+    if args.context_tokens:spec=replace(spec,context_tokens=args.context_tokens)
     if args.suite:
         suite=json.loads(args.suite.read_text(encoding='utf-8'))
         if suite.get('schema')!=1 or suite.get('frozen') is not True or not suite.get('cases'):raise PolicyError('Congele os critérios antes de executar.')
@@ -47,7 +50,7 @@ def main(argv=None):
             cases.append(case)
     else:cases=catalog['tasks']
     frozen={'revision':REVISION,'adapter_sha256':adapter_hash(),'suite_sha256':content_hash(cases),'model_manifest':spec.manifest_sha256,'json_output':True,
-            'image':args.image,'max_turns':args.max_turns,'total':len(cases),'judge_independent':False,'human_review_required':True}
+            'image':args.image,'max_turns':args.max_turns,'context_tokens':spec.context_tokens,'output_tokens':spec.output_tokens,'total':len(cases),'judge_independent':False,'human_review_required':True}
     if args.resume:
         state=json.loads((args.output/'state.json').read_text(encoding='utf-8'))
         if state['frozen']!=frozen:raise PolicyError('Retomada exige mesmos casos, modelo, imagem e orçamento.')
@@ -63,9 +66,10 @@ def main(argv=None):
             if row['status'] not in {'pending','interrupted'}:continue
             if args.max_cases is not None and processed>=args.max_cases:break
             if (args.output/'STOP_AFTER_CASE').exists():break
-            processed+=1;row.update(status='running');atomic(args.output/'state.json',state)
+            processed+=1;row.update(status='running');atomic(args.output/'state.json',state);write_report(args.output,state['cases'],detailed=False)
             attempt=args.output/('case-'+content_hash(case['id'])[:12]+'-'+uuid.uuid4().hex[:8]);attempt.mkdir()
             row['attempt']=attempt.name;(attempt/'documents').mkdir()
+            atomic(args.output/'state.json',state)
             try:
                 if args.suite:
                     task=case['task']
@@ -74,15 +78,17 @@ def main(argv=None):
                 else:
                     documents=args.output/'corpus'/content_hash(case['documents_prefix'])[:16];documents.mkdir(parents=True,exist_ok=True)
                     task=original_task(args.upstream,case,files,documents)
-                if engine and (engine.closed or getattr(engine,'harvey_calls',0)+args.max_turns+len(task['criteria'])+5>=4800):
+                # Include exact-token recounts during paging, not only generated
+                # answers, in the runtime's 10,000-request lifetime.
+                if engine and (engine.closed or getattr(engine,'harvey_rpc_calls',0)+34*args.max_turns+2*len(task['criteria'])+128>=9600):
                     engine.close();engine=None
                 if engine is None:
                     spec.verify();engine=DockerGgufRuntime(spec,diagnostics=args.output/'runtime',json_output=True)
                 result=run_case(task,attempt,args.image,engine,args.max_turns,documents=documents if not args.suite else None)
                 required=set(task.get('deliverables',{}).values()) or {name for criterion in task['criteria'] for name in criterion.get('deliverables',[])}
                 artifacts_present=required.issubset(result['deliverables'])
-                passed=(result['scores']['score']==1.0 and result['metrics']['finished_cleanly'] and artifacts_present)
-                row.update(status='provisional_pass' if passed else 'failed',scores=result['scores'],metrics=result['metrics'],human_review_required=True,required_artifacts_present=artifacts_present)
+                passed=(result['scores']['score']==1.0 and result['metrics']['finished_cleanly'] and artifacts_present and not result['grounding']['unsupported_families'])
+                row.update(status='provisional_pass' if passed else 'failed',scores=result['scores'],metrics=result['metrics'],grounding=result['grounding'],human_review_required=True,required_artifacts_present=artifacts_present)
                 write_report(attempt,[row])
                 # Keep the full original metrics and criteria in result.json;
                 # the global checkpoint remains small for thousands of tasks.
